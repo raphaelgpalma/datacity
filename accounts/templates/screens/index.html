@@ -6,14 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataCity</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .logo-icon img {
+            width: 120px; /* Ajuste o tamanho conforme necessário */
+            height: auto; /* Mantém a proporção */
+        }
+        /* Se preferir, pode adicionar estas classes ao seu arquivo CSS principal */
+        
+        /* Opções de tamanho alternativas:
+        .logo-icon img.small {
+            width: 80px;
+        }
+        .logo-icon img.medium {
+            width: 120px;
+        }
+        .logo-icon img.large {
+            width: 160px;
+        } */
+    </style>
 </head>
 <body>
     <header>
         <div class="logo">
             <div class="logo-icon">
-                <img src="{% static 'img/Logo.png' %}" alt="DataCity Logo">
+                <img src="{% static 'img/Logo.png' %}" alt="DataCity Logo" width="120" height="auto">
             </div>
-            DataCity
         </div>
         <div class="user-controls">
             <button class="notification-btn">
@@ -34,39 +51,13 @@
             </div>
         </div>
     </header>
-
     <main>
-        {% if username %}
-        <p>Bem-vindo, {{ username }}</p>
-        {% endif %}
-        
-        <div class="container">
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            
-            <div class="card">
-                <h2>Bem-vindo ao DataCity</h2>
-                <p>Uma plataforma para visualização de indicadores urbanos.</p>
-                
-                {% if dimensoes_count %}
-                <div class="stats">
-                    <p>Total de Dimensões: {{ dimensoes_count }}</p>
-                    <p>Total de Indicadores: {{ indicadores_count }}</p>
-                </div>
-                {% endif %}
-                
-                <a href="{% url 'dimensoes' %}" class="btn">Ver Dimensões</a>
-            </div>
+        <div id="content-container">
+            {% block content %}
+            {% include "screens/dimensoes.html" %}
+            {% endblock %}
         </div>
     </main>
-
     <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
