@@ -519,3 +519,11 @@ def indicador_detalhes(request, dimensao_id, indicador_id):
     except ValueError:
         messages.error(request, 'ID do indicador inválido')
         return redirect('indicadores', dimensao_id=dimensao_id)
+    
+
+    # Em accounts/views.py
+def modal_dimensoes(request):
+    return render(request, 'screens/modals-dimensoes.html')
+
+def modal_indicadores(request):
+    return render(request, 'screens/modals-indicadores.html')
