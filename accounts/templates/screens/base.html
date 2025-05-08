@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DataCity{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <h1>DataCity</h1>
+        {% if username %}
+        <p>Bem-vindo, {{ username }}</p>
+        {% endif %}
+    </header>
+    
+    <nav>
+        <a href="{% url 'index' %}">Início</a>
+        <a href="{% url 'dimensoes' %}">Dimensões</a>
+        <a href="{% url 'indicadores' %}">Indicadores</a>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        {% if username %}
+        <a href="{% url 'logout' %}">Sair</a>
+        {% else %}
+        <a href="{% url 'login' %}">Entrar</a>
+        <a href="{% url 'register' %}">Registrar</a>
+        {% endif %}
+    </nav>
+    
+    <div class="container">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

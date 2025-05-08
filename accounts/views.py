@@ -1,19 +1,26 @@
-from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm, LoginForm
 from .models import User
 import json
 import os
 from django.conf import settings
+from django.utils import timezone
+import mimetypes
+from pathlib import Path
+from django.contrib.staticfiles import finders
 from django.templatetags.static import static
 
+# Mock data for the application
 MOCK_DATA = {
     'dimensoes': [
         {'id': 'mobilidade', 'nome': 'Mobilidade', 'cor': '#FF8C00', 'ods': '9, 11', 'iso': 'ISO 37120'},
         {'id': 'urbanismo', 'nome': 'Urbanismo', 'cor': '#8A2BE2', 'ods': '11', 'iso': 'ISO 37122'},
-        {'id': 'educacao', 'nome': 'Educação', 'cor': 'transparent', 'ods': '4', 'iso': 'ISO 37120'},
+        {'id': 'educacao', 'nome': 'Educação', 'cor': '#4CAF50', 'ods': '4', 'iso': 'ISO 37120'},
         {'id': 'seguranca', 'nome': 'Segurança', 'cor': '#00CED1', 'ods': '16', 'iso': 'ISO 37120'},
         {'id': 'governanca', 'nome': 'Governança', 'cor': '#FF00FF', 'ods': '16, 17', 'iso': 'ISO 37122'},
         {'id': 'economia', 'nome': 'Economia', 'cor': '#32CD32', 'ods': '8, 9', 'iso': 'ISO 37120'},
@@ -39,11 +46,22 @@ MOCK_DATA = {
     }
 }
 
+# Helper function to get the next ID for a new indicator
+def get_next_indicator_id(dimensao_id):
+    indicadores = MOCK_DATA['indicadores'].get(dimensao_id, [])
+    if not indicadores:
+        return 1
+    return max(ind['id'] for ind in indicadores) + 1
+
+# Authentication views
+@require_http_methods(["GET", "POST"])
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
+            # In a real application, you would hash the password
+            # For simplicity, we're keeping it as is
             user.save()
             messages.success(request, 'Cadastro realizado com sucesso!')
             return redirect('login')
@@ -51,6 +69,7 @@ def register(request):
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
 
+@require_http_methods(["GET", "POST"])
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -59,86 +78,128 @@ def login(request):
             password = form.cleaned_data['password']
             try:
                 user = User.objects.get(username=username, password=password)
-                messages.success(request, 'Login realizado com sucesso!')
-                return redirect('register')  # Pode mudar para outra página
+                # In a real app, you would use Django's built-in auth system
+                # For now, we'll simulate a session
+                request.session['user_id'] = user.id
+                request.session['username'] = user.username
+                messages.success(request, f'Bem-vindo, {user.username}!')
+                return redirect('index')
             except User.DoesNotExist:
                 messages.error(request, 'Usuário ou senha inválidos')
     else:
         form = LoginForm()
     return render(request, 'accounts/login.html', {'form': form})
 
-def get_next_indicator_id(dimensao_id):
-    indicadores = MOCK_DATA['indicadores'].get(dimensao_id, [])
-    if not indicadores:
-        return 1
-    return max(ind['id'] for ind in indicadores) + 1
+def logout(request):
+    # Clear all session data
+    request.session.flush()
+    messages.success(request, 'Logout realizado com sucesso!')
+    return redirect('login')
 
+# Main page views
 def index(request):
-    return render(request, 'screens/index.html')
-
-# View da página de dimensões
-def dimensoes(request):
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    # Pass user information to the template
     context = {
-        'dimensoes': MOCK_DATA['dimensoes']
+        'username': request.session.get('username', ''),
+        'dimensoes_count': len(MOCK_DATA['dimensoes']),
+        'indicadores_count': sum(len(inds) for inds in MOCK_DATA['indicadores'].values())
+    }
+    return render(request, 'screens/index.html', context)
+
+@require_http_methods(["GET"])
+def dimensoes(request):
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    context = {
+        'dimensoes': MOCK_DATA['dimensoes'],
+        'username': request.session.get('username', '')
     }
     return render(request, 'screens/dimensoes.html', context)
 
-# View da página de indicadores
+@require_http_methods(["GET"])
 def indicadores(request, dimensao_id=None):
-    # Se a dimensão não for especificada na URL, verificar se está na sessão
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    # If no dimension specified, use one from session or default to 'economia'
     if dimensao_id is None:
         dimensao_id = request.session.get('dimensao_id', 'economia')
     
-    # Encontrar a dimensão pelo ID
+    # Find dimension by ID
     dimensao = next((d for d in MOCK_DATA['dimensoes'] if d['id'] == dimensao_id), None)
     
     if not dimensao:
-        # Se a dimensão não for encontrada, redirecionar para a página de dimensões
+        messages.error(request, 'Dimensão não encontrada')
         return redirect('dimensoes')
     
-    # Guardar a dimensão selecionada na sessão
+    # Store selected dimension in session
     request.session['dimensao_id'] = dimensao_id
     request.session['dimensao_nome'] = dimensao['nome']
     
-    # Obter os indicadores da dimensão
+    # Get indicators for this dimension
     indicadores = MOCK_DATA['indicadores'].get(dimensao_id, [])
     
     context = {
         'dimensao': dimensao,
-        'indicadores': indicadores
+        'indicadores': indicadores,
+        'dimensoes': MOCK_DATA['dimensoes'],  # For navigation menu
+        'username': request.session.get('username', '')
     }
     
     return render(request, 'screens/indicadores.html', context)
 
-# API para obter dados de dimensões
+# API for dimensions
+@require_http_methods(["GET"])
 def api_dimensoes(request):
+    # Check if user is logged in via API
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Não autorizado'}, status=401)
+    
     return JsonResponse(MOCK_DATA['dimensoes'], safe=False)
 
-# API para obter dados de indicadores de uma dimensão
+# API for indicators
+@require_http_methods(["GET"])
 def api_indicadores(request, dimensao_id):
+    # Check if user is logged in via API
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Não autorizado'}, status=401)
+    
+    # Verify if dimension exists
+    if dimensao_id not in MOCK_DATA['indicadores']:
+        return JsonResponse({'error': 'Dimensão não encontrada'}, status=404)
+    
     indicadores = MOCK_DATA['indicadores'].get(dimensao_id, [])
     return JsonResponse(indicadores, safe=False)
 
-# API para criar uma nova dimensão
+# API to create a new dimension
 @csrf_exempt
+@require_http_methods(["POST"])
 def criar_dimensao(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Método não permitido'}, status=405)
+    # Check if user is logged in via API
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Não autorizado'}, status=401)
     
     try:
         data = json.loads(request.body)
         
-        # Validar dados
+        # Validate required fields
         required_fields = ['id', 'nome', 'cor']
         for field in required_fields:
             if field not in data:
                 return JsonResponse({'error': f'Campo obrigatório ausente: {field}'}, status=400)
         
-        # Verificar se o ID já existe
+        # Check if ID already exists
         if any(d['id'] == data['id'] for d in MOCK_DATA['dimensoes']):
             return JsonResponse({'error': 'Dimensão com este ID já existe'}, status=400)
         
-        # Adicionar nova dimensão
+        # Create new dimension
         nova_dimensao = {
             'id': data['id'],
             'nome': data['nome'],
@@ -148,7 +209,7 @@ def criar_dimensao(request):
         }
         
         MOCK_DATA['dimensoes'].append(nova_dimensao)
-        MOCK_DATA['indicadores'][data['id']] = []  # Inicializar lista vazia de indicadores
+        MOCK_DATA['indicadores'][data['id']] = []  # Initialize empty indicators list
         
         return JsonResponse(nova_dimensao, status=201)
     
@@ -157,22 +218,24 @@ def criar_dimensao(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# API para editar uma dimensão existente
+# API to edit an existing dimension
 @csrf_exempt
+@require_http_methods(["PUT"])
 def editar_dimensao(request, dimensao_id):
-    if request.method != 'PUT':
-        return JsonResponse({'error': 'Método não permitido'}, status=405)
+    # Check if user is logged in via API
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Não autorizado'}, status=401)
     
     try:
         data = json.loads(request.body)
         
-        # Encontrar a dimensão pelo ID
+        # Find dimension by ID
         dimensao = next((d for d in MOCK_DATA['dimensoes'] if d['id'] == dimensao_id), None)
         
         if not dimensao:
             return JsonResponse({'error': 'Dimensão não encontrada'}, status=404)
         
-        # Atualizar campos
+        # Update fields
         if 'nome' in data:
             dimensao['nome'] = data['nome']
         if 'cor' in data:
@@ -189,47 +252,51 @@ def editar_dimensao(request, dimensao_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# API para remover uma dimensão
+# API to remove a dimension
 @csrf_exempt
+@require_http_methods(["DELETE"])
 def remover_dimensao(request, dimensao_id):
-    if request.method != 'DELETE':
-        return JsonResponse({'error': 'Método não permitido'}, status=405)
+    # Check if user is logged in via API
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Não autorizado'}, status=401)
     
-    # Encontrar o índice da dimensão
+    # Find dimension index
     index = next((i for i, d in enumerate(MOCK_DATA['dimensoes']) if d['id'] == dimensao_id), None)
     
     if index is None:
         return JsonResponse({'error': 'Dimensão não encontrada'}, status=404)
     
-    # Remover a dimensão
+    # Remove dimension
     dimensao_removida = MOCK_DATA['dimensoes'].pop(index)
     
-    # Remover também os indicadores associados
+    # Remove associated indicators
     if dimensao_id in MOCK_DATA['indicadores']:
         del MOCK_DATA['indicadores'][dimensao_id]
     
     return JsonResponse({'success': True, 'removed': dimensao_removida})
 
-# API para adicionar um novo indicador a uma dimensão
+# API to add a new indicator to a dimension
 @csrf_exempt
+@require_http_methods(["POST"])
 def adicionar_indicador(request, dimensao_id):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Método não permitido'}, status=405)
+    # Check if user is logged in via API
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Não autorizado'}, status=401)
     
     try:
         data = json.loads(request.body)
         
-        # Validar dados
+        # Validate required fields
         required_fields = ['nome', 'dado']
         for field in required_fields:
             if field not in data:
                 return JsonResponse({'error': f'Campo obrigatório ausente: {field}'}, status=400)
         
-        # Verificar se a dimensão existe
+        # Check if dimension exists
         if dimensao_id not in MOCK_DATA['indicadores']:
             return JsonResponse({'error': 'Dimensão não encontrada'}, status=404)
         
-        # Criar novo indicador
+        # Create new indicator
         novo_indicador = {
             'id': get_next_indicator_id(dimensao_id),
             'nome': data['nome'],
@@ -239,7 +306,7 @@ def adicionar_indicador(request, dimensao_id):
             'iso': data.get('iso', '')
         }
         
-        # Adicionar à lista de indicadores da dimensão
+        # Add to dimension's indicators list
         MOCK_DATA['indicadores'][dimensao_id].append(novo_indicador)
         
         return JsonResponse(novo_indicador, status=201)
@@ -249,27 +316,29 @@ def adicionar_indicador(request, dimensao_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# API para editar um indicador existente
+# API to edit an existing indicator
 @csrf_exempt
+@require_http_methods(["PUT"])
 def editar_indicador(request, dimensao_id, indicador_id):
-    if request.method != 'PUT':
-        return JsonResponse({'error': 'Método não permitido'}, status=405)
+    # Check if user is logged in via API
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Não autorizado'}, status=401)
     
     try:
         data = json.loads(request.body)
-        indicador_id = int(indicador_id)  # Converter para inteiro
+        indicador_id = int(indicador_id)  # Convert to integer
         
-        # Verificar se a dimensão existe
+        # Check if dimension exists
         if dimensao_id not in MOCK_DATA['indicadores']:
             return JsonResponse({'error': 'Dimensão não encontrada'}, status=404)
         
-        # Encontrar o indicador
+        # Find the indicator
         indicador = next((ind for ind in MOCK_DATA['indicadores'][dimensao_id] if ind['id'] == indicador_id), None)
         
         if not indicador:
             return JsonResponse({'error': 'Indicador não encontrado'}, status=404)
         
-        # Atualizar campos
+        # Update fields
         if 'nome' in data:
             indicador['nome'] = data['nome']
         if 'dado' in data:
@@ -290,27 +359,29 @@ def editar_indicador(request, dimensao_id, indicador_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# API para excluir um indicador
+# API to delete an indicator
 @csrf_exempt
+@require_http_methods(["DELETE"])
 def excluir_indicador(request, dimensao_id, indicador_id):
-    if request.method != 'DELETE':
-        return JsonResponse({'error': 'Método não permitido'}, status=405)
+    # Check if user is logged in via API
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Não autorizado'}, status=401)
     
     try:
-        indicador_id = int(indicador_id)  # Converter para inteiro
+        indicador_id = int(indicador_id)  # Convert to integer
         
-        # Verificar se a dimensão existe
+        # Check if dimension exists
         if dimensao_id not in MOCK_DATA['indicadores']:
             return JsonResponse({'error': 'Dimensão não encontrada'}, status=404)
         
-        # Encontrar o índice do indicador
+        # Find indicator index
         indicadores = MOCK_DATA['indicadores'][dimensao_id]
         index = next((i for i, ind in enumerate(indicadores) if ind['id'] == indicador_id), None)
         
         if index is None:
             return JsonResponse({'error': 'Indicador não encontrado'}, status=404)
         
-        # Remover o indicador
+        # Remove indicator
         indicador_removido = indicadores.pop(index)
         
         return JsonResponse({'success': True, 'removed': indicador_removido})
@@ -320,65 +391,131 @@ def excluir_indicador(request, dimensao_id, indicador_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# API para gerar relatório (simulado)
+# API to generate a report (simulated)
+@require_http_methods(["GET"])
 def gerar_relatorio(request, dimensao_id):
-    # Verificar se a dimensão existe
+    # Check if user is logged in via API
+    if 'user_id' not in request.session:
+        return JsonResponse({'error': 'Não autorizado'}, status=401)
+    
+    # Check if dimension exists
     if dimensao_id not in MOCK_DATA['indicadores']:
         return JsonResponse({'error': 'Dimensão não encontrada'}, status=404)
     
-    # Em um cenário real, aqui você geraria um PDF ou outro formato de relatório
-    # Por enquanto, apenas retornamos os dados em formato diferente
+    # In a real scenario, you would generate a PDF or other report format
+    # For now, we just return the data in a different format
     
     dimensao = next((d for d in MOCK_DATA['dimensoes'] if d['id'] == dimensao_id), None)
     indicadores = MOCK_DATA['indicadores'][dimensao_id]
     
     relatorio = {
         'titulo': f'Relatório de {dimensao["nome"]}',
-        'data_geracao': 'Data atual seria inserida aqui',
+        'data_geracao': timezone.now().strftime('%d/%m/%Y %H:%M:%S'),
         'dimensao': dimensao,
         'indicadores': indicadores,
-        'total_indicadores': len(indicadores)
+        'total_indicadores': len(indicadores),
+        'usuario': request.session.get('username', '')
     }
     
     return JsonResponse(relatorio)
 
-# Função corrigida para servir arquivos estáticos
 def serve_static(request, path):
-    # Tentar encontrar o arquivo em diferentes diretórios
-    possible_paths = [
-        os.path.join(settings.BASE_DIR, 'templates', 'screens', path),
-        os.path.join(settings.BASE_DIR, 'templates', 'static', path),
-        os.path.join(settings.BASE_DIR, 'static', path),
-        os.path.join(settings.BASE_DIR, 'templates', path)
-    ]
-    
-    # Verificar cada caminho possível
-    for file_path in possible_paths:
-        if os.path.exists(file_path) and os.path.isfile(file_path):
-            with open(file_path, 'rb') as f:
-                file_content = f.read()
-            
-            # Determinar o tipo de conteúdo com base na extensão do arquivo
+    """Improved function to serve static files."""
+    # Try Django's staticfiles system first
+    static_file = finders.find(path)
+    if static_file:
+        content_type, encoding = mimetypes.guess_type(static_file)
+        if content_type is None:
             if path.endswith('.css'):
                 content_type = 'text/css'
             elif path.endswith('.js'):
                 content_type = 'application/javascript'
-            elif path.endswith('.png'):
-                content_type = 'image/png'
-            elif path.endswith('.jpg') or path.endswith('.jpeg'):
-                content_type = 'image/jpeg'
-            elif path.endswith('.svg'):
-                content_type = 'image/svg+xml'
-            elif path.endswith('.woff') or path.endswith('.woff2'):
-                content_type = 'application/font-woff'
-            elif path.endswith('.ttf'):
-                content_type = 'application/font-ttf'
-            elif path.endswith('.eot'):
-                content_type = 'application/vnd.ms-fontobject'
             else:
                 content_type = 'application/octet-stream'
-            
-            return HttpResponse(file_content, content_type=content_type)
+                
+        return FileResponse(open(static_file, 'rb'), content_type=content_type)
     
-    # Se não encontrar o arquivo em nenhum dos caminhos possíveis
-    return HttpResponse(f'Arquivo {path} não encontrado. Caminhos verificados: {possible_paths}', status=404)
+    # If not found in staticfiles, search through various directories
+    possible_paths = [
+        os.path.join(settings.BASE_DIR, 'static', path),
+        os.path.join(settings.BASE_DIR, 'templates', 'static', path),
+    ]
+    
+    for file_path in possible_paths:
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            content_type, encoding = mimetypes.guess_type(file_path)
+            if content_type is None:
+                if path.endswith('.css'):
+                    content_type = 'text/css'
+                elif path.endswith('.js'):
+                    content_type = 'application/javascript'
+                else:
+                    content_type = 'application/octet-stream'
+            
+            return FileResponse(open(file_path, 'rb'), content_type=content_type)
+    
+    # If file not found
+    return HttpResponse(f'Arquivo {path} não encontrado.', status=404)
+
+# Dashboard view
+def dashboard(request):
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    # Calculate some statistics for the dashboard
+    total_dimensoes = len(MOCK_DATA['dimensoes'])
+    total_indicadores = sum(len(inds) for inds in MOCK_DATA['indicadores'].values())
+    
+    # Get dimensions with most indicators
+    dim_with_indicators = [(d['id'], d['nome'], len(MOCK_DATA['indicadores'].get(d['id'], []))) 
+                          for d in MOCK_DATA['dimensoes']]
+    dim_with_indicators.sort(key=lambda x: x[2], reverse=True)
+    top_dimensions = dim_with_indicators[:5]
+    
+    context = {
+        'username': request.session.get('username', ''),
+        'total_dimensoes': total_dimensoes,
+        'total_indicadores': total_indicadores,
+        'top_dimensions': top_dimensions,
+        'dimensoes': MOCK_DATA['dimensoes']  # For navigation
+    }
+    
+    return render(request, 'screens/dashboard.html', context)
+
+# View for detailed indicators
+def indicador_detalhes(request, dimensao_id, indicador_id):
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    try:
+        indicador_id = int(indicador_id)
+        
+        # Check if dimension exists
+        if dimensao_id not in MOCK_DATA['indicadores']:
+            messages.error(request, 'Dimensão não encontrada')
+            return redirect('dimensoes')
+        
+        # Find the indicator
+        indicador = next((ind for ind in MOCK_DATA['indicadores'][dimensao_id] if ind['id'] == indicador_id), None)
+        
+        if not indicador:
+            messages.error(request, 'Indicador não encontrado')
+            return redirect('indicadores', dimensao_id=dimensao_id)
+        
+        # Find the dimension
+        dimensao = next((d for d in MOCK_DATA['dimensoes'] if d['id'] == dimensao_id), None)
+        
+        context = {
+            'username': request.session.get('username', ''),
+            'dimensao': dimensao,
+            'indicador': indicador,
+            'dimensoes': MOCK_DATA['dimensoes']  # For navigation
+        }
+        
+        return render(request, 'screens/indicador_detalhes.html', context)
+    
+    except ValueError:
+        messages.error(request, 'ID do indicador inválido')
+        return redirect('indicadores', dimensao_id=dimensao_id)

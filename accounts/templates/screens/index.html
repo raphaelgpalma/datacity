@@ -1,16 +1,17 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataCity</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <header>
         <div class="logo">
             <div class="logo-icon">
-                <img src="Logo.png" alt="DataCity Logo">
+                <img src="{% static 'img/Logo.png' %}" alt="DataCity Logo">
             </div>
             DataCity
         </div>
@@ -23,7 +24,7 @@
             </button>
             <div class="user-profile">
                 <div class="user-avatar">
-                    <img src="avatar.png" alt="Avatar do usuário" width="40" height="40">
+                    <img src="{% static 'img/avatar.png' %}" alt="Avatar do usuário" width="40" height="40">
                 </div>
                 <div class="dropdown-icon">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -35,9 +36,37 @@
     </header>
 
     <main>
-        <iframe id="content-frame" src="dimensoes.html" frameborder="0"></iframe>
+        {% if username %}
+        <p>Bem-vindo, {{ username }}</p>
+        {% endif %}
+        
+        <div class="container">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="card">
+                <h2>Bem-vindo ao DataCity</h2>
+                <p>Uma plataforma para visualização de indicadores urbanos.</p>
+                
+                {% if dimensoes_count %}
+                <div class="stats">
+                    <p>Total de Dimensões: {{ dimensoes_count }}</p>
+                    <p>Total de Indicadores: {{ indicadores_count }}</p>
+                </div>
+                {% endif %}
+                
+                <a href="{% url 'dimensoes' %}" class="btn">Ver Dimensões</a>
+            </div>
+        </div>
     </main>
 
-    <script src="script.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

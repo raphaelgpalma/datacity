@@ -28,4 +28,9 @@ urlpatterns = [
     
     # Arquivos estáticos
     path('static/<path:path>', views.serve_static, name='serve_static'),
+
+    # Add these to your urlpatterns in accounts/urls.py:
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('indicador/<str:dimensao_id>/<int:indicador_id>/', views.indicador_detalhes, name='indicador_detalhes'),
+    path('logout/', views.logout, name='logout'),
 ]

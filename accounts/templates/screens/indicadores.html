@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataCity - Indicadores</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body class="indicadores-page">
     <div id="indicadores-view" class="view active">
@@ -38,6 +39,6 @@
         <button id="voltar-dimensoes-btn" class="back-btn">Voltar para Dimensões</button>
     </div>
 
-    <script src="script.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
