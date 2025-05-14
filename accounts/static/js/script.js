@@ -96,19 +96,20 @@ function setupDimensoesPage() {
                     sessionStorage.setItem('dimensaoSelecionada', dimensaoId);
                     sessionStorage.setItem('dimensaoNome', dimensaoNome);
                     
-                    iframe.src = 'indicadores';
+                    iframe.src = '/indicadores';
                 } else {
                     // Fallback para redirecionamento direto se não estiver em um iframe
-                    window.location.href = 'indicadores';
+                    window.location.href = '/indicadores';
                 }
             } else {
                 // Fallback para redirecionamento direto se não estiver em um iframe
                 sessionStorage.setItem('dimensaoSelecionada', dimensaoId);
                 sessionStorage.setItem('dimensaoNome', dimensaoNome);
-                window.location.href = 'indicadores';
+                window.location.href = '/indicadores';
             }
         });
     });
+
 
     // Eventos para os botões de gerenciamento de dimensões
     const novaDimensaoBtn = document.getElementById('nova-dimensao-btn');

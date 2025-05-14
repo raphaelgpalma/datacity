@@ -92,16 +92,16 @@ function setupDimensoesPage() {
                     sessionStorage.setItem('dimensaoSelecionada', dimensaoId);
                     sessionStorage.setItem('dimensaoNome', dimensaoNome);
                     
-                    iframe.src = 'indicadores.html';
+                    iframe.src = '/indicadores';
                 } else {
                     // Fallback para redirecionamento direto se não estiver em um iframe
-                    window.location.href = 'indicadores.html';
+                    window.location.href = '/indicadores';
                 }
             } else {
                 // Fallback para redirecionamento direto se não estiver em um iframe
                 sessionStorage.setItem('dimensaoSelecionada', dimensaoId);
                 sessionStorage.setItem('dimensaoNome', dimensaoNome);
-                window.location.href = 'indicadores.html';
+                window.location.href = '/indicadores';
             }
         });
     });
