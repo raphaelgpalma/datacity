@@ -92,16 +92,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Create these directories if they don't exist
+# Create static directory if it doesn't exist
 os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'templates', 'static'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'accounts', 'static'), exist_ok=True)
 
 # Additional locations of static files
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'templates', 'static'),
-    os.path.join(BASE_DIR, 'accounts', 'static'),
 ]
 
 # Default primary key field type
