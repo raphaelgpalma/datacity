@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Normas - Datacity</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{% static 'css/styles2.css' %}">
 </head>
 <body>
     <header>
@@ -15,13 +16,13 @@
     <div class="menu-container">
         <h1 class="menu-title">Normas disponíveis</h1>
         <div class="nav-buttons">
-            <a href="index.html" class="back-btn">Voltar</a>
+            <a href="javascript:history.back()" class="back-btn">Voltar</a>
             <div class="search-container">
                 <input type="text" id="searchNorma" placeholder="Buscar norma...">
             </div>
         </div>
         <div class="menu-buttons" id="menuButtons">
-            <a href="iso37120.html" class="menu-btn">ISO 37120</a>
+            <a href="iso37120" class="menu-btn">ISO 37120</a>
             <a href="iso37122.html" class="menu-btn">ISO 37122</a>
             <a href="iso37123.html" class="menu-btn">ISO 37123</a>
         </div>
@@ -91,7 +92,7 @@
     <script>
         // Armazenar as normas
         let normas = [
-            { nome: 'ISO 37120', link: 'iso37120.html' },
+            { nome: 'ISO 37120', link: 'iso37120' },
             { nome: 'ISO 37122', link: 'iso37122.html' },
             { nome: 'ISO 37123', link: 'iso37123.html' }
         ];

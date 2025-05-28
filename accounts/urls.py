@@ -7,7 +7,12 @@ urlpatterns = [
 
      # Páginas principais
     path('', views.index, name='index'),
+    path('menu', views.menu, name='menu'),
     path('dimensoes/', views.dimensoes, name='dimensoes'),
+    path('normas/', views.normas, name='normas'),
+    path('plataformas/', views.plataformas, name='plataformas'),
+    path('plataformas/csc', views.csc, name='csc'),
+    path('normas/iso37120', views.iso37120, name='iso37120'),
     path('indicadores/', views.indicadores, name='indicadores'),
     path('indicadores/<str:dimensao_id>/', views.indicadores, name='indicadores_dimensao'),
     

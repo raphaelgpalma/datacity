@@ -253,7 +253,7 @@ function removerNorma() {
 // Armazenar as plataformas
 let plataformas = [
     { nome: 'Bright Cities', link: 'https://www.brightcities.city/smart-city-profile/Brazil-Parana-Londrina/5bde2add3f9f3d37162cb881' },
-    { nome: 'CSC', link: 'dimensoes.html' },
+    { nome: 'CSC', link: 'csc' },
     { nome: 'Inteli.gente', link: 'https://inteligente.mcti.gov.br/municipios/londrina' }
 ];
 

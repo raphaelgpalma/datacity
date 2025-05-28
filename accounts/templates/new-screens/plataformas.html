@@ -1,11 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plataformas - Datacity</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="{% static 'css/styles2.css' %}">
+    <script src="{% static 'js/script2.js' %}" defer></script>
 </head>
 <body>
     <header>
@@ -16,7 +17,7 @@
     <div class="menu-container">
         <h1 class="menu-title">Plataformas disponíveis</h1>
         <div class="nav-buttons">
-            <a href="index.html" class="back-btn">Voltar</a>
+            <a href="javascript:history.back()" class="back-btn">Voltar</a>
         </div>
         <div class="menu-buttons" id="menuButtons">
             <!-- Plataformas serão adicionadas aqui pelo JavaScript -->

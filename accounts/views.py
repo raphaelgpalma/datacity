@@ -110,6 +110,19 @@ def index(request):
     }
     return render(request, 'screens/index.html', context)
 
+def menu(request):
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    # Pass user information to the template
+    context = {
+        'username': request.session.get('username', ''),
+        'dimensoes_count': len(MOCK_DATA['dimensoes']),
+        'indicadores_count': sum(len(inds) for inds in MOCK_DATA['indicadores'].values())
+    }
+    return render(request, 'new-screens/menu.html', context)
+
 @require_http_methods(["GET"])
 def dimensoes(request):
     # Check if user is logged in
@@ -121,6 +134,7 @@ def dimensoes(request):
         'username': request.session.get('username', '')
     }
     return render(request, 'screens/dimensoes.html', context)
+
 
 @require_http_methods(["GET"])
 def indicadores(request, dimensao_id=None):
@@ -154,6 +168,54 @@ def indicadores(request, dimensao_id=None):
     }
     
     return render(request, 'screens/indicadores.html', context)
+
+@require_http_methods(["GET"])
+def normas(request):
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    context = {
+        'dimensoes': MOCK_DATA['dimensoes'],
+        'username': request.session.get('username', '')
+    }
+    return render(request, 'new-screens/normas.html', context)
+
+@require_http_methods(["GET"])
+def plataformas(request):
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    context = {
+        'dimensoes': MOCK_DATA['dimensoes'],
+        'username': request.session.get('username', '')
+    }
+    return render(request, 'new-screens/plataformas.html', context)
+
+@require_http_methods(["GET"])
+def csc(request):
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    context = {
+        'dimensoes': MOCK_DATA['dimensoes'],
+        'username': request.session.get('username', '')
+    }
+    return render(request, 'new-screens/csc.html', context)
+
+@require_http_methods(["GET"])
+def iso37120(request):
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    context = {
+        'dimensoes': MOCK_DATA['dimensoes'],
+        'username': request.session.get('username', '')
+    }
+    return render(request, 'new-screens/iso37120.html', context)
 
 # API for dimensions
 @require_http_methods(["GET"])
