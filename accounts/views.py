@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import RegisterForm, LoginForm
 from .models import User
 import json
@@ -59,10 +60,7 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            # In a real application, you would hash the password
-            # For simplicity, we're keeping it as is
-            user.save()
+            user = form.save()
             messages.success(request, 'Cadastro realizado com sucesso!')
             return redirect('login')
     else:
@@ -76,72 +74,67 @@ def login(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            try:
-                user = User.objects.get(username=username, password=password)
-                # In a real app, you would use Django's built-in auth system
-                # For now, we'll simulate a session
-                request.session['user_id'] = user.id
-                request.session['username'] = user.username
-                messages.success(request, f'Bem-vindo, {user.username}!')
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                auth_login(request, user)
+                
+                # Mensagem personalizada baseada no tipo de usuário
+                tipo_usuario = {
+                    'ADMIN': 'Administrador',
+                    'MANAGER': 'Gestor',
+                    'COMMON': 'Usuário Comum'
+                }.get(user.user_type, 'Usuário')
+                
+                messages.success(request, f'Bem-vindo, {user.username}! (Nível de acesso: {tipo_usuario})')
                 return redirect('index')
-            except User.DoesNotExist:
+            else:
                 messages.error(request, 'Usuário ou senha inválidos')
     else:
         form = LoginForm()
     return render(request, 'accounts/login.html', {'form': form})
 
 def logout(request):
-    # Clear all session data
-    request.session.flush()
+    auth_logout(request)
     messages.success(request, 'Logout realizado com sucesso!')
     return redirect('login')
 
 # Main page views
+@login_required
 def index(request):
-    # Check if user is logged in
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
     # Pass user information to the template
     context = {
-        'username': request.session.get('username', ''),
+        'username': request.user.username,
+        'user_type': request.user.user_type,
         'dimensoes_count': len(MOCK_DATA['dimensoes']),
         'indicadores_count': sum(len(inds) for inds in MOCK_DATA['indicadores'].values())
     }
     return render(request, 'screens/index.html', context)
 
+@login_required
 def menu(request):
-    # Check if user is logged in
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
     # Pass user information to the template
     context = {
-        'username': request.session.get('username', ''),
+        'username': request.user.username,
+        'user_type': request.user.user_type,
         'dimensoes_count': len(MOCK_DATA['dimensoes']),
         'indicadores_count': sum(len(inds) for inds in MOCK_DATA['indicadores'].values())
     }
     return render(request, 'new-screens/menu.html', context)
 
+@login_required
 @require_http_methods(["GET"])
 def dimensoes(request):
-    # Check if user is logged in
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
     context = {
         'dimensoes': MOCK_DATA['dimensoes'],
-        'username': request.session.get('username', '')
+        'username': request.user.username,
+        'user_type': request.user.user_type
     }
     return render(request, 'screens/dimensoes.html', context)
 
-
+@login_required
 @require_http_methods(["GET"])
 def indicadores(request, dimensao_id=None):
-    # Check if user is logged in
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
     # If no dimension specified, use one from session or default to 'economia'
     if dimensao_id is None:
         dimensao_id = request.session.get('dimensao_id', 'economia')
@@ -164,32 +157,29 @@ def indicadores(request, dimensao_id=None):
         'dimensao': dimensao,
         'indicadores': indicadores,
         'dimensoes': MOCK_DATA['dimensoes'],  # For navigation menu
-        'username': request.session.get('username', '')
+        'username': request.user.username,
+        'user_type': request.user.user_type
     }
     
     return render(request, 'screens/indicadores.html', context)
 
+@login_required
 @require_http_methods(["GET"])
 def normas(request):
-    # Check if user is logged in
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
     context = {
         'dimensoes': MOCK_DATA['dimensoes'],
-        'username': request.session.get('username', '')
+        'username': request.user.username,
+        'user_type': request.user.user_type
     }
     return render(request, 'new-screens/normas.html', context)
 
+@login_required
 @require_http_methods(["GET"])
 def plataformas(request):
-    # Check if user is logged in
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
     context = {
         'dimensoes': MOCK_DATA['dimensoes'],
-        'username': request.session.get('username', '')
+        'username': request.user.username,
+        'user_type': request.user.user_type
     }
     return render(request, 'new-screens/plataformas.html', context)
 

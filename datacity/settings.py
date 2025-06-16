@@ -24,6 +24,14 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
 ]
 
+# Configuração do modelo de usuário personalizado
+AUTH_USER_MODEL = 'accounts.User'
+
+# Configurações de login/logout
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'login'
+
 # This is the missing middleware configuration that was causing the error
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -83,8 +91,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+LANGUAGE_CODE = "pt-br"
+TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
 USE_TZ = True
 
