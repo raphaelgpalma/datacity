@@ -271,16 +271,28 @@ async function carregarPlataformas() {
     }
 }
 
+// Função para garantir que o link tenha o protocolo http/https
+function garantirUrlCompleta(link) {
+    if (!link) return link;
+    if (!link.startsWith('http://') && !link.startsWith('https://')) {
+        return 'https://' + link;
+    }
+    return link;
+}
+
 // Função para adicionar uma nova plataforma
 async function adicionarPlataforma() {
     const nome = document.getElementById('nomePlataforma').value.trim();
-    const link = document.getElementById('linkPlataforma').value.trim();
+    let link = document.getElementById('linkPlataforma').value.trim();
    
     // Validar campos
     if (!nome || !link) {
         alert('Preencha todos os campos.');
         return;
     }
+
+    // Garantir que o link tenha o protocolo
+    link = garantirUrlCompleta(link);
    
     try {
         const response = await fetch('/plataformas/adicionar/', {
@@ -310,13 +322,16 @@ async function adicionarPlataforma() {
 async function editarPlataforma() {
     const plataformaId = document.getElementById('selectPlataforma').value;
     const novoNome = document.getElementById('editNomePlataforma').value.trim();
-    const novoLink = document.getElementById('editLinkPlataforma').value.trim();
+    let novoLink = document.getElementById('editLinkPlataforma').value.trim();
    
     // Validar campos
     if (!plataformaId || !novoNome || !novoLink) {
         alert('Preencha todos os campos.');
         return;
     }
+
+    // Garantir que o link tenha o protocolo
+    novoLink = garantirUrlCompleta(novoLink);
    
     try {
         const response = await fetch(`/plataformas/editar/${plataformaId}/`, {
@@ -396,7 +411,7 @@ function getCookie(name) {
 // Função para ordenar e exibir plataformas
 function ordenarEExibirPlataformas() {
     // Ordenar plataformas alfabeticamente
-    plataformas.sort((a, b) => a.nome.localeCompare(b.nome));
+    plataformas.sort((a, b) => a.name.localeCompare(b.name));
    
     // Atualizar a exibição das plataformas
     atualizarExibicaoPlataformas();
@@ -412,7 +427,7 @@ function atualizarExibicaoPlataformas(filtro = '') {
    
     // Filtrar plataformas se houver um filtro
     const plataformasFiltradas = filtro
-        ? plataformas.filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase()))
+        ? plataformas.filter(p => p.name.toLowerCase().includes(filtro.toLowerCase()))
         : plataformas;
    
     // Adicionar cada plataforma ao menu
@@ -420,10 +435,8 @@ function atualizarExibicaoPlataformas(filtro = '') {
         const link = document.createElement('a');
         link.href = plataforma.link;
         link.className = 'menu-btn';
-        if (plataforma.link.startsWith('http')) {
-            link.target = '_blank';
-        }
-        link.textContent = plataforma.nome;
+        link.target = '_blank'; // Sempre abrir em nova aba
+        link.textContent = plataforma.name;
         menuButtons.appendChild(link);
     });
    
@@ -456,14 +469,14 @@ function atualizarSelectsPopups() {
     plataformas.forEach(plataforma => {
         // Adicionar ao select de edição
         const optionEdit = document.createElement('option');
-        optionEdit.value = plataforma.nome;
-        optionEdit.textContent = plataforma.nome;
+        optionEdit.value = plataforma.id;
+        optionEdit.textContent = plataforma.name;
         selectPlataforma.appendChild(optionEdit);
        
         // Adicionar ao select de remoção
         const optionRemove = document.createElement('option');
-        optionRemove.value = plataforma.nome;
-        optionRemove.textContent = plataforma.nome;
+        optionRemove.value = plataforma.id;
+        optionRemove.textContent = plataforma.name;
         removePlataforma.appendChild(optionRemove);
     });
 }
@@ -476,9 +489,9 @@ function abrirPopup(tipo) {
     if (tipo === 'editar') {
         const selectPlataforma = document.getElementById('selectPlataforma');
         selectPlataforma.addEventListener('change', function() {
-            const plataformaSelecionada = plataformas.find(p => p.nome === this.value);
+            const plataformaSelecionada = plataformas.find(p => p.name === this.value);
             if (plataformaSelecionada) {
-                document.getElementById('editNomePlataforma').value = plataformaSelecionada.nome;
+                document.getElementById('editNomePlataforma').value = plataformaSelecionada.name;
                 document.getElementById('editLinkPlataforma').value = plataformaSelecionada.link;
             } else {
                 document.getElementById('editNomePlataforma').value = '';

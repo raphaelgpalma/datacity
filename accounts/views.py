@@ -6,7 +6,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import RegisterForm, LoginForm
-from .models import User
+from .models import User, Platform, Norm
 import json
 import os
 from django.conf import settings
@@ -15,6 +15,7 @@ import mimetypes
 from pathlib import Path
 from django.contrib.staticfiles import finders
 from django.templatetags.static import static
+from .decorators import admin_required, manager_required
 
 # Mock data for the application
 MOCK_DATA = {
@@ -164,24 +165,82 @@ def indicadores(request, dimensao_id=None):
     return render(request, 'screens/indicadores.html', context)
 
 @login_required
-@require_http_methods(["GET"])
 def normas(request):
-    context = {
-        'dimensoes': MOCK_DATA['dimensoes'],
-        'username': request.user.username,
-        'user_type': request.user.user_type
-    }
-    return render(request, 'new-screens/normas.html', context)
+    norms = Norm.objects.all()
+    return render(request, 'accounts/normas.html', {'norms': norms})
 
 @login_required
-@require_http_methods(["GET"])
 def plataformas(request):
-    context = {
-        'dimensoes': MOCK_DATA['dimensoes'],
-        'username': request.user.username,
-        'user_type': request.user.user_type
-    }
-    return render(request, 'new-screens/plataformas.html', context)
+    platforms = Platform.objects.all()
+    return render(request, 'accounts/plataformas.html', {'platforms': platforms})
+
+@login_required
+@manager_required
+def adicionar_plataforma(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        link = request.POST.get('link')
+        
+        if name and link:
+            platform = Platform.objects.create(
+                name=name,
+                link=link,
+                created_by=request.user
+            )
+            return JsonResponse({
+                'status': 'success',
+                'platform': {
+                    'name': platform.name,
+                    'link': platform.link
+                }
+            })
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+@manager_required
+def editar_plataforma(request, platform_id):
+    platform = get_object_or_404(Platform, id=platform_id)
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        link = request.POST.get('link')
+        
+        if name and link:
+            platform.name = name
+            platform.link = link
+            platform.save()
+            return JsonResponse({
+                'status': 'success',
+                'platform': {
+                    'name': platform.name,
+                    'link': platform.link
+                }
+            })
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+@manager_required
+def remover_plataforma(request, platform_id):
+    platform = get_object_or_404(Platform, id=platform_id)
+    
+    if request.method == 'POST':
+        platform.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+def listar_plataformas(request):
+    platforms = Platform.objects.all()
+    return JsonResponse({
+        'status': 'success',
+        'platforms': [
+            {
+                'id': p.id,
+                'name': p.name,
+                'link': p.link
+            } for p in platforms
+        ]
+    })
 
 @require_http_methods(["GET"])
 def csc(request):
@@ -579,3 +638,71 @@ def modal_dimensoes(request):
 
 def modal_indicadores(request):
     return render(request, 'screens/modals-indicadores.html')
+
+@login_required
+@manager_required
+def adicionar_norma(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        link = request.POST.get('link')
+        
+        if name and link:
+            norm = Norm.objects.create(
+                name=name,
+                link=link,
+                created_by=request.user
+            )
+            return JsonResponse({
+                'status': 'success',
+                'norm': {
+                    'name': norm.name,
+                    'link': norm.link
+                }
+            })
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+@manager_required
+def editar_norma(request, norm_id):
+    norm = get_object_or_404(Norm, id=norm_id)
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        link = request.POST.get('link')
+        
+        if name and link:
+            norm.name = name
+            norm.link = link
+            norm.save()
+            return JsonResponse({
+                'status': 'success',
+                'norm': {
+                    'name': norm.name,
+                    'link': norm.link
+                }
+            })
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+@manager_required
+def remover_norma(request, norm_id):
+    norm = get_object_or_404(Norm, id=norm_id)
+    
+    if request.method == 'POST':
+        norm.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+def listar_normas(request):
+    norms = Norm.objects.all()
+    return JsonResponse({
+        'status': 'success',
+        'norms': [
+            {
+                'id': n.id,
+                'name': n.name,
+                'link': n.link
+            } for n in norms
+        ]
+    })

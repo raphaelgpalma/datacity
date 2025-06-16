@@ -41,4 +41,15 @@ urlpatterns = [
 
     path('modals/dimensoes/', views.modal_dimensoes, name='modal-dimensoes'),
     path('modals/indicadores/', views.modal_indicadores, name='modal-indicadores'),
+
+    path('plataformas/adicionar/', views.adicionar_plataforma, name='adicionar_plataforma'),
+    path('plataformas/editar/<int:platform_id>/', views.editar_plataforma, name='editar_plataforma'),
+    path('plataformas/remover/<int:platform_id>/', views.remover_plataforma, name='remover_plataforma'),
+    path('plataformas/listar/', views.listar_plataformas, name='listar_plataformas'),
+
+    # APIs para normas
+    path('normas/adicionar_norma/', views.adicionar_norma, name='adicionar_norma'),
+    path('normas/editar_norma/<int:norm_id>/', views.editar_norma, name='editar_norma'),
+    path('normas/remover_norma/<int:norm_id>/', views.remover_norma, name='remover_norma'),
+    path('normas/listar_normas/', views.listar_normas, name='listar_normas'),
 ]

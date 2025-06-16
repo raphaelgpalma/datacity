@@ -1,0 +1,284 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Normas - Datacity</title>
+    <link rel="stylesheet" href="{% static 'css/styles2.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'img/Logo.png' %}" alt="Logo">
+        </div>
+    </header>
+    <div class="menu-container">
+        <h1 class="menu-title">Normas disponíveis</h1>
+        <div class="nav-buttons">
+            <a href="javascript:history.back()" class="back-btn">Voltar</a>
+            <div class="search-container">
+                <input type="text" id="searchNorma" placeholder="Buscar norma...">
+            </div>
+        </div>
+        <div class="menu-buttons" id="menuButtons">
+            {% for norm in norms %}
+            <a href="{% if norm.link|slice:":4" == 'http' %}{{ norm.link }}{% else %}https://{{ norm.link }}{% endif %}" class="menu-btn" target="_blank">
+                {{ norm.name }}
+            </a>
+            {% endfor %}
+        </div>
+        <!-- Botões de gerenciamento -->
+        <div class="admin-actions">
+            <button class="action-button add" onclick="abrirPopup('adicionar-norma')">
+                <span class="icon">+</span>
+                <span class="label">Adicionar</span>
+            </button>
+            <button class="action-button edit" onclick="abrirPopup('editar-norma')">
+                <span class="icon">✎</span>
+                <span class="label">Editar</span>
+            </button>
+            <button class="action-button remove" onclick="abrirPopup('remover-norma')">
+                <span class="icon">×</span>
+                <span class="label">Remover</span>
+            </button>
+        </div>
+    </div>
+    <!-- Popup Adicionar -->
+    <div id="popup-adicionar-norma" class="popup">
+        <div class="popup-content">
+            <h2>Adicionar nova norma</h2>
+            <input type="text" id="nomeNorma" placeholder="Nome da norma">
+            <input type="url" id="linkNorma" placeholder="Link da norma (opcional)">
+            <div class="popup-actions">
+                <button onclick="adicionarNorma()">Adicionar</button>
+                <button onclick="fecharPopup('adicionar-norma')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <!-- Popup Editar -->
+    <div id="popup-editar-norma" class="popup">
+        <div class="popup-content">
+            <h2>Editar norma</h2>
+            <select id="selectNorma">
+                <option value="">Selecione uma norma</option>
+                {% for norm in norms %}
+                <option value="{{ norm.id }}">{{ norm.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" id="editNomeNorma" placeholder="Novo nome">
+            <input type="url" id="editLinkNorma" placeholder="Novo link">
+            <div class="popup-actions">
+                <button onclick="editarNorma()">Salvar</button>
+                <button onclick="fecharPopup('editar-norma')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <!-- Popup Remover -->
+    <div id="popup-remover-norma" class="popup">
+        <div class="popup-content">
+            <h2>Remover norma</h2>
+            <select id="removeNorma">
+                <option value="">Selecione uma norma</option>
+                {% for norm in norms %}
+                <option value="{{ norm.id }}">{{ norm.name }}</option>
+                {% endfor %}
+            </select>
+            <div class="popup-actions">
+                <button onclick="removerNorma()">Remover</button>
+                <button onclick="fecharPopup('remover-norma')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função executada quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            // Adicionar evento para filtrar ao digitar na busca
+            document.getElementById('searchNorma').addEventListener('input', filtrarNormas);
+        });
+
+        // Função para filtrar normas
+        function filtrarNormas() {
+            const filtro = document.getElementById('searchNorma').value.toLowerCase();
+            const botoes = document.querySelectorAll('.menu-btn');
+            
+            botoes.forEach(botao => {
+                const texto = botao.textContent.toLowerCase();
+                if (texto.includes(filtro)) {
+                    botao.style.display = 'block';
+                } else {
+                    botao.style.display = 'none';
+                }
+            });
+        }
+
+        // Função para abrir popup
+        function abrirPopup(tipo) {
+            document.getElementById(`popup-${tipo}`).style.display = 'flex';
+            
+            // Se for edição, configurar o evento de seleção de norma
+            if (tipo === 'editar-norma') {
+                const selectNorma = document.getElementById('selectNorma');
+                selectNorma.addEventListener('change', function() {
+                    const normaId = this.value;
+                    if (normaId) {
+                        // Buscar dados da norma selecionada
+                        fetch(`/accounts/listar_normas/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const norma = data.norms.find(n => n.id == normaId);
+                                if (norma) {
+                                    document.getElementById('editNomeNorma').value = norma.name;
+                                    document.getElementById('editLinkNorma').value = norma.link;
+                                }
+                            });
+                    } else {
+                        document.getElementById('editNomeNorma').value = '';
+                        document.getElementById('editLinkNorma').value = '';
+                    }
+                });
+            }
+        }
+
+        // Função para fechar popup
+        function fecharPopup(tipo) {
+            document.getElementById(`popup-${tipo}`).style.display = 'none';
+            
+            // Limpar campos
+            if (tipo === 'adicionar-norma') {
+                document.getElementById('nomeNorma').value = '';
+                document.getElementById('linkNorma').value = '';
+            } else if (tipo === 'editar-norma') {
+                document.getElementById('selectNorma').value = '';
+                document.getElementById('editNomeNorma').value = '';
+                document.getElementById('editLinkNorma').value = '';
+            } else if (tipo === 'remover-norma') {
+                document.getElementById('removeNorma').value = '';
+            }
+        }
+
+        // Função para adicionar uma nova norma
+        function adicionarNorma() {
+            const nome = document.getElementById('nomeNorma').value.trim();
+            let link = document.getElementById('linkNorma').value.trim();
+            
+            if (!nome) {
+                alert('Preencha pelo menos o nome da norma.');
+                return;
+            }
+
+            // Se não houver link, criar um baseado no nome
+            if (!link) {
+                link = `${nome.toLowerCase().replace(/\s+/g, '')}.com`;
+            }
+            
+            // Garantir que o link tenha http:// ou https://
+            if (!link.startsWith('http://') && !link.startsWith('https://')) {
+                link = 'https://' + link;
+            }
+            
+            fetch('/normas/adicionar_norma/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `name=${encodeURIComponent(nome)}&link=${encodeURIComponent(link)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Erro ao adicionar norma.');
+                }
+            });
+        }
+
+        // Função para editar norma
+        function editarNorma() {
+            const normaId = document.getElementById('selectNorma').value;
+            const nome = document.getElementById('editNomeNorma').value.trim();
+            let link = document.getElementById('editLinkNorma').value.trim();
+            
+            if (!normaId || !nome) {
+                alert('Selecione uma norma e preencha o nome.');
+                return;
+            }
+
+            // Se não houver link, criar um baseado no nome
+            if (!link) {
+                link = `${nome.toLowerCase().replace(/\s+/g, '')}.com`;
+            }
+            
+            // Garantir que o link tenha http:// ou https://
+            if (!link.startsWith('http://') && !link.startsWith('https://')) {
+                link = 'https://' + link;
+            }
+            
+            fetch(`/normas/editar_norma/${normaId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `name=${encodeURIComponent(nome)}&link=${encodeURIComponent(link)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Erro ao editar norma.');
+                }
+            });
+        }
+
+        // Função para remover norma
+        function removerNorma() {
+            const normaId = document.getElementById('removeNorma').value;
+            
+            if (!normaId) {
+                alert('Selecione uma norma para remover.');
+                return;
+            }
+            
+            if (!confirm('Tem certeza que deseja remover esta norma?')) {
+                return;
+            }
+            
+            fetch(`/normas/remover_norma/${normaId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Erro ao remover norma.');
+                }
+            });
+        }
+
+        // Função auxiliar para obter o token CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

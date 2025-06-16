@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Gerenciamento de Normas</h2>
+    
+    {% if user.user_type == 'manager' or user.user_type == 'admin' %}
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addNormModal">
+        Adicionar Nova Norma
+    </button>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Link</th>
+                    {% if user.user_type == 'manager' or user.user_type == 'admin' %}
+                    <th>Ações</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody id="normsTableBody">
+                {% for norm in norms %}
+                <tr data-norm-id="{{ norm.id }}">
+                    <td>{{ norm.name }}</td>
+                    <td><a href="{{ norm.link }}" target="_blank">{{ norm.link }}</a></td>
+                    {% if user.user_type == 'manager' or user.user_type == 'admin' %}
+                    <td>
+                        <button class="btn btn-sm btn-warning edit-norm" data-norm-id="{{ norm.id }}">Editar</button>
+                        <button class="btn btn-sm btn-danger delete-norm" data-norm-id="{{ norm.id }}">Remover</button>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Adicionar Norma -->
+<div class="modal fade" id="addNormModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Nova Norma</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addNormForm">
+                    <div class="mb-3">
+                        <label for="normName" class="form-label">Nome da Norma</label>
+                        <input type="text" class="form-control" id="normName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="normLink" class="form-label">Link</label>
+                        <input type="url" class="form-control" id="normLink" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveNormBtn">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Norma -->
+<div class="modal fade" id="editNormModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Norma</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editNormForm">
+                    <input type="hidden" id="editNormId">
+                    <div class="mb-3">
+                        <label for="editNormName" class="form-label">Nome da Norma</label>
+                        <input type="text" class="form-control" id="editNormName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editNormLink" class="form-label">Link</label>
+                        <input type="url" class="form-control" id="editNormLink" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="updateNormBtn">Atualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar Norma
+    document.getElementById('saveNormBtn').addEventListener('click', function() {
+        const name = document.getElementById('normName').value;
+        const link = document.getElementById('normLink').value;
+        
+        fetch('/accounts/adicionar_norma/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: `name=${encodeURIComponent(name)}&link=${encodeURIComponent(link)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            }
+        });
+    });
+
+    // Editar Norma
+    document.querySelectorAll('.edit-norm').forEach(button => {
+        button.addEventListener('click', function() {
+            const normId = this.dataset.normId;
+            const row = this.closest('tr');
+            const name = row.cells[0].textContent;
+            const link = row.cells[1].querySelector('a').href;
+            
+            document.getElementById('editNormId').value = normId;
+            document.getElementById('editNormName').value = name;
+            document.getElementById('editNormLink').value = link;
+            
+            new bootstrap.Modal(document.getElementById('editNormModal')).show();
+        });
+    });
+
+    document.getElementById('updateNormBtn').addEventListener('click', function() {
+        const normId = document.getElementById('editNormId').value;
+        const name = document.getElementById('editNormName').value;
+        const link = document.getElementById('editNormLink').value;
+        
+        fetch(`/accounts/editar_norma/${normId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: `name=${encodeURIComponent(name)}&link=${encodeURIComponent(link)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            }
+        });
+    });
+
+    // Remover Norma
+    document.querySelectorAll('.delete-norm').forEach(button => {
+        button.addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja remover esta norma?')) {
+                const normId = this.dataset.normId;
+                
+                fetch(`/accounts/remover_norma/${normId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    });
+
+    // Função auxiliar para obter o token CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %} 

@@ -253,144 +253,48 @@ function removerNorma() {
 // Armazenar as plataformas
 let plataformas = [
     { nome: 'Bright Cities', link: 'https://www.brightcities.city/smart-city-profile/Brazil-Parana-Londrina/5bde2add3f9f3d37162cb881' },
-    { nome: 'CSC', link: 'dimensoes.html' },
+    { nome: 'CSC', link: 'csc' },
     { nome: 'Inteli.gente', link: 'https://inteligente.mcti.gov.br/municipios/londrina' }
 ];
 
-// Função para carregar plataformas do servidor
-async function carregarPlataformas() {
-    try {
-        const response = await fetch('/plataformas/listar/');
-        const data = await response.json();
-        if (data.status === 'success') {
-            plataformas = data.platforms;
-            ordenarEExibirPlataformas();
-        }
-    } catch (error) {
-        console.error('Erro ao carregar plataformas:', error);
-    }
-}
+// Função executada quando a página carrega
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar caixa de busca
+    adicionarCaixaBusca();
+    // Ordenar e exibir plataformas
+    ordenarEExibirPlataformas();
+});
 
-// Função para adicionar uma nova plataforma
-async function adicionarPlataforma() {
-    const nome = document.getElementById('nomePlataforma').value.trim();
-    const link = document.getElementById('linkPlataforma').value.trim();
+// Função para adicionar caixa de busca
+function adicionarCaixaBusca() {
+    const navButtons = document.querySelector('.nav-buttons');
    
-    // Validar campos
-    if (!nome || !link) {
-        alert('Preencha todos os campos.');
-        return;
-    }
+    // Criar o elemento de busca
+    const searchContainer = document.createElement('div');
+    searchContainer.className = 'search-container';
+    searchContainer.style.marginLeft = '15px';
+    searchContainer.style.display = 'flex';
+    searchContainer.style.alignItems = 'center';
    
-    try {
-        const response = await fetch('/plataformas/adicionar/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: `name=${encodeURIComponent(nome)}&link=${encodeURIComponent(link)}`
-        });
-        
-        const data = await response.json();
-        if (data.status === 'success') {
-            await carregarPlataformas();
-            fecharPopup('adicionar');
-            alert('Plataforma adicionada com sucesso!');
-        } else {
-            alert('Erro ao adicionar plataforma.');
-        }
-    } catch (error) {
-        console.error('Erro ao adicionar plataforma:', error);
-        alert('Erro ao adicionar plataforma.');
-    }
-}
-
-// Função para editar plataforma
-async function editarPlataforma() {
-    const plataformaId = document.getElementById('selectPlataforma').value;
-    const novoNome = document.getElementById('editNomePlataforma').value.trim();
-    const novoLink = document.getElementById('editLinkPlataforma').value.trim();
+    // Criar o input de busca
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.id = 'searchPlataforma';
+    searchInput.placeholder = 'Buscar plataforma...';
+    searchInput.style.padding = '0.5rem';
+    searchInput.style.borderRadius = '6px';
+    searchInput.style.border = '1px solid #333';
+    searchInput.style.backgroundColor = '#2d2d3a';
+    searchInput.style.color = '#fff';
    
-    // Validar campos
-    if (!plataformaId || !novoNome || !novoLink) {
-        alert('Preencha todos os campos.');
-        return;
-    }
+    // Adicionar evento para filtrar ao digitar
+    searchInput.addEventListener('input', filtrarPlataformas);
    
-    try {
-        const response = await fetch(`/plataformas/editar/${plataformaId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: `name=${encodeURIComponent(novoNome)}&link=${encodeURIComponent(novoLink)}`
-        });
-        
-        const data = await response.json();
-        if (data.status === 'success') {
-            await carregarPlataformas();
-            fecharPopup('editar');
-            alert('Plataforma editada com sucesso!');
-        } else {
-            alert('Erro ao editar plataforma.');
-        }
-    } catch (error) {
-        console.error('Erro ao editar plataforma:', error);
-        alert('Erro ao editar plataforma.');
-    }
-}
-
-// Função para remover plataforma
-async function removerPlataforma() {
-    const plataformaId = document.getElementById('removePlataforma').value;
+    // Adicionar o input ao container
+    searchContainer.appendChild(searchInput);
    
-    // Validar seleção
-    if (!plataformaId) {
-        alert('Selecione uma plataforma para remover.');
-        return;
-    }
-   
-    // Confirmar remoção
-    if (confirm('Tem certeza que deseja remover esta plataforma?')) {
-        try {
-            const response = await fetch(`/plataformas/remover/${plataformaId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken')
-                }
-            });
-            
-            const data = await response.json();
-            if (data.status === 'success') {
-                await carregarPlataformas();
-                fecharPopup('remover');
-                alert('Plataforma removida com sucesso!');
-            } else {
-                alert('Erro ao remover plataforma.');
-            }
-        } catch (error) {
-            console.error('Erro ao remover plataforma:', error);
-            alert('Erro ao remover plataforma.');
-        }
-    }
-}
-
-// Função para obter o token CSRF
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
+    // Adicionar o container à navegação
+    navButtons.appendChild(searchContainer);
 }
 
 // Função para ordenar e exibir plataformas
@@ -505,8 +409,93 @@ function fecharPopup(tipo) {
     }
 }
 
-// Carregar plataformas quando a página carregar
-document.addEventListener('DOMContentLoaded', function() {
-    carregarPlataformas();
-    adicionarCaixaBusca();
-});
+// Função para adicionar uma nova plataforma
+function adicionarPlataforma() {
+    const nome = document.getElementById('nomePlataforma').value.trim();
+    const link = document.getElementById('linkPlataforma').value.trim();
+   
+    // Validar campos
+    if (!nome || !link) {
+        alert('Preencha todos os campos.');
+        return;
+    }
+   
+    // Verificar se já existe uma plataforma com esse nome
+    if (plataformas.some(p => p.nome.toLowerCase() === nome.toLowerCase())) {
+        alert('Já existe uma plataforma com esse nome.');
+        return;
+    }
+   
+    // Adicionar plataforma
+    plataformas.push({ nome, link });
+   
+    // Ordenar e exibir plataformas
+    ordenarEExibirPlataformas();
+   
+    // Fechar popup
+    fecharPopup('adicionar');
+   
+    // Mensagem de sucesso
+    alert('Plataforma adicionada com sucesso!');
+}
+
+// Função para editar plataforma
+function editarPlataforma() {
+    const plataformaSelecionada = document.getElementById('selectPlataforma').value;
+    const novoNome = document.getElementById('editNomePlataforma').value.trim();
+    const novoLink = document.getElementById('editLinkPlataforma').value.trim();
+   
+    // Validar campos
+    if (!plataformaSelecionada || !novoNome || !novoLink) {
+        alert('Preencha todos os campos.');
+        return;
+    }
+   
+    // Verificar se o novo nome já existe para outra plataforma
+    if (novoNome !== plataformaSelecionada &&
+        plataformas.some(p => p.nome.toLowerCase() === novoNome.toLowerCase())) {
+        alert('Já existe uma plataforma com esse nome.');
+        return;
+    }
+   
+    // Atualizar plataforma
+    const index = plataformas.findIndex(p => p.nome === plataformaSelecionada);
+    if (index !== -1) {
+        plataformas[index] = { nome: novoNome, link: novoLink };
+       
+        // Ordenar e exibir plataformas
+        ordenarEExibirPlataformas();
+       
+        // Fechar popup
+        fecharPopup('editar');
+       
+        // Mensagem de sucesso
+        alert('Plataforma editada com sucesso!');
+    }
+}
+
+// Função para remover plataforma
+function removerPlataforma() {
+    const plataformaSelecionada = document.getElementById('removePlataforma').value;
+   
+    // Validar seleção
+    if (!plataformaSelecionada) {
+        alert('Selecione uma plataforma para remover.');
+        return;
+    }
+   
+    // Confirmar remoção
+    if (confirm(`Tem certeza que deseja remover a plataforma ${plataformaSelecionada}?`)) {
+        // Remover plataforma
+        plataformas = plataformas.filter(p => p.nome !== plataformaSelecionada);
+       
+        // Atualizar exibição
+        ordenarEExibirPlataformas();
+       
+        // Fechar popup
+        fecharPopup('remover');
+       
+        // Mensagem de sucesso
+        alert('Plataforma removida com sucesso!');
+    }
+}
