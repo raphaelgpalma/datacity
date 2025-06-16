@@ -2,7 +2,7 @@ services:
   - type: web
     name: datacity
     env: python
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
     startCommand: gunicorn -c gunicorn_config.py datacity.wsgi:application
     envVars:
       - key: PYTHON_VERSION
@@ -10,4 +10,6 @@ services:
       - key: DJANGO_DEBUG
         value: "False"
       - key: DJANGO_SECRET_KEY
-        generateValue: true 
+        generateValue: true
+      - key: PIP_NO_CACHE_DIR
+        value: "1" 
