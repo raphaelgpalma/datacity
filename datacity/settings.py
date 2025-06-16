@@ -29,7 +29,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # Configurações de login/logout
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = '/menu'
 LOGOUT_REDIRECT_URL = 'login'
 
 # This is the missing middleware configuration that was causing the error
