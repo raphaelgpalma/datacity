@@ -5,6 +5,7 @@ cffi==1.17.1
 charset-normalizer==3.4.1
 Django==5.1.7
 et_xmlfile==2.0.0
+gunicorn==21.2.0
 h11==0.14.0
 idna==3.10
 lxml==5.3.1
