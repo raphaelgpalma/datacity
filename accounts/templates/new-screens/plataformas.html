@@ -7,11 +7,12 @@
     <title>Plataformas - Datacity</title>
     <link rel="stylesheet" href="{% static 'css/styles2.css' %}">
     <script src="{% static 'js/script2.js' %}" defer></script>
+    {% csrf_token %}
 </head>
 <body>
     <header>
         <div class="logo">
-            <img src="Logo.png" alt="Logo">
+            <img src="{% static 'Logo.png' %}" alt="Logo">
         </div>
     </header>
     <div class="menu-container">

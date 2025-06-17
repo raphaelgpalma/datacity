@@ -11,6 +11,7 @@ services:
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
       python manage.py migrate
+      python manage.py create_test_users
     startCommand: gunicorn -c gunicorn_config.py datacity.wsgi:application
     envVars:
       - key: PYTHON_VERSION

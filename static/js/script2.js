@@ -5,12 +5,17 @@ let normas = [
     { nome: 'ISO 37123', link: 'iso37123.html' }
 ];
 
+// Armazenar as plataformas
+let plataformas = [];
+
 // Função executada quando a página carrega
 document.addEventListener('DOMContentLoaded', function() {
     // Adicionar caixa de busca
     adicionarCaixaBusca();
     // Ordenar e exibir normas
     ordenarEExibirNormas();
+    // Carregar plataformas do servidor
+    carregarPlataformas();
 });
 
 // Função para adicionar caixa de busca
@@ -250,51 +255,22 @@ function removerNorma() {
     }
 }
 
-// Armazenar as plataformas
-let plataformas = [
-    { nome: 'Bright Cities', link: 'https://www.brightcities.city/smart-city-profile/Brazil-Parana-Londrina/5bde2add3f9f3d37162cb881' },
-    { nome: 'CSC', link: 'csc' },
-    { nome: 'Inteli.gente', link: 'https://inteligente.mcti.gov.br/municipios/londrina' }
-];
-
-// Função executada quando a página carrega
-document.addEventListener('DOMContentLoaded', function() {
-    // Adicionar caixa de busca
-    adicionarCaixaBusca();
-    // Ordenar e exibir plataformas
-    ordenarEExibirPlataformas();
-});
-
-// Função para adicionar caixa de busca
-function adicionarCaixaBusca() {
-    const navButtons = document.querySelector('.nav-buttons');
-   
-    // Criar o elemento de busca
-    const searchContainer = document.createElement('div');
-    searchContainer.className = 'search-container';
-    searchContainer.style.marginLeft = '15px';
-    searchContainer.style.display = 'flex';
-    searchContainer.style.alignItems = 'center';
-   
-    // Criar o input de busca
-    const searchInput = document.createElement('input');
-    searchInput.type = 'text';
-    searchInput.id = 'searchPlataforma';
-    searchInput.placeholder = 'Buscar plataforma...';
-    searchInput.style.padding = '0.5rem';
-    searchInput.style.borderRadius = '6px';
-    searchInput.style.border = '1px solid #333';
-    searchInput.style.backgroundColor = '#2d2d3a';
-    searchInput.style.color = '#fff';
-   
-    // Adicionar evento para filtrar ao digitar
-    searchInput.addEventListener('input', filtrarPlataformas);
-   
-    // Adicionar o input ao container
-    searchContainer.appendChild(searchInput);
-   
-    // Adicionar o container à navegação
-    navButtons.appendChild(searchContainer);
+// Função para carregar plataformas do servidor
+async function carregarPlataformas() {
+    try {
+        const response = await fetch('/plataformas/listar/');
+        const data = await response.json();
+        if (data.status === 'success') {
+            plataformas = data.platforms.map(p => ({
+                id: p.id,
+                nome: p.name,
+                link: p.link
+            }));
+            ordenarEExibirPlataformas();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar plataformas:', error);
+    }
 }
 
 // Função para ordenar e exibir plataformas
