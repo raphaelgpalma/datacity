@@ -12,4 +12,30 @@ services:
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: PIP_NO_CACHE_DIR
-        value: "1" 
+        value: "1"
+      - key: POSTGRES_DATABASE
+        fromDatabase:
+          name: datacity-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: datacity-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: datacity-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: datacity-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: datacity-db
+          property: port
+
+databases:
+  - name: datacity-db
+    databaseName: datacity
+    user: datacity
+    plan: free 
