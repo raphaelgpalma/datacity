@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),
+    path('api/scraping/', include('scraping.urls')),
 ]
 
 # Add this to serve static files during development

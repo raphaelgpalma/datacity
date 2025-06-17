@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "accounts.apps.AccountsConfig",
+    "scraping.apps.ScrapingConfig",
 ]
 
 # Configuração do modelo de usuário personalizado
