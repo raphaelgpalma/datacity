@@ -179,13 +179,32 @@ def plataformas(request):
     return render(request, 'accounts/plataformas.html', {'platforms': platforms})
 
 @login_required
-@manager_required
+def listar_plataformas(request):
+    platforms = Platform.objects.all()
+    return JsonResponse({
+        'status': 'success',
+        'plataformas': [
+            {
+                'id': p.id,
+                'name': p.name,
+                'link': p.link
+            } for p in platforms
+        ]
+    })
+
+@login_required
 def adicionar_plataforma(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         link = request.POST.get('link')
         
-        if name and link:
+        if not name or not link:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Nome e link são obrigatórios'
+            })
+        
+        try:
             platform = Platform.objects.create(
                 name=name,
                 link=link,
@@ -193,57 +212,70 @@ def adicionar_plataforma(request):
             )
             return JsonResponse({
                 'status': 'success',
-                'platform': {
-                    'name': platform.name,
-                    'link': platform.link
-                }
+                'message': 'Plataforma adicionada com sucesso'
             })
-    return JsonResponse({'status': 'error'}, status=400)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            })
+    
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Método não permitido'
+    })
 
 @login_required
-@manager_required
 def editar_plataforma(request, platform_id):
-    platform = get_object_or_404(Platform, id=platform_id)
-    
     if request.method == 'POST':
+        platform = get_object_or_404(Platform, id=platform_id)
         name = request.POST.get('name')
         link = request.POST.get('link')
         
-        if name and link:
+        if not name or not link:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Nome e link são obrigatórios'
+            })
+        
+        try:
             platform.name = name
             platform.link = link
             platform.save()
             return JsonResponse({
                 'status': 'success',
-                'platform': {
-                    'name': platform.name,
-                    'link': platform.link
-                }
+                'message': 'Plataforma editada com sucesso'
             })
-    return JsonResponse({'status': 'error'}, status=400)
-
-@login_required
-@manager_required
-def remover_plataforma(request, platform_id):
-    platform = get_object_or_404(Platform, id=platform_id)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            })
     
-    if request.method == 'POST':
-        platform.delete()
-        return JsonResponse({'status': 'success'})
-    return JsonResponse({'status': 'error'}, status=400)
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Método não permitido'
+    })
 
 @login_required
-def listar_plataformas(request):
-    platforms = Platform.objects.all()
+def remover_plataforma(request, platform_id):
+    if request.method == 'POST':
+        platform = get_object_or_404(Platform, id=platform_id)
+        try:
+            platform.delete()
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Plataforma removida com sucesso'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            })
+    
     return JsonResponse({
-        'status': 'success',
-        'platforms': [
-            {
-                'id': p.id,
-                'name': p.name,
-                'link': p.link
-            } for p in platforms
-        ]
+        'status': 'error',
+        'message': 'Método não permitido'
     })
 
 @require_http_methods(["GET"])
@@ -649,21 +681,14 @@ def adicionar_norma(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         link = request.POST.get('link')
-        
-        if name and link:
-            norm = Norm.objects.create(
-                name=name,
-                link=link,
-                created_by=request.user
-            )
-            return JsonResponse({
-                'status': 'success',
-                'norm': {
-                    'name': norm.name,
-                    'link': norm.link
-                }
-            })
-    return JsonResponse({'status': 'error'}, status=400)
+        if not name or not link:
+            return JsonResponse({'status': 'error', 'message': 'Nome e link são obrigatórios'})
+        try:
+            Norm.objects.create(name=name, link=link, created_by=request.user)
+            return JsonResponse({'status': 'success', 'message': 'Norma adicionada com sucesso'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return JsonResponse({'status': 'error', 'message': 'Método não permitido'})
 
 @login_required
 @manager_required
@@ -702,7 +727,7 @@ def listar_normas(request):
     norms = Norm.objects.all()
     return JsonResponse({
         'status': 'success',
-        'norms': [
+        'normas': [
             {
                 'id': n.id,
                 'name': n.name,

@@ -5,12 +5,17 @@ let normas = [
     { nome: 'ISO 37123', link: 'iso37123.html' }
 ];
 
+// Armazenar as plataformas
+let plataformas = [];
+
 // Função executada quando a página carrega
 document.addEventListener('DOMContentLoaded', function() {
     // Adicionar caixa de busca
     adicionarCaixaBusca();
     // Ordenar e exibir normas
     ordenarEExibirNormas();
+    // Carregar plataformas do servidor
+    carregarPlataformas();
 });
 
 // Função para adicionar caixa de busca
@@ -250,30 +255,26 @@ function removerNorma() {
     }
 }
 
-// Armazenar as plataformas
-let plataformas = [
-    { nome: 'Bright Cities', link: 'https://www.brightcities.city/smart-city-profile/Brazil-Parana-Londrina/5bde2add3f9f3d37162cb881' },
-    { nome: 'CSC', link: 'dimensoes.html' },
-    { nome: 'Inteli.gente', link: 'https://inteligente.mcti.gov.br/municipios/londrina' }
-];
-
 // Função para carregar plataformas do servidor
 async function carregarPlataformas() {
     try {
-        const response = await fetch('/plataformas/listar/');
+        const response = await fetch('/dashboard/plataformas/listar/');
         const data = await response.json();
+        
         if (data.status === 'success') {
-            plataformas = data.platforms;
+            plataformas = data.plataformas;
             ordenarEExibirPlataformas();
+            atualizarSelectsPopups();
+        } else {
+            console.error('Erro ao carregar plataformas:', data.message);
         }
     } catch (error) {
         console.error('Erro ao carregar plataformas:', error);
     }
 }
 
-// Função para garantir que o link tenha o protocolo http/https
+// Função para garantir que a URL tenha o protocolo
 function garantirUrlCompleta(link) {
-    if (!link) return link;
     if (!link.startsWith('http://') && !link.startsWith('https://')) {
         return 'https://' + link;
     }
@@ -283,19 +284,16 @@ function garantirUrlCompleta(link) {
 // Função para adicionar uma nova plataforma
 async function adicionarPlataforma() {
     const nome = document.getElementById('nomePlataforma').value.trim();
-    let link = document.getElementById('linkPlataforma').value.trim();
+    const link = garantirUrlCompleta(document.getElementById('linkPlataforma').value.trim());
    
     // Validar campos
     if (!nome || !link) {
         alert('Preencha todos os campos.');
         return;
     }
-
-    // Garantir que o link tenha o protocolo
-    link = garantirUrlCompleta(link);
    
     try {
-        const response = await fetch('/plataformas/adicionar/', {
+        const response = await fetch('/dashboard/plataformas/adicionar/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -305,16 +303,20 @@ async function adicionarPlataforma() {
         });
         
         const data = await response.json();
+        
         if (data.status === 'success') {
+            // Recarregar plataformas
             await carregarPlataformas();
+            // Fechar popup
             fecharPopup('adicionar');
+            // Mensagem de sucesso
             alert('Plataforma adicionada com sucesso!');
         } else {
-            alert('Erro ao adicionar plataforma.');
+            alert('Erro ao adicionar plataforma: ' + data.message);
         }
     } catch (error) {
         console.error('Erro ao adicionar plataforma:', error);
-        alert('Erro ao adicionar plataforma.');
+        alert('Erro ao adicionar plataforma. Tente novamente.');
     }
 }
 
@@ -322,19 +324,16 @@ async function adicionarPlataforma() {
 async function editarPlataforma() {
     const plataformaId = document.getElementById('selectPlataforma').value;
     const novoNome = document.getElementById('editNomePlataforma').value.trim();
-    let novoLink = document.getElementById('editLinkPlataforma').value.trim();
+    const novoLink = garantirUrlCompleta(document.getElementById('editLinkPlataforma').value.trim());
    
     // Validar campos
     if (!plataformaId || !novoNome || !novoLink) {
         alert('Preencha todos os campos.');
         return;
     }
-
-    // Garantir que o link tenha o protocolo
-    novoLink = garantirUrlCompleta(novoLink);
    
     try {
-        const response = await fetch(`/plataformas/editar/${plataformaId}/`, {
+        const response = await fetch(`/dashboard/plataformas/editar/${plataformaId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -344,16 +343,20 @@ async function editarPlataforma() {
         });
         
         const data = await response.json();
+        
         if (data.status === 'success') {
+            // Recarregar plataformas
             await carregarPlataformas();
+            // Fechar popup
             fecharPopup('editar');
+            // Mensagem de sucesso
             alert('Plataforma editada com sucesso!');
         } else {
-            alert('Erro ao editar plataforma.');
+            alert('Erro ao editar plataforma: ' + data.message);
         }
     } catch (error) {
         console.error('Erro ao editar plataforma:', error);
-        alert('Erro ao editar plataforma.');
+        alert('Erro ao editar plataforma. Tente novamente.');
     }
 }
 
@@ -370,7 +373,7 @@ async function removerPlataforma() {
     // Confirmar remoção
     if (confirm('Tem certeza que deseja remover esta plataforma?')) {
         try {
-            const response = await fetch(`/plataformas/remover/${plataformaId}/`, {
+            const response = await fetch(`/dashboard/plataformas/remover/${plataformaId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken')
@@ -378,16 +381,20 @@ async function removerPlataforma() {
             });
             
             const data = await response.json();
+            
             if (data.status === 'success') {
+                // Recarregar plataformas
                 await carregarPlataformas();
+                // Fechar popup
                 fecharPopup('remover');
+                // Mensagem de sucesso
                 alert('Plataforma removida com sucesso!');
             } else {
-                alert('Erro ao remover plataforma.');
+                alert('Erro ao remover plataforma: ' + data.message);
             }
         } catch (error) {
             console.error('Erro ao remover plataforma:', error);
-            alert('Erro ao remover plataforma.');
+            alert('Erro ao remover plataforma. Tente novamente.');
         }
     }
 }
@@ -413,11 +420,8 @@ function ordenarEExibirPlataformas() {
     // Ordenar plataformas alfabeticamente
     plataformas.sort((a, b) => a.name.localeCompare(b.name));
    
-    // Atualizar a exibição das plataformas
+    // Atualizar a exibição
     atualizarExibicaoPlataformas();
-   
-    // Atualizar os selects nos popups
-    atualizarSelectsPopups();
 }
 
 // Função para atualizar a exibição das plataformas
@@ -435,7 +439,7 @@ function atualizarExibicaoPlataformas(filtro = '') {
         const link = document.createElement('a');
         link.href = plataforma.link;
         link.className = 'menu-btn';
-        link.target = '_blank'; // Sempre abrir em nova aba
+        link.target = '_blank';
         link.textContent = plataforma.name;
         menuButtons.appendChild(link);
     });
@@ -489,7 +493,7 @@ function abrirPopup(tipo) {
     if (tipo === 'editar') {
         const selectPlataforma = document.getElementById('selectPlataforma');
         selectPlataforma.addEventListener('change', function() {
-            const plataformaSelecionada = plataformas.find(p => p.name === this.value);
+            const plataformaSelecionada = plataformas.find(p => p.id === parseInt(this.value));
             if (plataformaSelecionada) {
                 document.getElementById('editNomePlataforma').value = plataformaSelecionada.name;
                 document.getElementById('editLinkPlataforma').value = plataformaSelecionada.link;
@@ -517,9 +521,3 @@ function fecharPopup(tipo) {
         document.getElementById('removePlataforma').value = '';
     }
 }
-
-// Carregar plataformas quando a página carregar
-document.addEventListener('DOMContentLoaded', function() {
-    carregarPlataformas();
-    adicionarCaixaBusca();
-});
