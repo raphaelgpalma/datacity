@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datacity - Plataforma de Dados</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'img/Logo.png' %}">
+    <style>
+        .hero-section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(to bottom, #1c1c24, #121214);
+        }
+
+        .hero-logo {
+            width: 200px;
+            margin-bottom: 2rem;
+            animation: fadeIn 1.5s ease-in;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #f2f2f2;
+            animation: slideUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            animation: slideUp 1.2s ease-out;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            animation: slideUp 1.4s ease-out;
+        }
+
+        .cta-button {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .cta-primary {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .cta-primary:hover {
+            background-color: #0b5ed7;
+            transform: translateY(-4px);
+        }
+
+        .cta-secondary {
+            background-color: #2d2d3a;
+            color: white;
+        }
+
+        .cta-secondary:hover {
+            background-color: #3a3a4d;
+            transform: translateY(-4px);
+        }
+
+        .auth-buttons {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .auth-button {
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .auth-login {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .auth-login:hover {
+            background-color: #0b5ed7;
+        }
+
+        .auth-register {
+            background-color: #2d2d3a;
+            color: white;
+            border: 1px solid #0d6efd;
+        }
+
+        .auth-register:hover {
+            background-color: #3a3a4d;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .auth-buttons {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-buttons">
+        <a href="{% url 'login' %}" class="auth-button auth-login">Login</a>
+        <a href="{% url 'register' %}" class="auth-button auth-register">Registrar</a>
+    </div>
+    <div class="hero-section">
+        <img src="{% static 'img/Logo.png' %}" alt="Datacity Logo" class="hero-logo">
+        <h1 class="hero-title">Bem-vindo ao Datacity</h1>
+        <p class="hero-subtitle">Sua plataforma centralizada para gerenciamento e análise de dados urbanos. Acesse informações importantes sobre sua cidade de forma simples e eficiente.</p>
+        <div class="cta-buttons">
+            <a href="{% url 'login' %}" class="cta-button cta-primary">Acessar Plataforma</a>
+            <a href="#" class="cta-button cta-secondary">Saiba Mais</a>
+        </div>
+    </div>
+</body>
+</html> 

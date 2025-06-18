@@ -48,6 +48,10 @@ MOCK_DATA = {
     }
 }
 
+# Landing page view
+def landing(request):
+    return render(request, 'landing.html')
+
 # Helper function to get the next ID for a new indicator
 def get_next_indicator_id(dimensao_id):
     indicadores = MOCK_DATA['indicadores'].get(dimensao_id, [])

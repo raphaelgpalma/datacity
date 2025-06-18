@@ -5,9 +5,10 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
 
-     # Páginas principais
-    path('', views.menu, name='index'),
-    path('menu', views.menu, name='menu'),
+    # Páginas principais
+    path('', views.landing, name='landing'),  # Nova landing page
+    path('dashboard/', views.menu, name='index'),  # Menu principal agora é acessível via dashboard
+    path('menu/', views.menu, name='menu'),
     path('dimensoes/', views.dimensoes, name='dimensoes'),
     path('normas/', views.normas, name='normas'),
     path('plataformas/', views.plataformas, name='plataformas'),
