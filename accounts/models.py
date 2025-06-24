@@ -51,6 +51,7 @@ class Platform(models.Model):
 
     class Meta:
         ordering = ['name']
+        db_table = 'plataforma'
 
     def __str__(self):
         return self.name
@@ -64,6 +65,7 @@ class Norm(models.Model):
 
     class Meta:
         ordering = ['name']
+        db_table = 'norma'
 
     def __str__(self):
         return self.name
