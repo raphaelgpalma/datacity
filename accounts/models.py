@@ -7,6 +7,22 @@ class User(AbstractUser):
         MANAGER = 'MANAGER', 'Gestor'
         COMMON = 'COMMON', 'Usuário Comum'
 
+    id_usuario = models.AutoField(primary_key=True)  # Chave primária personalizada
+    nome = models.CharField(max_length=100, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    cpf = models.CharField(max_length=14, null=True, blank=True)  # CPF com formatação (000.000.000-00)
+    cidade = models.CharField(max_length=100, null=True, blank=True)
+    class CategoriaChoices(models.TextChoices):
+        ADMIN = 'ADMIN', 'Administrador'
+        MANAGER = 'MANAGER', 'Gestor'
+        COMMON = 'COMMON', 'Usuário'
+
+    categoria = models.CharField(
+        max_length=10,
+        choices=CategoriaChoices.choices,
+        null=True,
+        blank=True
+    )
     user_type = models.CharField(
         max_length=10,
         choices=UserType.choices,
