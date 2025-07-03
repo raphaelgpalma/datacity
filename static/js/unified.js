@@ -7,8 +7,9 @@
 // ========================================
 
 // Armazenar as normas
-let normas = [];
-
+let normas = [
+   
+];
 
 // Armazenar as plataformas
 let plataformas = [];

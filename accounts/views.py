@@ -278,27 +278,21 @@ def remover_plataforma(request, platform_id):
         'message': 'Método não permitido'
     })
 
+@login_required
 @require_http_methods(["GET"])
 def csc(request):
-    # Check if user is logged in
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
     context = {
         'dimensoes': MOCK_DATA['dimensoes'],
-        'username': request.session.get('username', '')
+        'username': request.user.username
     }
     return render(request, 'new-screens/csc.html', context)
 
+@login_required
 @require_http_methods(["GET"])
 def iso37120(request):
-    # Check if user is logged in
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
     context = {
         'dimensoes': MOCK_DATA['dimensoes'],
-        'username': request.session.get('username', '')
+        'username': request.user.username
     }
     return render(request, 'new-screens/iso37120.html', context)
 
@@ -724,14 +718,14 @@ def remover_norma(request, norm_id):
 
 @login_required
 def listar_normas(request):
-    norms = Norm.objects.all()
+    norms = list(Norm.objects.all().values('id', 'name', 'link'))
+    # Adiciona a norma estática
+    norms.append({
+        'id': 9999,  # Use um ID que não conflite com o banco
+        'name': 'ISO 37120',
+        'link': 'http://localhost:8000/dashboard/normas/iso37120/'
+    })
     return JsonResponse({
         'status': 'success',
-        'normas': [
-            {
-                'id': n.id,
-                'name': n.name,
-                'link': n.link
-            } for n in norms
-        ]
+        'normas': norms
     })
