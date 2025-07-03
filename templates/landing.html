@@ -112,6 +112,16 @@
             background-color: #3a3a4d;
         }
 
+        .auth-welcome {
+            color: #0d6efd;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(13, 110, 253, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(13, 110, 253, 0.3);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -152,16 +162,26 @@
 </head>
 <body>
     <div class="auth-buttons">
-        <a href="{% url 'login' %}" class="auth-button auth-login">Login</a>
-        <a href="{% url 'register' %}" class="auth-button auth-register">Registrar</a>
+        {% if is_authenticated %}
+            <span class="auth-welcome">Olá, {{ user.username }}!</span>
+            <a href="{% url 'logout' %}" class="auth-button auth-login">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="auth-button auth-login">Login</a>
+            <a href="{% url 'register' %}" class="auth-button auth-register">Registrar</a>
+        {% endif %}
     </div>
     <div class="hero-section">
         <img src="{% static 'img/Logo.png' %}" alt="Datacity Logo" class="hero-logo">
         <h1 class="hero-title">Bem-vindo ao Datacity</h1>
         <p class="hero-subtitle">Sua plataforma centralizada para gerenciamento e análise de dados urbanos. Acesse informações importantes sobre sua cidade de forma simples e eficiente.</p>
         <div class="cta-buttons">
-            <a href="{% url 'login' %}" class="cta-button cta-primary">Acessar Plataforma</a>
-            <a href="#" class="cta-button cta-secondary">Saiba Mais</a>
+            {% if is_authenticated %}
+                <a href="{% url 'index' %}" class="cta-button cta-primary">Acessar Plataforma</a>
+                <a href="#" class="cta-button cta-secondary">Saiba Mais</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="cta-button cta-primary">Acessar Plataforma</a>
+                <a href="#" class="cta-button cta-secondary">Saiba Mais</a>
+            {% endif %}
         </div>
     </div>
 </body>

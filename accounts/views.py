@@ -50,7 +50,11 @@ MOCK_DATA = {
 
 # Landing page view
 def landing(request):
-    return render(request, 'landing.html')
+    context = {
+        'user': request.user if request.user.is_authenticated else None,
+        'is_authenticated': request.user.is_authenticated
+    }
+    return render(request, 'landing.html', context)
 
 # Helper function to get the next ID for a new indicator
 def get_next_indicator_id(dimensao_id):
@@ -92,7 +96,7 @@ def login(request):
                 }.get(user.user_type, 'Usuário')
                 
                 messages.success(request, f'Bem-vindo, {user.username}! (Nível de acesso: {tipo_usuario})')
-                return redirect('index')
+                return redirect('landing')
             else:
                 messages.error(request, 'Usuário ou senha inválidos')
     else:
