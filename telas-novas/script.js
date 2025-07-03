@@ -1,17 +1,8 @@
-// Armazenar as normas
-let normas = [
-    { nome: 'ISO 37120', link: 'iso37120.html' },
-    { nome: 'ISO 37122', link: 'iso37122.html' },
-    { nome: 'ISO 37123', link: 'iso37123.html' }
-];
+// Este arquivo foi substituído pelo arquivo unificado
+// Por favor, use o arquivo ../static/js/unified.js em vez deste
 
-// Função executada quando a página carrega
-document.addEventListener('DOMContentLoaded', function() {
-    // Adicionar caixa de busca
-    adicionarCaixaBusca();
-    // Ordenar e exibir normas
-    ordenarEExibirNormas();
-});
+// Redirecionamento para o arquivo unificado
+console.log('Este arquivo foi substituído pelo arquivo unificado. Use ../static/js/unified.js');
 
 // Função para adicionar caixa de busca
 function adicionarCaixaBusca() {
