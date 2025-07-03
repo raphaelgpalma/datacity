@@ -185,9 +185,9 @@ def listar_plataformas(request):
         'status': 'success',
         'plataformas': [
             {
-                'id': p.id,
-                'name': p.name,
-                'link': p.link
+                'id': p.id_plataforma,
+                'name': p.Nome,
+                'link': p.Direcionamento
             } for p in platforms
         ]
     })
@@ -206,9 +206,8 @@ def adicionar_plataforma(request):
         
         try:
             platform = Platform.objects.create(
-                name=name,
-                link=link,
-                created_by=request.user
+                Nome=name,
+                Direcionamento=link
             )
             return JsonResponse({
                 'status': 'success',
@@ -228,7 +227,7 @@ def adicionar_plataforma(request):
 @login_required
 def editar_plataforma(request, platform_id):
     if request.method == 'POST':
-        platform = get_object_or_404(Platform, id=platform_id)
+        platform = get_object_or_404(Platform, id_plataforma=platform_id)
         name = request.POST.get('name')
         link = request.POST.get('link')
         
@@ -239,8 +238,8 @@ def editar_plataforma(request, platform_id):
             })
         
         try:
-            platform.name = name
-            platform.link = link
+            platform.Nome = name
+            platform.Direcionamento = link
             platform.save()
             return JsonResponse({
                 'status': 'success',
@@ -260,7 +259,7 @@ def editar_plataforma(request, platform_id):
 @login_required
 def remover_plataforma(request, platform_id):
     if request.method == 'POST':
-        platform = get_object_or_404(Platform, id=platform_id)
+        platform = get_object_or_404(Platform, id_plataforma=platform_id)
         try:
             platform.delete()
             return JsonResponse({
@@ -678,7 +677,7 @@ def adicionar_norma(request):
         if not name or not link:
             return JsonResponse({'status': 'error', 'message': 'Nome e link são obrigatórios'})
         try:
-            Norm.objects.create(name=name, link=link, created_by=request.user)
+            Norm.objects.create(Nome=name, Direcionamento=link)
             return JsonResponse({'status': 'success', 'message': 'Norma adicionada com sucesso'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
@@ -687,21 +686,21 @@ def adicionar_norma(request):
 @login_required
 @manager_required
 def editar_norma(request, norm_id):
-    norm = get_object_or_404(Norm, id=norm_id)
+    norm = get_object_or_404(Norm, id_norma=norm_id)
     
     if request.method == 'POST':
         name = request.POST.get('name')
         link = request.POST.get('link')
         
         if name and link:
-            norm.name = name
-            norm.link = link
+            norm.Nome = name
+            norm.Direcionamento = link
             norm.save()
             return JsonResponse({
                 'status': 'success',
                 'norm': {
-                    'name': norm.name,
-                    'link': norm.link
+                    'name': norm.Nome,
+                    'link': norm.Direcionamento
                 }
             })
     return JsonResponse({'status': 'error'}, status=400)
@@ -709,7 +708,7 @@ def editar_norma(request, norm_id):
 @login_required
 @manager_required
 def remover_norma(request, norm_id):
-    norm = get_object_or_404(Norm, id=norm_id)
+    norm = get_object_or_404(Norm, id_norma=norm_id)
     
     if request.method == 'POST':
         norm.delete()
@@ -718,12 +717,12 @@ def remover_norma(request, norm_id):
 
 @login_required
 def listar_normas(request):
-    norms = list(Norm.objects.all().values('id', 'name', 'link'))
+    norms = list(Norm.objects.all().values('id_norma', 'Nome', 'Direcionamento'))
     # Adiciona a norma estática
     norms.append({
-        'id': 9999,  # Use um ID que não conflite com o banco
-        'name': 'ISO 37120',
-        'link': 'http://localhost:8000/dashboard/normas/iso37120/'
+        'id_norma': 9999,  # Use um ID que não conflite com o banco
+        'Nome': 'ISO 37120',
+        'Direcionamento': 'http://localhost:8000/dashboard/normas/iso37120/'
     })
     return JsonResponse({
         'status': 'success',

@@ -20,8 +20,8 @@
         </div>
         <div class="menu-buttons" id="menuButtons">
             {% for norm in norms %}
-            <a href="{% if norm.link|slice:":4" == 'http' %}{{ norm.link }}{% else %}https://{{ norm.link }}{% endif %}" class="menu-btn" target="_blank">
-                {{ norm.name }}
+            <a href="{% if norm.Direcionamento|slice:":4" == 'http' %}{{ norm.Direcionamento }}{% else %}https://{{ norm.Direcionamento }}{% endif %}" class="menu-btn" target="_blank">
+                {{ norm.Nome }}
             </a>
             {% endfor %}
         </div>
@@ -60,7 +60,7 @@
             <select id="selectNorma">
                 <option value="">Selecione uma norma</option>
                 {% for norm in norms %}
-                <option value="{{ norm.id }}">{{ norm.name }}</option>
+                <option value="{{ norm.id_norma }}">{{ norm.Nome }}</option>
                 {% endfor %}
             </select>
             <input type="text" id="editNomeNorma" placeholder="Novo nome">
@@ -78,7 +78,7 @@
             <select id="removeNorma">
                 <option value="">Selecione uma norma</option>
                 {% for norm in norms %}
-                <option value="{{ norm.id }}">{{ norm.name }}</option>
+                <option value="{{ norm.id_norma }}">{{ norm.Nome }}</option>
                 {% endfor %}
             </select>
             <div class="popup-actions">

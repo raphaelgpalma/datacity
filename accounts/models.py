@@ -43,29 +43,25 @@ class User(AbstractUser):
         return self.username
 
 class Platform(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    link = models.URLField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
+    id_plataforma = models.AutoField(primary_key=True)  # Chave primária personalizada
+    Nome = models.CharField(max_length=100, unique=True)
+    Direcionamento = models.URLField()
+    
     class Meta:
-        ordering = ['name']
+        ordering = ['Nome']
         db_table = 'plataforma'
 
-    def __str__(self):
-        return self.name
+    def __str__(self): 
+        return self.Nome
 
 class Norm(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    link = models.URLField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
+    id_norma = models.AutoField(primary_key=True)  # Chave primária personalizada
+    Nome = models.CharField(max_length=100, unique=True)
+    Direcionamento = models.URLField()
+    
     class Meta:
-        ordering = ['name']
+        ordering = ['Nome']
         db_table = 'norma'
 
-    def __str__(self):
-        return self.name
+    def __str__(self): 
+        return self.Nome

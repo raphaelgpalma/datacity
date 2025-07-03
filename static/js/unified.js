@@ -160,7 +160,7 @@ function adicionarCaixaBuscaNormas() {
 // Função para ordenar e exibir normas
 function ordenarEExibirNormas() {
     // Ordenar normas alfabeticamente
-    normas.sort((a, b) => a.name.localeCompare(b.name));
+    normas.sort((a, b) => a.Nome.localeCompare(b.Nome));
    
     // Atualizar a exibição das normas
     atualizarExibicaoNormas();
@@ -178,18 +178,18 @@ function atualizarExibicaoNormas(filtro = '') {
    
     // Filtrar normas se houver um filtro
     const normasFiltradas = filtro
-        ? normas.filter(n => n.name.toLowerCase().includes(filtro.toLowerCase()))
+        ? normas.filter(n => n.Nome.toLowerCase().includes(filtro.toLowerCase()))
         : normas;
    
     // Adicionar cada norma ao menu
     normasFiltradas.forEach(norma => {
         const link = document.createElement('a');
-        link.href = norma.link;
+        link.href = norma.Direcionamento;
         link.className = 'menu-btn';
-        if (norma.link.startsWith('http')) {
+        if (norma.Direcionamento.startsWith('http')) {
             link.target = '_blank';
         }
-        link.textContent = norma.name;
+        link.textContent = norma.Nome;
         menuButtons.appendChild(link);
     });
    
@@ -221,8 +221,8 @@ function atualizarSelectsPopupsNormas() {
         // Adicionar opções para cada norma
         normas.forEach(norma => {
             const optionEdit = document.createElement('option');
-            optionEdit.value = norma.id;
-            optionEdit.textContent = norma.name;
+            optionEdit.value = norma.id_norma;
+            optionEdit.textContent = norma.Nome;
             selectNorma.appendChild(optionEdit);
         });
     }
@@ -234,8 +234,8 @@ function atualizarSelectsPopupsNormas() {
         // Adicionar opções para cada norma
         normas.forEach(norma => {
             const optionRemove = document.createElement('option');
-            optionRemove.value = norma.id;
-            optionRemove.textContent = norma.name;
+            optionRemove.value = norma.id_norma;
+            optionRemove.textContent = norma.Nome;
             removeNorma.appendChild(optionRemove);
         });
     }

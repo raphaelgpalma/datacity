@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-4">
@@ -23,13 +24,13 @@
             </thead>
             <tbody id="normsTableBody">
                 {% for norm in norms %}
-                <tr data-norm-id="{{ norm.id }}">
-                    <td>{{ norm.name }}</td>
-                    <td><a href="{{ norm.link }}" target="_blank">{{ norm.link }}</a></td>
+                <tr data-norm-id="{{ norm.id_norma }}">
+                    <td>{{ norm.Nome }}</td>
+                    <td><a href="{{ norm.Direcionamento }}" target="_blank">{{ norm.Direcionamento }}</a></td>
                     {% if user.user_type == 'manager' or user.user_type == 'admin' %}
                     <td>
-                        <button class="btn btn-sm btn-warning edit-norm" data-norm-id="{{ norm.id }}">Editar</button>
-                        <button class="btn btn-sm btn-danger delete-norm" data-norm-id="{{ norm.id }}">Remover</button>
+                        <button class="btn btn-sm btn-warning edit-norm" data-norm-id="{{ norm.id_norma }}">Editar</button>
+                        <button class="btn btn-sm btn-danger delete-norm" data-norm-id="{{ norm.id_norma }}">Remover</button>
                     </td>
                     {% endif %}
                 </tr>
