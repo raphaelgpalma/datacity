@@ -15,6 +15,7 @@ urlpatterns = [
     path('dashboard/plataformas/', views.plataformas, name='plataformas'),
     path('dashboard/plataformas/csc/', views.csc, name='csc'),
     path('dashboard/normas/iso37120/', views.iso37120, name='iso37120'),
+    path('dashboard/normas/iso37122/', views.iso37122, name='iso37122'),
     path('dashboard/indicadores/', views.indicadores, name='indicadores'),
     path('dashboard/indicadores/<str:dimensao_id>/', views.indicadores, name='indicadores_dimensao'),
     

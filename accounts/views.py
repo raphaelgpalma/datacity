@@ -96,7 +96,7 @@ def login(request):
                 }.get(user.user_type, 'Usuário')
                 
                 messages.success(request, f'Bem-vindo, {user.username}! (Nível de acesso: {tipo_usuario})')
-                return redirect('landing')
+                return redirect('menu')
             else:
                 messages.error(request, 'Usuário ou senha inválidos')
     else:
@@ -298,6 +298,15 @@ def iso37120(request):
         'username': request.user.username
     }
     return render(request, 'new-screens/iso37120.html', context)
+
+@login_required
+@require_http_methods(["GET"])
+def iso37122(request):
+    context = {
+        'dimensoes': MOCK_DATA['dimensoes'],
+        'username': request.user.username
+    }
+    return render(request, 'new-screens/iso37122.html', context)
 
 # API for dimensions
 @require_http_methods(["GET"])

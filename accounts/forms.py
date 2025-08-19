@@ -20,5 +20,5 @@ class RegisterForm(UserCreationForm):
         fields = ['username', 'nome', 'email', 'cpf', 'cidade', 'categoria', 'password1', 'password2', 'user_type']
 
 class LoginForm(forms.Form):
-    username = forms.CharField(max_length=50)
-    password = forms.CharField(widget=forms.PasswordInput)
+    username = forms.CharField(max_length=50, label='Email ou Usuário')
+    password = forms.CharField(widget=forms.PasswordInput, label='Senha')

@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataformas - DataCity</title>
-    {% load static %}
+    <title>Normas - DataCity</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -14,7 +13,7 @@
             font-family: 'Poppins', sans-serif;
         }
         body {
-            background: url('{% static "img/Fundo (1).png" %}') no-repeat center center/cover;
+            background: url('img/Fundo (1).png') no-repeat center center/cover;
             height: 100vh;
             overflow: hidden;
             color: #333;
@@ -173,14 +172,14 @@
     <div class="container">
         <div class="logo">
             <div class="logo-container">
-                <img src="{% static 'img/Logo_drive.png' %}" alt="DataCity Logo">
+                <img src="img/logo.png" alt="DataCity Logo">
             </div>
         </div>
         <div class="header">
-            <a href="{% url 'index' %}" class="back-btn">Voltar</a>
+            <a href="index.html" class="back-btn">Voltar</a>
         </div>
         <div class="menu-container">
-            <h1 class="menu-title">Plataformas disponíveis</h1>
+            <h1 class="menu-title">Normas disponíveis</h1>
             <div class="admin-actions">
                 <input type="text" id="pesquisar" placeholder="Pesquisar">
                 <button class="action-button add">+ Adicionar</button>
@@ -188,7 +187,8 @@
                 <button class="action-button remove">🗑 Remover</button>
             </div>
             <div class="menu-buttons">
-                <a href="{% url 'csc' %}" class="menu-btn">CSC</a>
+                <a href="iso37120.html" class="menu-btn">ISO 37120</a>
+                <a href="iso37122.html" class="menu-btn">ISO 37122</a>
             </div>
         </div>
         <div class="background-overlay"></div>
@@ -200,4 +200,4 @@
         document.querySelector('.remove').addEventListener('click', () => console.log('Remover clicado'));
     </script>
 </body>
-</html> 
+</html>

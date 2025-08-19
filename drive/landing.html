@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataCity - Sua plataforma de dados urbanos</title>
-    {% load static %}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -24,7 +23,7 @@
             width: 100vw;
             height: 100vh;
             position: relative;
-            background-image: url('{% static "img/Fundo (1).png" %}');
+            background-image: url('img/Fundo (1).png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -171,7 +170,7 @@
     <div class="container">
         <!-- Logo -->
         <div class="logo-container">
-            <img src="{% static 'img/Logo_drive.png' %}" alt="DataCity Logo" />
+            <img src="img/logo.png" alt="DataCity Logo" />
         </div>
 
         <!-- Main Content -->
@@ -184,21 +183,22 @@
                 cidade de forma simples e eficiente!
             </p>
             <div class="buttons-container">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'menu' %}" class="btn">Acessar</a>
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn">Acessar</a>
-                {% endif %}
+                <button class="btn" onclick="handleAccess()">Acessar</button>
                 <button class="btn" onclick="handleLearnMore()">Saiba mais</button>
             </div>
         </div>
     </div>
 
     <script>
+        function handleAccess() {
+            console.log('Botão Acessar clicado');
+            // Aqui você pode adicionar a lógica para acessar a plataforma
+        }
+
         function handleLearnMore() {
             console.log('Botão Saiba mais clicado');
             // Aqui você pode adicionar a lógica para mostrar mais informações
         }
     </script>
 </body>
-</html> 
+</html>

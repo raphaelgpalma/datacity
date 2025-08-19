@@ -7,9 +7,13 @@ class User(AbstractUser):
         MANAGER = 'MANAGER', 'Gestor'
         COMMON = 'COMMON', 'Usuário Comum'
 
-    id_usuario = models.AutoField(primary_key=True)  # Chave primária personalizada
+    # Usando o campo id padrão do Django
     nome = models.CharField(max_length=100, null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
+    email = models.EmailField(unique=True, null=True, blank=True)
+    
+    # Configurando email como campo de autenticação
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
     cpf = models.CharField(max_length=14, null=True, blank=True)  # CPF com formatação (000.000.000-00)
     cidade = models.CharField(max_length=100, null=True, blank=True)
     class CategoriaChoices(models.TextChoices):
