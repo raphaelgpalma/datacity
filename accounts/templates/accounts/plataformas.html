@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Normas - DataCity</title>
+    <title>Plataformas - DataCity</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -221,30 +221,30 @@
             <a href="{% url 'menu' %}" class="back-btn">← Voltar</a>
         </div>
         <div class="menu-container">
-            <h1 class="menu-title">Normas disponíveis</h1>
+            <h1 class="menu-title">Plataformas disponíveis</h1>
             <div class="admin-actions">
-                <input type="text" id="searchInput" placeholder="Pesquisar normas..." onkeyup="filterNorms()">
+                <input type="text" id="searchInput" placeholder="Pesquisar plataformas..." onkeyup="filterPlatforms()">
                 {% if user.user_type == 'MANAGER' or user.user_type == 'ADMIN' %}
-                <button class="action-button" data-bs-toggle="modal" data-bs-target="#addNormModal">
+                <button class="action-button" data-bs-toggle="modal" data-bs-target="#addPlatformModal">
                     <span class="icon">+</span>
                     <span class="label">Adicionar</span>
                 </button>
                 {% endif %}
             </div>
-            <div class="menu-buttons" id="normsContainer">
-                {% for norm in norms %}
-                <div class="menu-btn norm-item" data-norm-name="{{ norm.Nome|lower }}" onclick="window.open('{{ norm.Direcionamento }}', '_blank')">
-                    {{ norm.Nome }}
+            <div class="menu-buttons" id="platformsContainer">
+                {% for platform in platforms %}
+                <div class="menu-btn platform-item" data-platform-name="{{ platform.Nome|lower }}" onclick="window.open('{{ platform.Direcionamento }}', '_blank')">
+                    {{ platform.Nome }}
                     {% if user.user_type == 'MANAGER' or user.user_type == 'ADMIN' %}
                     <div class="admin-controls">
-                        <button class="control-btn edit-norm" data-norm-id="{{ norm.id_norma }}" onclick="event.stopPropagation(); editNorm('{{ norm.id_norma }}', '{{ norm.Nome }}', '{{ norm.Direcionamento }}')">✎</button>
-                        <button class="control-btn delete-norm" data-norm-id="{{ norm.id_norma }}" onclick="event.stopPropagation(); deleteNorm('{{ norm.id_norma }}', '{{ norm.Nome }}')">×</button>
+                        <button class="control-btn edit-platform" data-platform-id="{{ platform.id_plataforma }}" onclick="event.stopPropagation(); editPlatform('{{ platform.id_plataforma }}', '{{ platform.Nome }}', '{{ platform.Direcionamento }}')">✎</button>
+                        <button class="control-btn delete-platform" data-platform-id="{{ platform.id_plataforma }}" onclick="event.stopPropagation(); deletePlatform('{{ platform.id_plataforma }}', '{{ platform.Nome }}')">×</button>
                     </div>
                     {% endif %}
                 </div>
                 {% empty %}
                 <div class="text-center">
-                    <p class="text-muted">Nenhuma norma cadastrada ainda.</p>
+                    <p class="text-muted">Nenhuma plataforma cadastrada ainda.</p>
                 </div>
                 {% endfor %}
             </div>
@@ -252,65 +252,65 @@
         <div class="background-overlay"></div>
     </div>
 
-    <!-- Modal Adicionar Norma -->
-    <div class="modal fade" id="addNormModal" tabindex="-1">
+    <!-- Modal Adicionar Plataforma -->
+    <div class="modal fade" id="addPlatformModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Adicionar Nova Norma</h5>
+                    <h5 class="modal-title">Adicionar Nova Plataforma</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addNormForm">
+                    <form id="addPlatformForm">
                         <div class="mb-3">
-                            <label for="normName" class="form-label">Nome da Norma</label>
-                            <input type="text" class="form-control" id="normName" required>
+                            <label for="platformName" class="form-label">Nome da Plataforma</label>
+                            <input type="text" class="form-control" id="platformName" required>
                         </div>
                         <div class="mb-3">
-                            <label for="normLink" class="form-label">Link</label>
-                            <input type="url" class="form-control" id="normLink" required>
+                            <label for="platformLink" class="form-label">Link</label>
+                            <input type="url" class="form-control" id="platformLink" required>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="saveNormBtn">Salvar</button>
+                    <button type="button" class="btn btn-primary" id="savePlatformBtn">Salvar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Editar Norma -->
-    <div class="modal fade" id="editNormModal" tabindex="-1">
+    <!-- Modal Editar Plataforma -->
+    <div class="modal fade" id="editPlatformModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Editar Norma</h5>
+                    <h5 class="modal-title">Editar Plataforma</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editNormForm">
-                        <input type="hidden" id="editNormId">
+                    <form id="editPlatformForm">
+                        <input type="hidden" id="editPlatformId">
                         <div class="mb-3">
-                            <label for="editNormName" class="form-label">Nome da Norma</label>
-                            <input type="text" class="form-control" id="editNormName" required>
+                            <label for="editPlatformName" class="form-label">Nome da Plataforma</label>
+                            <input type="text" class="form-control" id="editPlatformName" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editNormLink" class="form-label">Link</label>
-                            <input type="url" class="form-control" id="editNormLink" required>
+                            <label for="editPlatformLink" class="form-label">Link</label>
+                            <input type="url" class="form-control" id="editPlatformLink" required>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="updateNormBtn">Atualizar</button>
+                    <button type="button" class="btn btn-primary" id="updatePlatformBtn">Atualizar</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal Confirmar Exclusão -->
-    <div class="modal fade" id="deleteNormModal" tabindex="-1">
+    <div class="modal fade" id="deletePlatformModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -318,12 +318,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Tem certeza que deseja excluir a norma <strong id="deleteNormName"></strong>?</p>
-                    <input type="hidden" id="deleteNormId">
+                    <p>Tem certeza que deseja excluir a plataforma <strong id="deletePlatformName"></strong>?</p>
+                    <input type="hidden" id="deletePlatformId">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Excluir</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeletePlatformBtn">Excluir</button>
                 </div>
             </div>
         </div>
@@ -333,14 +333,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Search functionality
-        function filterNorms() {
+        function filterPlatforms() {
             const searchInput = document.getElementById('searchInput');
             const filter = searchInput.value.toLowerCase();
-            const normItems = document.querySelectorAll('.norm-item');
+            const platformItems = document.querySelectorAll('.platform-item');
             
-            normItems.forEach(function(item) {
-                const normName = item.getAttribute('data-norm-name');
-                if (normName.includes(filter)) {
+            platformItems.forEach(function(item) {
+                const platformName = item.getAttribute('data-platform-name');
+                if (platformName.includes(filter)) {
                     item.style.display = '';
                 } else {
                     item.style.display = 'none';
@@ -348,22 +348,22 @@
             });
         }
 
-        // Edit norm functionality
-        function editNorm(id, name, link) {
-            document.getElementById('editNormId').value = id;
-            document.getElementById('editNormName').value = name;
-            document.getElementById('editNormLink').value = link;
+        // Edit platform functionality
+        function editPlatform(id, name, link) {
+            document.getElementById('editPlatformId').value = id;
+            document.getElementById('editPlatformName').value = name;
+            document.getElementById('editPlatformLink').value = link;
             
-            const editModal = new bootstrap.Modal(document.getElementById('editNormModal'));
+            const editModal = new bootstrap.Modal(document.getElementById('editPlatformModal'));
             editModal.show();
         }
 
-        // Delete norm functionality
-        function deleteNorm(id, name) {
-            document.getElementById('deleteNormId').value = id;
-            document.getElementById('deleteNormName').textContent = name;
+        // Delete platform functionality
+        function deletePlatform(id, name) {
+            document.getElementById('deletePlatformId').value = id;
+            document.getElementById('deletePlatformName').textContent = name;
             
-            const deleteModal = new bootstrap.Modal(document.getElementById('deleteNormModal'));
+            const deleteModal = new bootstrap.Modal(document.getElementById('deletePlatformModal'));
             deleteModal.show();
         }
 
@@ -385,28 +385,28 @@
 
         // Wait for DOM to be loaded
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Normas page loaded, Bootstrap available:', typeof bootstrap !== 'undefined');
+            console.log('Plataformas page loaded, Bootstrap available:', typeof bootstrap !== 'undefined');
             
             // Test function available in console
             window.testModal = function() {
                 console.log('Testing modal...');
-                const modal = new bootstrap.Modal(document.getElementById('addNormModal'));
+                const modal = new bootstrap.Modal(document.getElementById('addPlatformModal'));
                 modal.show();
             };
             
-            // Add norm functionality
-            const saveBtn = document.getElementById('saveNormBtn');
+            // Add platform functionality
+            const saveBtn = document.getElementById('savePlatformBtn');
             if (saveBtn) {
                 saveBtn.addEventListener('click', function() {
-                    const name = document.getElementById('normName').value;
-                    const link = document.getElementById('normLink').value;
+                    const name = document.getElementById('platformName').value;
+                    const link = document.getElementById('platformLink').value;
                     
                     if (!name || !link) {
                         alert('Por favor, preencha todos os campos.');
                         return;
                     }
                     
-                    fetch('{% url "adicionar_norma" %}', {
+                    fetch('{% url "adicionar_plataforma" %}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -422,30 +422,30 @@
                         if (data.success) {
                             location.reload();
                         } else {
-                            alert('Erro ao adicionar norma: ' + (data.message || 'Erro desconhecido'));
+                            alert('Erro ao adicionar plataforma: ' + (data.message || 'Erro desconhecido'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Erro ao adicionar norma.');
+                        alert('Erro ao adicionar plataforma.');
                     });
                 });
             }
 
-            // Update norm functionality
-            const updateBtn = document.getElementById('updateNormBtn');
+            // Update platform functionality
+            const updateBtn = document.getElementById('updatePlatformBtn');
             if (updateBtn) {
                 updateBtn.addEventListener('click', function() {
-                    const id = document.getElementById('editNormId').value;
-                    const name = document.getElementById('editNormName').value;
-                    const link = document.getElementById('editNormLink').value;
+                    const id = document.getElementById('editPlatformId').value;
+                    const name = document.getElementById('editPlatformName').value;
+                    const link = document.getElementById('editPlatformLink').value;
                     
                     if (!name || !link) {
                         alert('Por favor, preencha todos os campos.');
                         return;
                     }
                     
-                    fetch(`/dashboard/normas/editar_norma/${id}/`, {
+                    fetch(`/dashboard/plataformas/editar/${id}/`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -461,23 +461,23 @@
                         if (data.success) {
                             location.reload();
                         } else {
-                            alert('Erro ao editar norma: ' + (data.message || 'Erro desconhecido'));
+                            alert('Erro ao editar plataforma: ' + (data.message || 'Erro desconhecido'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Erro ao editar norma.');
+                        alert('Erro ao editar plataforma.');
                     });
                 });
             }
 
-            // Delete norm functionality
-            const deleteBtn = document.getElementById('confirmDeleteBtn');
+            // Delete platform functionality
+            const deleteBtn = document.getElementById('confirmDeletePlatformBtn');
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', function() {
-                    const id = document.getElementById('deleteNormId').value;
+                    const id = document.getElementById('deletePlatformId').value;
                     
-                    fetch(`/dashboard/normas/remover_norma/${id}/`, {
+                    fetch(`/dashboard/plataformas/remover/${id}/`, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRFToken': getCookie('csrftoken')
@@ -488,16 +488,16 @@
                         if (data.success) {
                             location.reload();
                         } else {
-                            alert('Erro ao remover norma: ' + (data.message || 'Erro desconhecido'));
+                            alert('Erro ao remover plataforma: ' + (data.message || 'Erro desconhecido'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Erro ao remover norma.');
+                        alert('Erro ao remover plataforma.');
                     });
                 });
             }
         });
     </script>
 </body>
-</html> 
+</html>

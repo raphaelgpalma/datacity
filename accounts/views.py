@@ -199,87 +199,64 @@ def listar_plataformas(request):
 @login_required
 def adicionar_plataforma(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        link = request.POST.get('link')
+        try:
+            import json
+            data = json.loads(request.body)
+            name = data.get('name')
+            link = data.get('link')
+        except (json.JSONDecodeError, AttributeError):
+            name = request.POST.get('name')
+            link = request.POST.get('link')
         
         if not name or not link:
-            return JsonResponse({
-                'status': 'error',
-                'message': 'Nome e link são obrigatórios'
-            })
+            return JsonResponse({'success': False, 'message': 'Nome e link são obrigatórios'})
         
         try:
-            platform = Platform.objects.create(
-                Nome=name,
-                Direcionamento=link
-            )
-            return JsonResponse({
-                'status': 'success',
-                'message': 'Plataforma adicionada com sucesso'
-            })
+            platform = Platform.objects.create(Nome=name, Direcionamento=link)
+            return JsonResponse({'success': True, 'message': 'Plataforma adicionada com sucesso'})
         except Exception as e:
-            return JsonResponse({
-                'status': 'error',
-                'message': str(e)
-            })
+            return JsonResponse({'success': False, 'message': str(e)})
     
-    return JsonResponse({
-        'status': 'error',
-        'message': 'Método não permitido'
-    })
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
 def editar_plataforma(request, platform_id):
     if request.method == 'POST':
         platform = get_object_or_404(Platform, id_plataforma=platform_id)
-        name = request.POST.get('name')
-        link = request.POST.get('link')
+        
+        try:
+            import json
+            data = json.loads(request.body)
+            name = data.get('name')
+            link = data.get('link')
+        except (json.JSONDecodeError, AttributeError):
+            name = request.POST.get('name')
+            link = request.POST.get('link')
         
         if not name or not link:
-            return JsonResponse({
-                'status': 'error',
-                'message': 'Nome e link são obrigatórios'
-            })
+            return JsonResponse({'success': False, 'message': 'Nome e link são obrigatórios'})
         
         try:
             platform.Nome = name
             platform.Direcionamento = link
             platform.save()
-            return JsonResponse({
-                'status': 'success',
-                'message': 'Plataforma editada com sucesso'
-            })
+            return JsonResponse({'success': True, 'message': 'Plataforma editada com sucesso'})
         except Exception as e:
-            return JsonResponse({
-                'status': 'error',
-                'message': str(e)
-            })
+            return JsonResponse({'success': False, 'message': str(e)})
     
-    return JsonResponse({
-        'status': 'error',
-        'message': 'Método não permitido'
-    })
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
 def remover_plataforma(request, platform_id):
-    if request.method == 'POST':
+    if request.method == 'DELETE':
         platform = get_object_or_404(Platform, id_plataforma=platform_id)
         try:
             platform.delete()
-            return JsonResponse({
-                'status': 'success',
-                'message': 'Plataforma removida com sucesso'
-            })
+            return JsonResponse({'success': True, 'message': 'Plataforma removida com sucesso'})
         except Exception as e:
-            return JsonResponse({
-                'status': 'error',
-                'message': str(e)
-            })
+            return JsonResponse({'success': False, 'message': str(e)})
     
-    return JsonResponse({
-        'status': 'error',
-        'message': 'Método não permitido'
-    })
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
 @require_http_methods(["GET"])
@@ -685,16 +662,24 @@ def modal_indicadores(request):
 @manager_required
 def adicionar_norma(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        link = request.POST.get('link')
+        try:
+            import json
+            data = json.loads(request.body)
+            name = data.get('name')
+            link = data.get('link')
+        except (json.JSONDecodeError, AttributeError):
+            # Fallback para dados de formulário
+            name = request.POST.get('name')
+            link = request.POST.get('link')
+            
         if not name or not link:
-            return JsonResponse({'status': 'error', 'message': 'Nome e link são obrigatórios'})
+            return JsonResponse({'success': False, 'message': 'Nome e link são obrigatórios'})
         try:
             Norm.objects.create(Nome=name, Direcionamento=link)
-            return JsonResponse({'status': 'success', 'message': 'Norma adicionada com sucesso'})
+            return JsonResponse({'success': True, 'message': 'Norma adicionada com sucesso'})
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
-    return JsonResponse({'status': 'error', 'message': 'Método não permitido'})
+            return JsonResponse({'success': False, 'message': str(e)})
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
 @manager_required
@@ -702,31 +687,33 @@ def editar_norma(request, norm_id):
     norm = get_object_or_404(Norm, id_norma=norm_id)
     
     if request.method == 'POST':
-        name = request.POST.get('name')
-        link = request.POST.get('link')
+        try:
+            import json
+            data = json.loads(request.body)
+            name = data.get('name')
+            link = data.get('link')
+        except (json.JSONDecodeError, AttributeError):
+            name = request.POST.get('name')
+            link = request.POST.get('link')
         
         if name and link:
             norm.Nome = name
             norm.Direcionamento = link
             norm.save()
-            return JsonResponse({
-                'status': 'success',
-                'norm': {
-                    'name': norm.Nome,
-                    'link': norm.Direcionamento
-                }
-            })
-    return JsonResponse({'status': 'error'}, status=400)
+            return JsonResponse({'success': True, 'message': 'Norma editada com sucesso'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Nome e link são obrigatórios'})
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
 @manager_required
 def remover_norma(request, norm_id):
     norm = get_object_or_404(Norm, id_norma=norm_id)
     
-    if request.method == 'POST':
+    if request.method == 'DELETE':
         norm.delete()
-        return JsonResponse({'status': 'success'})
-    return JsonResponse({'status': 'error'}, status=400)
+        return JsonResponse({'success': True, 'message': 'Norma removida com sucesso'})
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
 def listar_normas(request):

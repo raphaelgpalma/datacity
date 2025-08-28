@@ -88,7 +88,15 @@
         }
 
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            color: #483D8B;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
         }
 
         .form-row {
@@ -283,8 +291,21 @@
             
             <form method="post">
                 {% csrf_token %}
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">{{ form.nome.label }}</label>
                         {{ form.nome }}
                         {% if form.nome.errors %}
                             <ul class="errorlist">
@@ -295,6 +316,7 @@
                         {% endif %}
                     </div>
                     <div class="form-group">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
                         {{ form.email }}
                         {% if form.email.errors %}
                             <ul class="errorlist">
@@ -307,6 +329,7 @@
                 </div>
                 
                 <div class="form-group">
+                    <label for="{{ form.cidade.id_for_label }}" class="form-label">{{ form.cidade.label }}</label>
                     {{ form.cidade }}
                     {% if form.cidade.errors %}
                         <ul class="errorlist">
@@ -319,6 +342,7 @@
                 
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="{{ form.categoria.id_for_label }}" class="form-label">{{ form.categoria.label }}</label>
                         {{ form.categoria }}
                         {% if form.categoria.errors %}
                             <ul class="errorlist">
@@ -329,6 +353,7 @@
                         {% endif %}
                     </div>
                     <div class="form-group">
+                        <label for="{{ form.cpf.id_for_label }}" class="form-label">{{ form.cpf.label }}</label>
                         {{ form.cpf }}
                         {% if form.cpf.errors %}
                             <ul class="errorlist">
@@ -341,6 +366,7 @@
                 </div>
                 
                 <div class="form-group">
+                    <label for="{{ form.password1.id_for_label }}" class="form-label">{{ form.password1.label }}</label>
                     {{ form.password1 }}
                     {% if form.password1.errors %}
                         <ul class="errorlist">
@@ -352,6 +378,7 @@
                 </div>
                 
                 <div class="form-group">
+                    <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}</label>
                     {{ form.password2 }}
                     {% if form.password2.errors %}
                         <ul class="errorlist">
@@ -363,6 +390,7 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="{{ form.user_type.id_for_label }}" class="form-label">{{ form.user_type.label }}</label>
                     {{ form.user_type }}
                     {% if form.user_type.errors %}
                         <ul class="errorlist">
@@ -405,6 +433,18 @@
                     alert('As senhas não coincidem!');
                 }
             });
+
+            // Formatação automática do CPF
+            const cpfInput = document.querySelector('input[name="cpf"]');
+            if (cpfInput) {
+                cpfInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                    e.target.value = value;
+                });
+            }
 
             // Efeito de loading no botão ao submeter
             document.querySelector('form').addEventListener('submit', function() {
