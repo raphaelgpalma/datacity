@@ -231,6 +231,23 @@
                 </button>
                 {% endif %}
             </div>
+            <!-- Botões Estáticos das Normas (não editáveis) -->
+            <div class="menu-buttons static-norms">
+                <div class="menu-btn norm-item" data-norm-name="iso 37120" onclick="window.location.href='{% url 'iso37120' %}'">
+                    ISO 37120
+                </div>
+                <div class="menu-btn norm-item" data-norm-name="iso 37122" onclick="window.location.href='{% url 'iso37122' %}'">
+                    ISO 37122
+                </div>
+                <div class="menu-btn norm-item" data-norm-name="iso 37123" onclick="window.location.href='{% url 'iso37123' %}'">
+                    ISO 37123
+                </div>
+                <div class="menu-btn norm-item" data-norm-name="iso 37125" onclick="window.location.href='{% url 'iso37125' %}'">
+                    ISO 37125
+                </div>
+            </div>
+
+            <!-- Botões Dinâmicos das Normas (editáveis pelos administradores) -->
             <div class="menu-buttons" id="normsContainer">
                 {% for norm in norms %}
                 <div class="menu-btn norm-item" data-norm-name="{{ norm.Nome|lower }}" onclick="window.open('{{ norm.Direcionamento }}', '_blank')">
@@ -241,10 +258,6 @@
                         <button class="control-btn delete-norm" data-norm-id="{{ norm.id_norma }}" onclick="event.stopPropagation(); deleteNorm('{{ norm.id_norma }}', '{{ norm.Nome }}')">×</button>
                     </div>
                     {% endif %}
-                </div>
-                {% empty %}
-                <div class="text-center">
-                    <p class="text-muted">Nenhuma norma cadastrada ainda.</p>
                 </div>
                 {% endfor %}
             </div>
@@ -399,11 +412,17 @@
             if (saveBtn) {
                 saveBtn.addEventListener('click', function() {
                     const name = document.getElementById('normName').value;
-                    const link = document.getElementById('normLink').value;
-                    
+                    let link = document.getElementById('normLink').value;
+
                     if (!name || !link) {
                         alert('Por favor, preencha todos os campos.');
                         return;
+                    }
+
+                    // Normalizar URL no frontend
+                    if (link && !link.startsWith('http://') && !link.startsWith('https://')) {
+                        link = 'https://' + link;
+                        document.getElementById('normLink').value = link;
                     }
                     
                     fetch('{% url "adicionar_norma" %}', {
@@ -438,11 +457,17 @@
                 updateBtn.addEventListener('click', function() {
                     const id = document.getElementById('editNormId').value;
                     const name = document.getElementById('editNormName').value;
-                    const link = document.getElementById('editNormLink').value;
-                    
+                    let link = document.getElementById('editNormLink').value;
+
                     if (!name || !link) {
                         alert('Por favor, preencha todos os campos.');
                         return;
+                    }
+
+                    // Normalizar URL no frontend
+                    if (link && !link.startsWith('http://') && !link.startsWith('https://')) {
+                        link = 'https://' + link;
+                        document.getElementById('editNormLink').value = link;
                     }
                     
                     fetch(`/dashboard/normas/editar_norma/${id}/`, {

@@ -196,6 +196,19 @@ def listar_plataformas(request):
         ]
     })
 
+def normalize_url(url):
+    """Normaliza URL para garantir que tenha protocolo"""
+    if not url:
+        return url
+
+    url = url.strip()
+
+    # Se não tem protocolo, adiciona https://
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+
+    return url
+
 @login_required
 def adicionar_plataforma(request):
     if request.method == 'POST':
@@ -207,16 +220,19 @@ def adicionar_plataforma(request):
         except (json.JSONDecodeError, AttributeError):
             name = request.POST.get('name')
             link = request.POST.get('link')
-        
+
         if not name or not link:
             return JsonResponse({'success': False, 'message': 'Nome e link são obrigatórios'})
-        
+
+        # Normalizar URL
+        link = normalize_url(link)
+
         try:
             platform = Platform.objects.create(Nome=name, Direcionamento=link)
             return JsonResponse({'success': True, 'message': 'Plataforma adicionada com sucesso'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)})
-    
+
     return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
@@ -235,7 +251,10 @@ def editar_plataforma(request, platform_id):
         
         if not name or not link:
             return JsonResponse({'success': False, 'message': 'Nome e link são obrigatórios'})
-        
+
+        # Normalizar URL
+        link = normalize_url(link)
+
         try:
             platform.Nome = name
             platform.Direcionamento = link
@@ -265,7 +284,7 @@ def csc(request):
         'dimensoes': MOCK_DATA['dimensoes'],
         'username': request.user.username
     }
-    return render(request, 'new-screens/csc.html', context)
+    return render(request, 'accounts/plataformas/csc.html', context)
 
 @login_required
 @require_http_methods(["GET"])
@@ -274,7 +293,7 @@ def iso37120(request):
         'dimensoes': MOCK_DATA['dimensoes'],
         'username': request.user.username
     }
-    return render(request, 'new-screens/iso37120.html', context)
+    return render(request, 'accounts/normas/iso37120.html', context)
 
 @login_required
 @require_http_methods(["GET"])
@@ -283,7 +302,23 @@ def iso37122(request):
         'dimensoes': MOCK_DATA['dimensoes'],
         'username': request.user.username
     }
-    return render(request, 'new-screens/iso37122.html', context)
+    return render(request, 'accounts/normas/iso37122.html', context)
+
+@login_required
+def iso37123(request):
+    context = {
+        'dimensoes': MOCK_DATA['dimensoes'],
+        'username': request.user.username
+    }
+    return render(request, 'accounts/normas/iso37123.html', context)
+
+@login_required
+def iso37125(request):
+    context = {
+        'dimensoes': MOCK_DATA['dimensoes'],
+        'username': request.user.username
+    }
+    return render(request, 'accounts/normas/iso37125.html', context)
 
 # API for dimensions
 @require_http_methods(["GET"])
@@ -674,6 +709,10 @@ def adicionar_norma(request):
             
         if not name or not link:
             return JsonResponse({'success': False, 'message': 'Nome e link são obrigatórios'})
+
+        # Normalizar URL
+        link = normalize_url(link)
+
         try:
             Norm.objects.create(Nome=name, Direcionamento=link)
             return JsonResponse({'success': True, 'message': 'Norma adicionada com sucesso'})
@@ -697,6 +736,9 @@ def editar_norma(request, norm_id):
             link = request.POST.get('link')
         
         if name and link:
+            # Normalizar URL
+            link = normalize_url(link)
+
             norm.Nome = name
             norm.Direcionamento = link
             norm.save()

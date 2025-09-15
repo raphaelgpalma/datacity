@@ -231,6 +231,14 @@
                 </button>
                 {% endif %}
             </div>
+            <!-- Botões Estáticos das Plataformas (não editáveis) -->
+            <div class="menu-buttons static-platforms">
+                <div class="menu-btn platform-item" data-platform-name="csc" onclick="window.location.href='{% url 'csc' %}'">
+                    CSC
+                </div>
+            </div>
+
+            <!-- Botões Dinâmicos das Plataformas (editáveis pelos administradores) -->
             <div class="menu-buttons" id="platformsContainer">
                 {% for platform in platforms %}
                 <div class="menu-btn platform-item" data-platform-name="{{ platform.Nome|lower }}" onclick="window.open('{{ platform.Direcionamento }}', '_blank')">
@@ -241,10 +249,6 @@
                         <button class="control-btn delete-platform" data-platform-id="{{ platform.id_plataforma }}" onclick="event.stopPropagation(); deletePlatform('{{ platform.id_plataforma }}', '{{ platform.Nome }}')">×</button>
                     </div>
                     {% endif %}
-                </div>
-                {% empty %}
-                <div class="text-center">
-                    <p class="text-muted">Nenhuma plataforma cadastrada ainda.</p>
                 </div>
                 {% endfor %}
             </div>
@@ -399,11 +403,17 @@
             if (saveBtn) {
                 saveBtn.addEventListener('click', function() {
                     const name = document.getElementById('platformName').value;
-                    const link = document.getElementById('platformLink').value;
-                    
+                    let link = document.getElementById('platformLink').value;
+
                     if (!name || !link) {
                         alert('Por favor, preencha todos os campos.');
                         return;
+                    }
+
+                    // Normalizar URL no frontend
+                    if (link && !link.startsWith('http://') && !link.startsWith('https://')) {
+                        link = 'https://' + link;
+                        document.getElementById('platformLink').value = link;
                     }
                     
                     fetch('{% url "adicionar_plataforma" %}', {
@@ -438,11 +448,17 @@
                 updateBtn.addEventListener('click', function() {
                     const id = document.getElementById('editPlatformId').value;
                     const name = document.getElementById('editPlatformName').value;
-                    const link = document.getElementById('editPlatformLink').value;
-                    
+                    let link = document.getElementById('editPlatformLink').value;
+
                     if (!name || !link) {
                         alert('Por favor, preencha todos os campos.');
                         return;
+                    }
+
+                    // Normalizar URL no frontend
+                    if (link && !link.startsWith('http://') && !link.startsWith('https://')) {
+                        link = 'https://' + link;
+                        document.getElementById('editPlatformLink').value = link;
                     }
                     
                     fetch(`/dashboard/plataformas/editar/${id}/`, {
