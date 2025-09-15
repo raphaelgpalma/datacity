@@ -85,5 +85,18 @@ class RegisterForm(UserCreationForm):
         fields = ['username', 'nome', 'email', 'cpf', 'cidade', 'categoria', 'password1', 'password2', 'user_type']
 
 class LoginForm(forms.Form):
-    username = forms.CharField(max_length=50, label='Email ou Usuário')
-    password = forms.CharField(widget=forms.PasswordInput, label='Senha')
+    username = forms.CharField(
+        max_length=50,
+        label='Email ou Usuário',
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Digite seu email ou nome de usuário',
+            'class': 'form-control'
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Digite sua senha',
+            'class': 'form-control'
+        }),
+        label='Senha'
+    )
