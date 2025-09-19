@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saiba Mais - DataCity</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #513C9A 0%, #6B4FB5 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 1rem;
+        }
+
+        .logo-container img {
+            width: 120px;
+            height: auto;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .content {
+            padding: 3rem 0;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #513C9A;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #513C9A;
+            padding-bottom: 0.5rem;
+        }
+
+        .section h3 {
+            color: #6B4FB5;
+            font-size: 1.4rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #513C9A20 0%, #6B4FB520 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #513C9A;
+            margin: 1.5rem 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .feature-card h4 {
+            color: #513C9A;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .dimensions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .dimension-item {
+            background: linear-gradient(135deg, #513C9A 0%, #6B4FB5 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .tech-item {
+            background: #513C9A;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: #513C9A;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .back-button:hover {
+            background: #6B4FB5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(81, 60, 154, 0.3);
+        }
+
+        .team-info {
+            text-align: center;
+            background: linear-gradient(135deg, #513C9A10 0%, #6B4FB510 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .section h2 {
+                font-size: 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dimensions-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="logo-container">
+                <img src="{% static 'img/Logo_drive.png' %}" alt="DataCity Logo" />
+            </div>
+            <h1>DataCity</h1>
+            <p>Plataforma Inteligente para Gestão de Dados Urbanos</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <!-- Sobre o Projeto -->
+            <div class="section">
+                <h2>Sobre o DataCity</h2>
+                <p>
+                    O DataCity é uma plataforma inovadora desenvolvida por estudantes de Ciência da Computação do
+                    Centro Universitário Filadélfia, com o objetivo de revolucionar a gestão e análise de dados urbanos.
+                </p>
+
+                <div class="highlight">
+                    <p>
+                        <strong>Nossa missão:</strong> Fornecer uma solução centralizada e inteligente para que gestores
+                        públicos, pesquisadores e cidadãos possam acessar, analisar e compreender os dados que moldam
+                        nossas cidades.
+                    </p>
+                </div>
+
+                <p>
+                    A plataforma foi concebida para atender às crescentes demandas por transparência, eficiência e
+                    tomada de decisão baseada em dados no contexto urbano. Com uma interface intuitiva e ferramentas
+                    avançadas de análise, o DataCity democratiza o acesso à informação urbana.
+                </p>
+            </div>
+
+            <!-- Funcionalidades -->
+            <div class="section">
+                <h2>Principais Funcionalidades</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h4>🌍 Análise Multidimensional</h4>
+                        <p>Explore dados urbanos em 11 dimensões essenciais, desde mobilidade até governança.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Indicadores Inteligentes</h4>
+                        <p>Acompanhe indicadores-chave baseados em normas ISO e ODS da ONU.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔍 Coleta Automatizada</h4>
+                        <p>Sistema avançado de web scraping para coleta automática de dados públicos.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📈 Relatórios Dinâmicos</h4>
+                        <p>Geração automática de relatórios personalizados e visualizações interativas.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🏛️ Gestão de Normas</h4>
+                        <p>Integração com normas ISO 37120, 37122, 37123 e 37125 para cidades inteligentes.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔐 Segurança Avançada</h4>
+                        <p>Sistema de autenticação robusto com diferentes níveis de acesso.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dimensões -->
+            <div class="section">
+                <h2>Dimensões de Análise</h2>
+                <p>
+                    O DataCity organiza os dados urbanos em 11 dimensões fundamentais, permitindo uma visão
+                    holística e integrada da cidade:
+                </p>
+                <div class="dimensions-list">
+                    <div class="dimension-item">🚊 Mobilidade</div>
+                    <div class="dimension-item">🏗️ Urbanismo</div>
+                    <div class="dimension-item">🎓 Educação</div>
+                    <div class="dimension-item">🛡️ Segurança</div>
+                    <div class="dimension-item">🏛️ Governança</div>
+                    <div class="dimension-item">💰 Economia</div>
+                    <div class="dimension-item">⚡ Energia</div>
+                    <div class="dimension-item">🌱 Meio Ambiente</div>
+                    <div class="dimension-item">💡 Tecnologia e Inovação</div>
+                    <div class="dimension-item">🚀 Empreendedorismo</div>
+                    <div class="dimension-item">🏥 Saúde</div>
+                </div>
+            </div>
+
+            <!-- Tecnologia -->
+            <div class="section">
+                <h2>Tecnologia e Inovação</h2>
+                <h3>Stack Tecnológico</h3>
+                <div class="tech-stack">
+                    <span class="tech-item">Python</span>
+                    <span class="tech-item">Django</span>
+                    <span class="tech-item">PostgreSQL</span>
+                    <span class="tech-item">BeautifulSoup4</span>
+                    <span class="tech-item">Selenium</span>
+                    <span class="tech-item">Pandas</span>
+                    <span class="tech-item">NumPy</span>
+                    <span class="tech-item">HTML5</span>
+                    <span class="tech-item">CSS3</span>
+                    <span class="tech-item">JavaScript</span>
+                </div>
+
+                <h3>Arquitetura do Sistema</h3>
+                <p>
+                    A plataforma foi desenvolvida seguindo as melhores práticas de engenharia de software,
+                    utilizando o framework Django para garantir escalabilidade, segurança e manutenibilidade.
+                    A arquitetura modular permite fácil extensão e integração com outras plataformas.
+                </p>
+
+                <div class="highlight">
+                    <p>
+                        <strong>Inovação Acadêmica:</strong> O projeto representa a aplicação prática de conhecimentos
+                        em Ciência da Computação, integrando conceitos de desenvolvimento web, análise de dados,
+                        inteligência artificial e engenharia de software.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Equipe -->
+            <div class="section">
+                <h2>Nossa Equipe</h2>
+                <div class="team-info">
+                    <h3>🎓 Centro Universitário Filadélfia</h3>
+                    <p>
+                        Desenvolvido por estudantes dedicados do curso de Ciência da Computação, o DataCity é
+                        resultado da paixão por tecnologia e do comprometimento com o desenvolvimento urbano sustentável.
+                    </p>
+                    <p>
+                        Nossa equipe combina conhecimento acadêmico com visão prática, criando soluções que realmente
+                        fazem a diferença na gestão urbana moderna.
+                    </p>
+                </div>
+
+                <h3>Valores e Compromissos</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h4>🎯 Excelência Técnica</h4>
+                        <p>Código limpo, documentado e seguindo as melhores práticas de desenvolvimento.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🌍 Impacto Social</h4>
+                        <p>Tecnologia a serviço da sociedade e do desenvolvimento urbano sustentável.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📚 Aprendizado Contínuo</h4>
+                        <p>Constante evolução e incorporação de novas tecnologias e metodologias.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🤝 Colaboração</h4>
+                        <p>Trabalho em equipe e compartilhamento de conhecimento como pilares fundamentais.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visão Futura -->
+            <div class="section">
+                <h2>Visão para o Futuro</h2>
+                <p>
+                    O DataCity não é apenas uma plataforma, mas sim o primeiro passo em direção a um ecossistema
+                    completo de soluções para cidades inteligentes. Nossos planos incluem:
+                </p>
+
+                <h3>🚀 Próximas Funcionalidades</h3>
+                <ul style="list-style: none; padding-left: 0;">
+                    <li style="margin: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: #513C9A;">🤖</span>
+                        Inteligência Artificial para análise preditiva
+                    </li>
+                    <li style="margin: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: #513C9A;">📱</span>
+                        Aplicativo móvel para cidadãos
+                    </li>
+                    <li style="margin: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: #513C9A;">🔗</span>
+                        APIs abertas para desenvolvedores
+                    </li>
+                    <li style="margin: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: #513C9A;">🌐</span>
+                        Integração com IoT urbano
+                    </li>
+                    <li style="margin: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: #513C9A;">📊</span>
+                        Dashboard em tempo real
+                    </li>
+                </ul>
+
+                <div class="highlight">
+                    <p>
+                        <strong>Nossa Visão:</strong> Tornar o DataCity a principal referência em plataformas de
+                        dados urbanos no Brasil, contribuindo para a construção de cidades mais inteligentes,
+                        sustentáveis e eficientes.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botão de Volta -->
+            <div style="text-align: center;">
+                <a href="{% url 'landing' %}" class="back-button">← Voltar à Página Inicial</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

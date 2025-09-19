@@ -6,6 +6,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('', views.landing, name='landing'),
+    path('saiba-mais/', views.saiba_mais, name='saiba_mais'),
 
     # Rotas protegidas (requerem login)
     path('dashboard/', views.menu, name='index'),

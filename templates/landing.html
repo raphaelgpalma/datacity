@@ -189,16 +189,10 @@
                 {% else %}
                     <a href="{% url 'login' %}" class="btn">Acessar</a>
                 {% endif %}
-                <button class="btn" onclick="handleLearnMore()">Saiba mais</button>
+                <a href="{% url 'saiba_mais' %}" class="btn">Saiba mais</a>
             </div>
         </div>
     </div>
 
-    <script>
-        function handleLearnMore() {
-            console.log('Botão Saiba mais clicado');
-            // Aqui você pode adicionar a lógica para mostrar mais informações
-        }
-    </script>
 </body>
 </html> 

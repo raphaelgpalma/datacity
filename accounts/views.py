@@ -56,6 +56,10 @@ def landing(request):
     }
     return render(request, 'landing.html', context)
 
+# Saiba Mais page view
+def saiba_mais(request):
+    return render(request, 'saiba_mais.html')
+
 # Helper function to get the next ID for a new indicator
 def get_next_indicator_id(dimensao_id):
     indicadores = MOCK_DATA['indicadores'].get(dimensao_id, [])
