@@ -730,11 +730,11 @@
         }
 
         .legend-core {
-            background: #ff8c00;
+            background: #513C9A;
         }
 
         .legend-supporting {
-            background: #ffd700;
+            background: #6B4FB5;
         }
 
         /* Table styles */
@@ -811,6 +811,7 @@
             transition: all 0.3s ease;
             text-align: center;
             font-family: 'Poppins', sans-serif;
+            flex: 1;
         }
 
         .data-input:focus, .source-input:focus {
@@ -823,6 +824,60 @@
         .data-input.filled {
             border-color: #28a745;
             background: rgba(40, 167, 69, 0.1);
+        }
+
+        .data-input:disabled {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+            border-color: #e9ecef;
+        }
+
+        .data-input.editing {
+            background: white;
+            border-color: #513C9A;
+            box-shadow: 0 0 0 3px rgba(81, 60, 154, 0.1);
+        }
+
+        /* Edit Icon Styles */
+        .input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-icon {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            padding: 4px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #513C9A;
+            background: transparent;
+            border: none;
+            width: 24px;
+            height: 24px;
+        }
+
+        .edit-icon:hover {
+            opacity: 1;
+            background: rgba(81, 60, 154, 0.1);
+            transform: scale(1.1);
+        }
+
+        .edit-icon:active {
+            transform: scale(0.95);
+        }
+
+        .edit-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2;
         }
 
         .source-link {
@@ -856,15 +911,15 @@
         }
 
         .type-principal {
-            color: #ff8c00 !important;
+            color: #513C9A !important;
         }
 
         .type-apoio {
-            color: #ffd700 !important;
+            color: #513C9A !important;
         }
 
         .type-perfil {
-            color: #8a2be2 !important;
+            color: #513C9A !important;
         }
 
         /* Export buttons */
@@ -2046,19 +2101,48 @@
                         </div>
                         <div class="table-cell ods-cell">${indicator.ods}</div>
                         <div class="table-cell">
-                            <input type="text" class="data-input ${currentValue.value ? 'filled' : ''}" 
-                                   value="${currentValue.value}" 
-                                   onchange="updateData('${dataKey}', 'value', this.value)"
-                                   placeholder="Inserir dado">
+                            <div class="input-container">
+                                <input type="text" class="data-input ${currentValue.value ? 'filled' : ''}"
+                                       value="${currentValue.value}"
+                                       onchange="updateData('${dataKey}', 'value', this.value)"
+                                       placeholder="Clique no lápis para editar"
+                                       disabled>
+                                <button class="edit-icon" title="Clique para editar" onclick="enableEdit(this)">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                        <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
+                                        <path d="m15 5 3 3"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div class="table-cell unit-cell">${indicator.unit}</div>
                         <div class="table-cell source-cell">
-                            ${currentValue.source && isValidUrl(currentValue.source) ? 
-                                `<a href="${currentValue.source}" target="_blank" class="source-link">${currentValue.source}</a>` :
-                                `<input type="url" class="source-input" 
-                                        value="${currentValue.source}" 
-                                        onchange="updateData('${dataKey}', 'source', this.value)"
-                                        placeholder="https://exemplo.com">`
+                            ${currentValue.source && isValidUrl(currentValue.source) ?
+                                `<div class="input-container">
+                                    <a href="${currentValue.source}" target="_blank" class="source-link">${currentValue.source}</a>
+                                    <button class="edit-icon" title="Clique para editar" onclick="enableSourceEdit(this, '${dataKey}')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                            <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
+                                            <path d="m15 5 3 3"/>
+                                        </svg>
+                                    </button>
+                                </div>` :
+                                `<div class="input-container">
+                                    <input type="url" class="source-input"
+                                            value="${currentValue.source}"
+                                            onchange="updateData('${dataKey}', 'source', this.value)"
+                                            placeholder="Clique no lápis para editar"
+                                            disabled>
+                                    <button class="edit-icon" title="Clique para editar" onclick="enableSourceEdit(this, '${dataKey}')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                            <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
+                                            <path d="m15 5 3 3"/>
+                                        </svg>
+                                    </button>
+                                </div>`
                             }
                         </div>
                     `;
@@ -2516,7 +2600,7 @@
                             badge = `<span style="display:inline-block;background:#513C9A;color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;margin-bottom:6px;">${badgeText}</span>`;
                         }
 
-                        const typeColor = indicator.type === 'core' ? '#ff8c00' : '#ffd700';
+                        const typeColor = indicator.type === 'core' ? '#513C9A' : '#6B4FB5';
                         const typeText = indicator.type === 'core' ? 'PRINCIPAL' : 'APOIO';
 
                         chartCard.innerHTML = `
@@ -3076,6 +3160,178 @@
                 return '🥉 <strong>Nível Bronze</strong> - Cidade atende aos requisitos para certificação Bronze';
             } else {
                 return '📊 <strong>Em Desenvolvimento</strong> - Cidade ainda não atende aos requisitos mínimos para certificação';
+            }
+        }
+
+        // Function to enable editing when edit icon is clicked
+        function enableEdit(editIcon) {
+            const inputContainer = editIcon.parentElement;
+            const input = inputContainer.querySelector('.data-input');
+
+            if (input) {
+                // Enable the input
+                input.disabled = false;
+                input.classList.add('editing');
+
+                // Focus and select text
+                input.focus();
+                input.select();
+
+                // Change icon and tooltip
+                editIcon.title = "Salvar";
+                editIcon.style.color = "#28a745"; // Green color when editing
+
+                // Change icon to check mark
+                editIcon.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="9,11 12,14 22,4"></polyline>
+                        <path d="M21,12v7a2,2 0 0,1 -2,2H5a2,2 0 0,1 -2,-2V5a2,2 0 0,1 2,-2h11"></path>
+                    </svg>
+                `;
+
+                // Change onclick to save function
+                editIcon.onclick = function() { saveEdit(this); };
+
+                // Add blur event to auto-save when clicking outside
+                input.onblur = function() {
+                    setTimeout(() => saveEdit(editIcon), 100);
+                };
+
+                // Add animation
+                input.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    input.style.transform = 'scale(1)';
+                }, 150);
+            }
+        }
+
+        // Function to save edit and return to disabled state
+        function saveEdit(editIcon) {
+            const inputContainer = editIcon.parentElement;
+            const input = inputContainer.querySelector('.data-input');
+
+            if (input && !input.disabled) {
+                // Disable the input
+                input.disabled = true;
+                input.classList.remove('editing');
+
+                // Reset icon and tooltip
+                editIcon.title = "Clique para editar";
+                editIcon.style.color = "#513C9A"; // Return to original color
+
+                // Change icon back to pencil
+                editIcon.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
+                        <path d="m15 5 3 3"/>
+                    </svg>
+                `;
+
+                // Change onclick back to enable function
+                editIcon.onclick = function() { enableEdit(this); };
+
+                // Remove blur event
+                input.onblur = null;
+
+                // Add save animation
+                input.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    input.style.transform = 'scale(1)';
+                }, 150);
+            }
+        }
+
+        // Function to enable editing source fields
+        function enableSourceEdit(editIcon, dataKey) {
+            const inputContainer = editIcon.parentElement;
+            const link = inputContainer.querySelector('.source-link');
+            const input = inputContainer.querySelector('.source-input');
+
+            if (link) {
+                // Convert link to input
+                const currentUrl = link.href;
+                inputContainer.innerHTML = `
+                    <input type="url" class="source-input editing"
+                           value="${currentUrl}"
+                           onchange="updateData('${dataKey}', 'source', this.value)"
+                           placeholder="https://exemplo.com">
+                    <button class="edit-icon" title="Salvar" onclick="saveSourceEdit(this, '${dataKey}')" style="color: #28a745;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polyline points="9,11 12,14 22,4"></polyline>
+                            <path d="M21,12v7a2,2 0 0,1 -2,2H5a2,2 0 0,1 -2,-2V5a2,2 0 0,1 2,-2h11"></path>
+                        </svg>
+                    </button>
+                `;
+                const newInput = inputContainer.querySelector('.source-input');
+                newInput.focus();
+                newInput.select();
+            } else if (input) {
+                // Enable disabled input
+                input.disabled = false;
+                input.classList.add('editing');
+                input.focus();
+                input.select();
+
+                // Change icon
+                editIcon.title = "Salvar";
+                editIcon.style.color = "#28a745";
+                editIcon.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="9,11 12,14 22,4"></polyline>
+                        <path d="M21,12v7a2,2 0 0,1 -2,2H5a2,2 0 0,1 -2,-2V5a2,2 0 0,1 2,-2h11"></path>
+                    </svg>
+                `;
+                editIcon.onclick = function() { saveSourceEdit(this, dataKey); };
+
+                // Add blur event
+                input.onblur = function() {
+                    setTimeout(() => saveSourceEdit(editIcon, dataKey), 100);
+                };
+            }
+        }
+
+        // Function to save source edit
+        function saveSourceEdit(editIcon, dataKey) {
+            const inputContainer = editIcon.parentElement;
+            const input = inputContainer.querySelector('.source-input');
+
+            if (input && !input.disabled) {
+                const value = input.value.trim();
+
+                // Update data
+                updateData(dataKey, 'source', value);
+
+                if (value && isValidUrl(value)) {
+                    // Convert to link
+                    inputContainer.innerHTML = `
+                        <a href="${value}" target="_blank" class="source-link">${value}</a>
+                        <button class="edit-icon" title="Clique para editar" onclick="enableSourceEdit(this, '${dataKey}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
+                                <path d="m15 5 3 3"/>
+                            </svg>
+                        </button>
+                    `;
+                } else {
+                    // Keep as disabled input
+                    input.disabled = true;
+                    input.classList.remove('editing');
+                    input.onblur = null;
+
+                    // Reset icon
+                    editIcon.title = "Clique para editar";
+                    editIcon.style.color = "#513C9A";
+                    editIcon.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
+                            <path d="m15 5 3 3"/>
+                        </svg>
+                    `;
+                    editIcon.onclick = function() { enableSourceEdit(this, dataKey); };
+                }
             }
         }
     </script>
