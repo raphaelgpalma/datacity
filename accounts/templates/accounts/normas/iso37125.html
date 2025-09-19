@@ -1679,7 +1679,6 @@
 
         let currentYear = 2024;
         let currentData = {};
-        let selectedMunicipality = '';
 
 
         // Initialize the application
@@ -1687,7 +1686,6 @@
             loadData();
             renderCategoriesOverview();
             populateFilterOptions();
-            generateSampleData();
             loadStates();
             // initial UI state
             const defaults = document.getElementById('default-sections');
@@ -1773,8 +1771,6 @@
             document.getElementById('selection-display').classList.add('show');
             document.getElementById('clear-selection').style.display = 'block';
 
-            // set selectedMunicipality id/name for exports and progress
-            selectedMunicipality = selectedMunicipalityData.nome.replace(/\s+/g, '_').toLowerCase();
 
             // Unlock the rest of the UI
             _onMunicipalitySelected();
@@ -1783,7 +1779,6 @@
         // Clear municipality selection and revert UI to default
         function clearSelection() {
             selectedMunicipalityData = null;
-            selectedMunicipality = '';
             const municipalitySelect = document.getElementById('municipality-select');
             if (municipalitySelect) {
                 municipalitySelect.selectedIndex = 0;
@@ -1805,7 +1800,6 @@
             if (defaults) defaults.style.display = 'block';
 
             // Reset any page state and re-render overview
-            selectedMunicipality = '';
             renderCategoriesOverview();
             renderProfileIndicators();
             renderTable();
@@ -1821,6 +1815,14 @@
             if (details) {
                 details.classList.add('show');
                 details.style.display = 'block';
+            }
+
+            // Load data from database for Londrina
+            if (selectedMunicipalityData &&
+                selectedMunicipalityData.nome.toLowerCase() === 'londrina' &&
+                selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla.toUpperCase() === 'PR') {
+                console.log('Loading data from database for Londrina...');
+                loadDataFromDatabase();
             }
 
             // render the dynamic content for the selected municipality
@@ -1844,87 +1846,202 @@
             });
         }
 
-        // Generate sample data for demonstration
-        function generateSampleData() {
-            const years = [2022, 2023, 2024];
-            
-            Object.keys(indicatorsData).forEach(categoryKey => {
-                const category = indicatorsData[categoryKey];
-                
-                // Process regular indicators
-                category.indicators.forEach((indicator, index) => {
-                    years.forEach(year => {
-                        const dataKey = `${categoryKey}_${index}_${year}`;
-                        if (!currentData[dataKey]) {
-                            // Generate some random sample data for demonstration
-                            let value = '';
-                            if (Math.random() > 0.3) { // 70% chance of having data
-                                if (indicator.unit.includes('%')) {
-                                    value = (Math.random() * 100).toFixed(1);
-                                } else if (indicator.unit.includes('hab')) {
-                                    value = (Math.random() * 1000 + 100).toFixed(0);
-                                } else if (indicator.unit === 'dias' || indicator.unit === 'meses') {
-                                    value = (Math.random() * 30 + 1).toFixed(0);
-                                } else if (indicator.unit === 'horas' || indicator.unit === 'minutos') {
-                                    value = (Math.random() * 24).toFixed(1);
-                                } else {
-                                    value = (Math.random() * 100 + 10).toFixed(1);
-                                }
-                            }
-                            
-                            currentData[dataKey] = {
-                                value: value,
-                                source: value ? 'https://exemplo.gov.br/dados' : ''
-                            };
-                        }
-                    });
-                });
-                
-                // Process profile indicators
-                if (category.profileIndicators) {
-                    category.profileIndicators.forEach((indicator, index) => {
-                        years.forEach(year => {
-                            const dataKey = `${categoryKey}_profile_${index}_${year}`;
-                            if (!currentData[dataKey]) {
-                                // Generate some random sample data for demonstration
-                                let value = '';
-                                if (Math.random() > 0.3) { // 70% chance of having data
-                                    if (indicator.unit.includes('%')) {
-                                        value = (Math.random() * 100).toFixed(1);
-                                    } else if (indicator.unit.includes('hab')) {
-                                        value = (Math.random() * 1000 + 100).toFixed(0);
-                                    } else if (indicator.unit === 'dias' || indicator.unit === 'meses') {
-                                        value = (Math.random() * 30 + 1).toFixed(0);
-                                    } else if (indicator.unit === 'horas' || indicator.unit === 'minutos') {
-                                        value = (Math.random() * 24).toFixed(1);
-                                    } else {
-                                        value = (Math.random() * 100 + 10).toFixed(1);
-                                    }
-                                }
-                                
-                                currentData[dataKey] = {
-                                    value: value,
-                                    source: value ? 'https://exemplo.gov.br/dados' : '',
-                                    isProfile: true
-                                };
-                            }
-                        });
-                    });
-                }
-            });
-            saveData();
-        }
 
         // Load data from memory
         function loadData() {
             if (!currentData) {
                 currentData = {};
             }
+            initializeEmptyData();
+        }
+
+        // Initialize empty data structure
+        function initializeEmptyData() {
+            currentData = {};
+            Object.keys(indicatorsData).forEach(categoryKey => {
+                const category = indicatorsData[categoryKey];
+                category.indicators.forEach((indicator, index) => {
+                    [2022, 2023, 2024].forEach(year => {
+                        const dataKey = `${categoryKey}_${index}_${year}`;
+                        currentData[dataKey] = {
+                            value: '',
+                            source: ''
+                        };
+                    });
+                });
+            });
+        }
+
+        // Function to save individual field changes immediately
+        async function saveIndividualFieldToDatabase(key, field, value) {
+            try {
+                console.log('saveIndividualFieldToDatabase called:', { key, field, value });
+
+                // Parse the key to find the indicator
+                const keyParts = key.split('_');
+                const categoryKey = keyParts[0];
+                const indicatorIndex = parseInt(keyParts[1]);
+                const year = keyParts[2];
+
+                console.log('Parsed key parts:', { categoryKey, indicatorIndex, year });
+
+                const category = indicatorsData[categoryKey];
+                if (!category || !category.indicators[indicatorIndex]) {
+                    console.error('Category or indicator not found:', { categoryKey, indicatorIndex });
+                    return;
+                }
+
+                const indicator = category.indicators[indicatorIndex];
+                console.log('Found indicator:', indicator.name);
+
+                // Get existing data for this indicator to preserve other years
+                console.log('Getting existing data...');
+                const existingData = await getExistingIndicatorData(indicator.name);
+                console.log('Existing data:', existingData);
+
+                const data = {
+                    categoria: categoryKey,
+                    nome_indicador: indicator.name,
+                    tipo: 'core', // Default type for ISO37125
+                    ods: indicator.ods,
+                    unidade: indicator.unit,
+                    cidade: selectedMunicipalityData?.nome || 'Londrina',
+                    estado: selectedMunicipalityData?.microrregiao?.mesorregiao?.UF?.sigla || 'PR'
+                };
+
+                // Preserve existing data for all years
+                if (existingData) {
+                    data.dado_2022 = existingData.dado_2022;
+                    data.dado_2023 = existingData.dado_2023;
+                    data.dado_2024 = existingData.dado_2024;
+                    data.fonte_2022 = existingData.fonte_2022;
+                    data.fonte_2023 = existingData.fonte_2023;
+                    data.fonte_2024 = existingData.fonte_2024;
+                }
+
+                // Update the specific field being changed
+                if (field === 'value') {
+                    data[`dado_${year}`] = value;
+                } else if (field === 'source') {
+                    data[`fonte_${year}`] = value;
+                }
+
+                console.log('Data to save:', data);
+
+                const response = await fetch('/dashboard/api/iso37125/save/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                console.log('Save response:', result);
+
+                if (!result.success) {
+                    console.error('Failed to save:', result.message);
+                }
+
+            } catch (error) {
+                console.error('Erro ao salvar campo individual:', error);
+            }
+        }
+
+        // Helper function to get existing data for an indicator
+        async function getExistingIndicatorData(indicatorName) {
+            try {
+                const cidade = selectedMunicipalityData?.nome || 'Londrina';
+                const estado = selectedMunicipalityData?.microrregiao?.mesorregiao?.UF?.sigla || 'PR';
+
+                const response = await fetch(`/dashboard/api/iso37125/get/?cidade=${encodeURIComponent(cidade)}&estado=${encodeURIComponent(estado)}`);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    return result.data.find(record => record.nome_indicador === indicatorName);
+                }
+                return null;
+            } catch (error) {
+                console.error('Erro ao buscar dados existentes:', error);
+                return null;
+            }
+        }
+
+        // Load data from database
+        async function loadDataFromDatabase() {
+            try {
+                const cidade = selectedMunicipalityData?.nome || 'Londrina';
+                const estado = selectedMunicipalityData?.microrregiao?.mesorregiao?.UF?.sigla || 'PR';
+
+                console.log('Loading data from database for:', { cidade, estado });
+
+                const response = await fetch(`/dashboard/api/iso37125/get/?cidade=${encodeURIComponent(cidade)}&estado=${encodeURIComponent(estado)}`);
+                console.log('API response status:', response.status);
+
+                const result = await response.json();
+                console.log('API result:', result);
+
+                // Clear current data first
+                currentData = {};
+
+                if (result.success && result.data) {
+                    // Create a map of indicator names to database records
+                    const dbDataMap = {};
+                    result.data.forEach(record => {
+                        dbDataMap[record.nome_indicador] = record;
+                    });
+
+                    // Initialize all indicators with data from database or empty values
+                    Object.keys(indicatorsData).forEach(categoryKey => {
+                        const category = indicatorsData[categoryKey];
+                        category.indicators.forEach((indicator, index) => {
+                            [2022, 2023, 2024].forEach(year => {
+                                const dataKey = `${categoryKey}_${index}_${year}`;
+                                const dbRecord = dbDataMap[indicator.name];
+
+                                currentData[dataKey] = {
+                                    value: dbRecord ? (dbRecord[`dado_${year}`] || '') : '',
+                                    source: dbRecord ? (dbRecord[`fonte_${year}`] || '') : ''
+                                };
+                            });
+                        });
+                    });
+                } else {
+                    // Initialize empty data if no database records found
+                    initializeEmptyData();
+                }
+
+                console.log('Data loaded from database:', currentData);
+
+                // Re-render the table to show loaded data
+                renderTable();
+
+            } catch (error) {
+                console.error('Erro ao carregar dados do banco:', error);
+                // Initialize empty data on error
+                initializeEmptyData();
+            }
+        }
+
+        // Function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
 
         // Save data to memory
         function saveData() {
-            if (selectedMunicipality) {
+            if (selectedMunicipalityData) {
                 updateProgress();
             }
         }
@@ -2000,7 +2117,7 @@
             updateProgress();
             
             // Update the radar chart
-            if (selectedMunicipality) {
+            if (selectedMunicipalityData) {
                 updateRadarChart();
                 updateCategorySummary();
             }
@@ -2204,18 +2321,29 @@
                 currentData[key] = { value: '', source: '' };
             }
             currentData[key][field] = value;
+
+            console.log('currentData updated:', currentData[key]);
+
+            // Save individual field to database immediately
+            console.log('Calling saveIndividualFieldToDatabase...');
+            saveIndividualFieldToDatabase(key, field, value);
+
+            // Update local display
             saveData();
-            
+
+            // Re-render to update visual state
+            renderTable();
+
             // Update progress immediately
             updateProgress();
-            
+
             // Update profile indicators if needed
             if (key.includes('_profile_')) {
                 renderProfileIndicators();
             }
-            
+
             // Update radar chart and category summary immediately
-            if (selectedMunicipality) {
+            if (selectedMunicipalityData) {
                 updateRadarChart();
                 updateCategorySummary();
             }
@@ -2763,14 +2891,16 @@
                 }
             });
 
-            downloadFile(`indicadores_esg_${selectedMunicipality}_completo.csv`, csv, 'text/csv');
+            const municipalityName = selectedMunicipalityData?.nome ? selectedMunicipalityData.nome.replace(/\s+/g, '_').toLowerCase() : 'municipality';
+            downloadFile(`indicadores_esg_${municipalityName}_completo.csv`, csv, 'text/csv');
         }
 
         // Export to JSON
         function exportToJSON() {
             const counts = countFilledIndicators();
+            const municipalityName = selectedMunicipalityData?.nome || 'Municipality';
             const exportData = {
-                municipality: selectedMunicipality.replace('-', ' ').toUpperCase(),
+                municipality: municipalityName.toUpperCase(),
                 exportDate: new Date().toISOString(),
                 summary: {
                     totalIndicators: `${counts.filledCount}/${counts.totalCount}`,
@@ -2780,7 +2910,8 @@
                 metadata: indicatorsData
             };
             
-            downloadFile(`indicadores_esg_${selectedMunicipality}_completo.json`, JSON.stringify(exportData, null, 2), 'application/json');
+            const filenameMunicipality = selectedMunicipalityData?.nome ? selectedMunicipalityData.nome.replace(/\s+/g, '_').toLowerCase() : 'municipality';
+            downloadFile(`indicadores_esg_${filenameMunicipality}_completo.json`, JSON.stringify(exportData, null, 2), 'application/json');
         }
 
         // Download file
@@ -2804,8 +2935,9 @@
             const completionRate = ((totalFilled / totalIndicators) * 100).toFixed(1);
 
             // Create summary
+            const reportMunicipality = selectedMunicipalityData?.nome || 'Municipality';
             const summaryHtml = `
-                <strong>📈 Relatório Executivo - ${selectedMunicipality.replace('-', ' ').toUpperCase()}</strong><br><br>
+                <strong>📈 Relatório Executivo - ${reportMunicipality.toUpperCase()}</strong><br><br>
                 <strong>Período:</strong> 2022-2024<br>
                 <strong>Data de Geração:</strong> ${new Date().toLocaleDateString('pt-BR')}<br><br>
                 <strong>📊 Resumo Geral de Preenchimento (${currentYear}):</strong><br>
@@ -3008,6 +3140,36 @@
                 }
             }
         }
+
+        // Initialize the application when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStates();
+
+            // Auto-select Londrina for demonstration and load data
+            setTimeout(() => {
+                if (!selectedMunicipalityData) {
+                    // Auto-select Londrina if no municipality is selected
+                    selectedMunicipalityData = {
+                        id: 4113700,
+                        nome: 'Londrina',
+                        microrregiao: {
+                            mesorregiao: {
+                                UF: {
+                                    id: 41,
+                                    nome: 'Paraná',
+                                    sigla: 'PR'
+                                }
+                            }
+                        }
+                    };
+                    console.log('Auto-selected Londrina, loading data...');
+                    loadDataFromDatabase();
+                } else if (selectedMunicipalityData.nome.toLowerCase() === 'londrina' &&
+                           selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla.toUpperCase() === 'PR') {
+                    loadDataFromDatabase();
+                }
+            }, 1000);
+        });
     </script>
 </body>
 </html>

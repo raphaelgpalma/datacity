@@ -6,7 +6,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import RegisterForm, LoginForm
-from .models import User, Platform, Norm
+from .models import User, Platform, Norm, ISO37120Indicator, ISO37122Indicator, ISO37123Indicator, ISO37125Indicator
 import json
 import os
 from django.conf import settings
@@ -298,6 +298,514 @@ def iso37120(request):
         'username': request.user.username
     }
     return render(request, 'accounts/normas/iso37120.html', context)
+
+# API to save/update ISO37120 indicator data
+@csrf_exempt
+@login_required
+def save_iso37120_data(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            categoria = data.get('categoria')
+            nome_indicador = data.get('nome_indicador')
+            tipo = data.get('tipo')
+            ods = data.get('ods')
+            unidade = data.get('unidade')
+            cidade = data.get('cidade', 'Londrina')
+            estado = data.get('estado', 'PR')
+
+            # Data fields
+            dado_2022 = data.get('dado_2022')
+            dado_2023 = data.get('dado_2023')
+            dado_2024 = data.get('dado_2024')
+
+            # Source fields
+            fonte_2022 = data.get('fonte_2022')
+            fonte_2023 = data.get('fonte_2023')
+            fonte_2024 = data.get('fonte_2024')
+
+            # Create or update indicator
+            indicator, created = ISO37120Indicator.objects.get_or_create(
+                nome_indicador=nome_indicador,
+                cidade=cidade,
+                estado=estado,
+                defaults={
+                    'categoria': categoria,
+                    'tipo': tipo,
+                    'ods': ods,
+                    'unidade': unidade,
+                    'dado_2022': dado_2022,
+                    'dado_2023': dado_2023,
+                    'dado_2024': dado_2024,
+                    'fonte_2022': fonte_2022,
+                    'fonte_2023': fonte_2023,
+                    'fonte_2024': fonte_2024,
+                }
+            )
+
+            if not created:
+                # Update existing indicator - only update provided fields
+                indicator.categoria = categoria
+                indicator.tipo = tipo
+                indicator.ods = ods
+                indicator.unidade = unidade
+
+                # Only update data fields if they are provided (not None)
+                if dado_2022 is not None:
+                    indicator.dado_2022 = dado_2022
+                if dado_2023 is not None:
+                    indicator.dado_2023 = dado_2023
+                if dado_2024 is not None:
+                    indicator.dado_2024 = dado_2024
+
+                # Only update source fields if they are provided (not None)
+                if fonte_2022 is not None:
+                    indicator.fonte_2022 = fonte_2022
+                if fonte_2023 is not None:
+                    indicator.fonte_2023 = fonte_2023
+                if fonte_2024 is not None:
+                    indicator.fonte_2024 = fonte_2024
+
+                indicator.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Dados salvos com sucesso',
+                'id': indicator.id
+            })
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+
+# API to get ISO37120 indicator data
+@login_required
+def get_iso37120_data(request):
+    try:
+        cidade = request.GET.get('cidade', 'Londrina')
+        estado = request.GET.get('estado', 'PR')
+
+        indicators = ISO37120Indicator.objects.filter(
+            cidade=cidade,
+            estado=estado
+        ).values()
+
+        return JsonResponse({
+            'success': True,
+            'data': list(indicators)
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+# API to update specific field (for edit functionality)
+@csrf_exempt
+@login_required
+def update_iso37120_field(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            indicator_id = data.get('indicator_id')
+            field_name = data.get('field_name')
+            field_value = data.get('field_value')
+
+            indicator = ISO37120Indicator.objects.get(id=indicator_id)
+            setattr(indicator, field_name, field_value)
+            indicator.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Campo atualizado com sucesso'
+            })
+
+        except ISO37120Indicator.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Indicador não encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+
+# API to save/update ISO37122 indicator data
+@csrf_exempt
+@login_required
+def save_iso37122_data(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            categoria = data.get('categoria')
+            nome_indicador = data.get('nome_indicador')
+            tipo = data.get('tipo')
+            ods = data.get('ods')
+            unidade = data.get('unidade')
+            cidade = data.get('cidade', 'Londrina')
+            estado = data.get('estado', 'PR')
+
+            # Data fields
+            dado_2022 = data.get('dado_2022')
+            dado_2023 = data.get('dado_2023')
+            dado_2024 = data.get('dado_2024')
+
+            # Source fields
+            fonte_2022 = data.get('fonte_2022')
+            fonte_2023 = data.get('fonte_2023')
+            fonte_2024 = data.get('fonte_2024')
+
+            # Create or update indicator
+            indicator, created = ISO37122Indicator.objects.get_or_create(
+                nome_indicador=nome_indicador,
+                cidade=cidade,
+                estado=estado,
+                defaults={
+                    'categoria': categoria,
+                    'tipo': tipo,
+                    'ods': ods,
+                    'unidade': unidade,
+                    'dado_2022': dado_2022,
+                    'dado_2023': dado_2023,
+                    'dado_2024': dado_2024,
+                    'fonte_2022': fonte_2022,
+                    'fonte_2023': fonte_2023,
+                    'fonte_2024': fonte_2024,
+                }
+            )
+
+            if not created:
+                # Update existing indicator - only update provided fields
+                indicator.categoria = categoria
+                indicator.tipo = tipo
+                indicator.ods = ods
+                indicator.unidade = unidade
+
+                # Only update data fields if they are provided (not None)
+                if dado_2022 is not None:
+                    indicator.dado_2022 = dado_2022
+                if dado_2023 is not None:
+                    indicator.dado_2023 = dado_2023
+                if dado_2024 is not None:
+                    indicator.dado_2024 = dado_2024
+
+                # Only update source fields if they are provided (not None)
+                if fonte_2022 is not None:
+                    indicator.fonte_2022 = fonte_2022
+                if fonte_2023 is not None:
+                    indicator.fonte_2023 = fonte_2023
+                if fonte_2024 is not None:
+                    indicator.fonte_2024 = fonte_2024
+
+                indicator.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Dados salvos com sucesso',
+                'id': indicator.id
+            })
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+
+# API to get ISO37122 indicator data
+@login_required
+def get_iso37122_data(request):
+    try:
+        cidade = request.GET.get('cidade', 'Londrina')
+        estado = request.GET.get('estado', 'PR')
+
+        indicators = ISO37122Indicator.objects.filter(
+            cidade=cidade,
+            estado=estado
+        ).values()
+
+        return JsonResponse({
+            'success': True,
+            'data': list(indicators)
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+# API to save/update ISO37123 indicator data
+@csrf_exempt
+@login_required
+def save_iso37123_data(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            categoria = data.get('categoria')
+            nome_indicador = data.get('nome_indicador')
+            tipo = data.get('tipo')
+            ods = data.get('ods')
+            unidade = data.get('unidade')
+            cidade = data.get('cidade', 'Londrina')
+            estado = data.get('estado', 'PR')
+
+            # Data fields
+            dado_2022 = data.get('dado_2022')
+            dado_2023 = data.get('dado_2023')
+            dado_2024 = data.get('dado_2024')
+
+            # Source fields
+            fonte_2022 = data.get('fonte_2022')
+            fonte_2023 = data.get('fonte_2023')
+            fonte_2024 = data.get('fonte_2024')
+
+            # Create or update indicator
+            indicator, created = ISO37123Indicator.objects.get_or_create(
+                nome_indicador=nome_indicador,
+                cidade=cidade,
+                estado=estado,
+                defaults={
+                    'categoria': categoria,
+                    'tipo': tipo,
+                    'ods': ods,
+                    'unidade': unidade,
+                    'dado_2022': dado_2022,
+                    'dado_2023': dado_2023,
+                    'dado_2024': dado_2024,
+                    'fonte_2022': fonte_2022,
+                    'fonte_2023': fonte_2023,
+                    'fonte_2024': fonte_2024,
+                }
+            )
+
+            if not created:
+                # Update existing indicator - only update provided fields
+                indicator.categoria = categoria
+                indicator.tipo = tipo
+                indicator.ods = ods
+                indicator.unidade = unidade
+
+                # Only update data fields if they are provided (not None)
+                if dado_2022 is not None:
+                    indicator.dado_2022 = dado_2022
+                if dado_2023 is not None:
+                    indicator.dado_2023 = dado_2023
+                if dado_2024 is not None:
+                    indicator.dado_2024 = dado_2024
+
+                # Only update source fields if they are provided (not None)
+                if fonte_2022 is not None:
+                    indicator.fonte_2022 = fonte_2022
+                if fonte_2023 is not None:
+                    indicator.fonte_2023 = fonte_2023
+                if fonte_2024 is not None:
+                    indicator.fonte_2024 = fonte_2024
+
+                indicator.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Dados salvos com sucesso',
+                'id': indicator.id
+            })
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+
+# API to get ISO37123 indicator data
+@login_required
+def get_iso37123_data(request):
+    try:
+        cidade = request.GET.get('cidade', 'Londrina')
+        estado = request.GET.get('estado', 'PR')
+
+        indicators = ISO37123Indicator.objects.filter(
+            cidade=cidade,
+            estado=estado
+        ).values()
+
+        return JsonResponse({
+            'success': True,
+            'data': list(indicators)
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+# API to save/update ISO37125 indicator data
+@csrf_exempt
+@login_required
+def save_iso37125_data(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            categoria = data.get('categoria')
+            nome_indicador = data.get('nome_indicador')
+            tipo = data.get('tipo')
+            ods = data.get('ods')
+            unidade = data.get('unidade')
+            cidade = data.get('cidade', 'Londrina')
+            estado = data.get('estado', 'PR')
+
+            # Data fields
+            dado_2022 = data.get('dado_2022')
+            dado_2023 = data.get('dado_2023')
+            dado_2024 = data.get('dado_2024')
+
+            # Source fields
+            fonte_2022 = data.get('fonte_2022')
+            fonte_2023 = data.get('fonte_2023')
+            fonte_2024 = data.get('fonte_2024')
+
+            # Create or update indicator
+            indicator, created = ISO37125Indicator.objects.get_or_create(
+                nome_indicador=nome_indicador,
+                cidade=cidade,
+                estado=estado,
+                defaults={
+                    'categoria': categoria,
+                    'tipo': tipo,
+                    'ods': ods,
+                    'unidade': unidade,
+                    'dado_2022': dado_2022,
+                    'dado_2023': dado_2023,
+                    'dado_2024': dado_2024,
+                    'fonte_2022': fonte_2022,
+                    'fonte_2023': fonte_2023,
+                    'fonte_2024': fonte_2024,
+                }
+            )
+
+            if not created:
+                # Update existing indicator - only update provided fields
+                indicator.categoria = categoria
+                indicator.tipo = tipo
+                indicator.ods = ods
+                indicator.unidade = unidade
+
+                # Only update data fields if they are provided (not None)
+                if dado_2022 is not None:
+                    indicator.dado_2022 = dado_2022
+                if dado_2023 is not None:
+                    indicator.dado_2023 = dado_2023
+                if dado_2024 is not None:
+                    indicator.dado_2024 = dado_2024
+
+                # Only update source fields if they are provided (not None)
+                if fonte_2022 is not None:
+                    indicator.fonte_2022 = fonte_2022
+                if fonte_2023 is not None:
+                    indicator.fonte_2023 = fonte_2023
+                if fonte_2024 is not None:
+                    indicator.fonte_2024 = fonte_2024
+
+                indicator.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Dados salvos com sucesso',
+                'id': indicator.id
+            })
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+
+# API to get ISO37125 indicator data
+@login_required
+def get_iso37125_data(request):
+    try:
+        cidade = request.GET.get('cidade', 'Londrina')
+        estado = request.GET.get('estado', 'PR')
+
+        indicators = ISO37125Indicator.objects.filter(
+            cidade=cidade,
+            estado=estado
+        ).values()
+
+        return JsonResponse({
+            'success': True,
+            'data': list(indicators)
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+# API to update specific field for ISO37122 (for edit functionality)
+@csrf_exempt
+@login_required
+def update_iso37122_field(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            indicator_id = data.get('indicator_id')
+            field_name = data.get('field_name')
+            field_value = data.get('field_value')
+
+            indicator = ISO37122Indicator.objects.get(id=indicator_id)
+            setattr(indicator, field_name, field_value)
+            indicator.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Campo atualizado com sucesso'
+            })
+
+        except ISO37122Indicator.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Indicador não encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+
+# API to update specific field for ISO37123 (for edit functionality)
+@csrf_exempt
+@login_required
+def update_iso37123_field(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            indicator_id = data.get('indicator_id')
+            field_name = data.get('field_name')
+            field_value = data.get('field_value')
+
+            indicator = ISO37123Indicator.objects.get(id=indicator_id)
+            setattr(indicator, field_name, field_value)
+            indicator.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Campo atualizado com sucesso'
+            })
+
+        except ISO37123Indicator.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Indicador não encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+
+# API to update specific field for ISO37125 (for edit functionality)
+@csrf_exempt
+@login_required
+def update_iso37125_field(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            indicator_id = data.get('indicator_id')
+            field_name = data.get('field_name')
+            field_value = data.get('field_value')
+
+            indicator = ISO37125Indicator.objects.get(id=indicator_id)
+            setattr(indicator, field_name, field_value)
+            indicator.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Campo atualizado com sucesso'
+            })
+
+        except ISO37125Indicator.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Indicador não encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
 @require_http_methods(["GET"])

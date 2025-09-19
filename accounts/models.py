@@ -78,10 +78,158 @@ class Norm(models.Model):
     id_norma = models.AutoField(primary_key=True)  # Chave primária personalizada
     Nome = models.CharField(max_length=100, unique=True)
     Direcionamento = models.URLField()
-    
+
     class Meta:
         ordering = ['Nome']
         db_table = 'norma'
 
-    def __str__(self): 
+    def __str__(self):
         return self.Nome
+
+class ISO37120Indicator(models.Model):
+    id = models.AutoField(primary_key=True)
+    categoria = models.CharField(max_length=100)
+    nome_indicador = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=20, choices=[
+        ('core', 'Principal'),
+        ('supporting', 'Apoio'),
+        ('profile', 'Perfil')
+    ])
+    ods = models.CharField(max_length=10)
+    unidade = models.CharField(max_length=50)
+
+    # Dados para diferentes anos
+    dado_2022 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2023 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2024 = models.CharField(max_length=100, null=True, blank=True)
+
+    # Fontes para diferentes anos
+    fonte_2022 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2023 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
+
+    # Cidade para permitir dados de múltiplas cidades
+    cidade = models.CharField(max_length=100, default='Londrina')
+    estado = models.CharField(max_length=50, default='PR')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'iso37120_indicators'
+        ordering = ['categoria', 'nome_indicador']
+        unique_together = ['nome_indicador', 'cidade', 'estado']
+
+    def __str__(self):
+        return f"{self.nome_indicador} - {self.cidade}/{self.estado}"
+
+class ISO37122Indicator(models.Model):
+    id = models.AutoField(primary_key=True)
+    categoria = models.CharField(max_length=100)
+    nome_indicador = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=20, choices=[
+        ('core', 'Principal'),
+        ('supporting', 'Apoio'),
+        ('profile', 'Perfil')
+    ])
+    ods = models.CharField(max_length=10)
+    unidade = models.CharField(max_length=50)
+
+    # Dados para diferentes anos
+    dado_2022 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2023 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2024 = models.CharField(max_length=100, null=True, blank=True)
+
+    # Fontes para diferentes anos
+    fonte_2022 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2023 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
+
+    # Cidade para permitir dados de múltiplas cidades
+    cidade = models.CharField(max_length=100, default='Londrina')
+    estado = models.CharField(max_length=50, default='PR')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'iso37122_indicators'
+        ordering = ['categoria', 'nome_indicador']
+        unique_together = ['nome_indicador', 'cidade', 'estado']
+
+    def __str__(self):
+        return f"{self.nome_indicador} - {self.cidade}/{self.estado}"
+
+class ISO37123Indicator(models.Model):
+    id = models.AutoField(primary_key=True)
+    categoria = models.CharField(max_length=100)
+    nome_indicador = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=20, choices=[
+        ('core', 'Principal'),
+        ('supporting', 'Apoio'),
+        ('profile', 'Perfil')
+    ])
+    ods = models.CharField(max_length=10)
+    unidade = models.CharField(max_length=50)
+
+    # Dados para diferentes anos
+    dado_2022 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2023 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2024 = models.CharField(max_length=100, null=True, blank=True)
+
+    # Fontes para diferentes anos
+    fonte_2022 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2023 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
+
+    # Cidade para permitir dados de múltiplas cidades
+    cidade = models.CharField(max_length=100, default='Londrina')
+    estado = models.CharField(max_length=50, default='PR')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'iso37123_indicators'
+        ordering = ['categoria', 'nome_indicador']
+        unique_together = ['nome_indicador', 'cidade', 'estado']
+
+    def __str__(self):
+        return f"{self.nome_indicador} - {self.cidade}/{self.estado}"
+
+class ISO37125Indicator(models.Model):
+    id = models.AutoField(primary_key=True)
+    categoria = models.CharField(max_length=100)
+    nome_indicador = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=20, choices=[
+        ('core', 'Principal'),
+        ('supporting', 'Apoio'),
+        ('profile', 'Perfil')
+    ])
+    ods = models.CharField(max_length=10)
+    unidade = models.CharField(max_length=50)
+
+    # Dados para diferentes anos
+    dado_2022 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2023 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2024 = models.CharField(max_length=100, null=True, blank=True)
+
+    # Fontes para diferentes anos
+    fonte_2022 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2023 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
+
+    # Cidade para permitir dados de múltiplas cidades
+    cidade = models.CharField(max_length=100, default='Londrina')
+    estado = models.CharField(max_length=50, default='PR')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'iso37125_indicators'
+        ordering = ['categoria', 'nome_indicador']
+        unique_together = ['nome_indicador', 'cidade', 'estado']
+
+    def __str__(self):
+        return f"{self.nome_indicador} - {self.cidade}/{self.estado}"

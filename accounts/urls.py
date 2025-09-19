@@ -59,4 +59,24 @@ urlpatterns = [
     path('dashboard/normas/editar_norma/<int:norm_id>/', views.editar_norma, name='editar_norma'),
     path('dashboard/normas/remover_norma/<int:norm_id>/', views.remover_norma, name='remover_norma'),
     path('dashboard/normas/listar_normas/', views.listar_normas, name='listar_normas'),
+
+    # APIs para ISO37120
+    path('dashboard/api/iso37120/save/', views.save_iso37120_data, name='save_iso37120_data'),
+    path('dashboard/api/iso37120/get/', views.get_iso37120_data, name='get_iso37120_data'),
+    path('dashboard/api/iso37120/update_field/', views.update_iso37120_field, name='update_iso37120_field'),
+
+    # APIs para ISO37122
+    path('dashboard/api/iso37122/save/', views.save_iso37122_data, name='save_iso37122_data'),
+    path('dashboard/api/iso37122/get/', views.get_iso37122_data, name='get_iso37122_data'),
+    path('dashboard/api/iso37122/update_field/', views.update_iso37122_field, name='update_iso37122_field'),
+
+    # APIs para ISO37123
+    path('dashboard/api/iso37123/save/', views.save_iso37123_data, name='save_iso37123_data'),
+    path('dashboard/api/iso37123/get/', views.get_iso37123_data, name='get_iso37123_data'),
+    path('dashboard/api/iso37123/update_field/', views.update_iso37123_field, name='update_iso37123_field'),
+
+    # APIs para ISO37125
+    path('dashboard/api/iso37125/save/', views.save_iso37125_data, name='save_iso37125_data'),
+    path('dashboard/api/iso37125/get/', views.get_iso37125_data, name='get_iso37125_data'),
+    path('dashboard/api/iso37125/update_field/', views.update_iso37125_field, name='update_iso37125_field'),
 ]
