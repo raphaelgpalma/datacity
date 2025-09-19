@@ -1367,7 +1367,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <a href="#" class="back-button" onclick="resetPage()">
+            <a href="#" class="back-button" onclick="history.back(); return false;">
                 ← Voltar para Normas
             </a>
            <div class="logo-header">
@@ -1873,14 +1873,34 @@
 
         // Populate filter dropdown with categories
         function populateFilterOptions() {
+            console.log('populateFilterOptions called');
             const filterSelect = document.getElementById('category-filter');
+            console.log('Filter select element:', filterSelect);
+
+            // Clear only the dynamically added options, keep the "all" option
+            const allOption = filterSelect.querySelector('option[value="all"]');
+            filterSelect.innerHTML = '';
+            if (allOption) {
+                filterSelect.appendChild(allOption);
+            } else {
+                // Add "all" option if it doesn't exist
+                const allOptionNew = document.createElement('option');
+                allOptionNew.value = 'all';
+                allOptionNew.textContent = 'Todas as categorias';
+                filterSelect.appendChild(allOptionNew);
+            }
+
+            // Add category options
+            console.log('Available categories:', Object.keys(indicatorsData));
             Object.keys(indicatorsData).forEach(categoryKey => {
                 const category = indicatorsData[categoryKey];
                 const option = document.createElement('option');
                 option.value = categoryKey;
                 option.textContent = category.name;
+                console.log('Adding option:', categoryKey, '-', category.name);
                 filterSelect.appendChild(option);
             });
+            console.log('populateFilterOptions completed');
         }
 
         // Generate sample data for demonstration
@@ -1897,10 +1917,7 @@
             }
         }
 
-        // Reset page
-        function resetPage() {
-            console.log('Voltando para página de normas...');
-        }
+        // Note: resetPage function removed - using history.back() instead
 
         // Render categories overview
         function renderCategoriesOverview() {
@@ -2035,15 +2052,22 @@
 
         // Render the indicators table
         function renderTable() {
+            console.log('renderTable called');
             const tableBody = document.getElementById('table-body');
             if (!tableBody) return;
-            
+
             const filter = document.getElementById('category-filter').value;
-            
+            console.log('renderTable filter value:', filter);
+
             tableBody.innerHTML = '';
 
             Object.keys(indicatorsData).forEach(categoryKey => {
-                if (filter !== 'all' && filter !== categoryKey) return;
+                console.log('Processing category:', categoryKey, 'filter:', filter);
+                if (filter !== 'all' && filter !== categoryKey) {
+                    console.log('Skipping category:', categoryKey);
+                    return;
+                }
+                console.log('Rendering category:', categoryKey);
                 
                 const category = indicatorsData[categoryKey];
                 
@@ -2370,6 +2394,9 @@
 
         // Filter by category
         function filterByCategory() {
+            console.log('filterByCategory called');
+            const filter = document.getElementById('category-filter').value;
+            console.log('Current filter value:', filter);
             renderTable();
             updateCertificationLevels();
         }
@@ -3291,7 +3318,10 @@
         });
 
         // Initialize when page loads
-        window.onload = init;
+        window.addEventListener('load', function() {
+            console.log('Window loaded - calling populateFilterOptions');
+            populateFilterOptions();
+        });
         // Função de relatório histórico (Visualização histórica)
         function generateReport() {
             const counts = countFilledIndicators();
