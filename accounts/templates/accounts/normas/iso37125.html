@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+{% load static %}
 <head>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataCity - ISO 37125</title>
+    <link rel="icon" type="image/png" href="{% static 'img/Logo_drive.png' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -55,6 +57,11 @@
             justify-content: center;
             gap: 8px;
             width: 100%;
+        }
+
+        .logo-header img {
+            width: 180px;
+            height: auto;
         }
 
         .logo-text {
@@ -1286,7 +1293,7 @@
                 ← Voltar para Normas
             </a>
            <div class="logo-header">
-            <img src="img/logo.png" alt="DataCity Logo" />
+            <img src="{% static 'img/Logo_drive.png' %}" alt="DataCity Logo" />
             </div>
         </div>
 
