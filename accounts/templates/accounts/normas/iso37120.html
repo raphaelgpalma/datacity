@@ -2694,43 +2694,57 @@ function selectMunicipality() {
         }
 
         // Generate comprehensive report with charts
-        function generateReport() {
-            const counts = countFilledIndicators();
-            const totalFilled = counts.coreCount + counts.supportingCount;
-            const totalIndicators = counts.totalCore + counts.totalSupporting;
-            const completionRate = ((totalFilled / totalIndicators) * 100).toFixed(1);
-            
-            // Create summary
-            const summaryHtml = `
-                <strong>📈 Relatório Executivo - ${selectedMunicipality.replace('-', ' ').toUpperCase()}</strong><br><br>
-                <strong>Período:</strong> 2022-2024<br>
-                <strong>Data de Geração:</strong> ${new Date().toLocaleDateString('pt-BR')}<br><br>
-                
-                <strong>📊 Resumo Geral de Preenchimento (${currentYear}):</strong><br>
-                • Indicadores Principais: <strong>${counts.coreCount}/${counts.totalCore}</strong> (${((counts.coreCount/counts.totalCore)*100).toFixed(1)}%)<br>
-                • Indicadores de Apoio: <strong>${counts.supportingCount}/${counts.totalSupporting}</strong> (${((counts.supportingCount/counts.totalSupporting)*100).toFixed(1)}%)<br>
-                • Taxa de Completude Total: <strong>${completionRate}%</strong><br><br>
-                
-                <strong>🎯 Status de Certificação:</strong><br>
-                ${getBestCertificationLevel(counts)}<br><br>
-                
-                <strong>📋 Este relatório apresenta a evolução temporal de todos os indicadores com dados disponíveis para os anos 2022, 2023 e 2024.</strong>
-            `;
-            
-            document.getElementById('reportSummary').innerHTML = summaryHtml;
-            
-            // Generate and show trends summary
-            const trendsHtml = generateTrendsSummary();
-            const trendsContainer = document.getElementById('trendsSummary');
-            trendsContainer.innerHTML = trendsHtml;
-            trendsContainer.style.display = 'block';
-            
-            // Generate charts for indicators with data
-            generateIndicatorCharts();
-            
-            // Show modal
-            document.getElementById('reportModal').style.display = 'block';
-        }
+       function generateReport() {
+    // Verificar se há município selecionado
+    if (!selectedMunicipalityData) {
+        alert('Por favor, selecione um município primeiro.');
+        return;
+    }
+
+    const counts = countFilledIndicators();
+    const totalFilled = counts.coreCount + counts.supportingCount;
+    const totalIndicators = counts.totalCore + counts.totalSupporting;
+    const completionRate = ((totalFilled / totalIndicators) * 100).toFixed(1);
+    
+    // Obter nome do município formatado
+    const municipalityName = selectedMunicipalityData.nome;
+    const stateName = selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla;
+    const municipalityFullName = `${municipalityName} - ${stateName}`;
+    
+    // Create summary
+    const summaryHtml = `
+        <strong>📈 Relatório Executivo - ${municipalityFullName.toUpperCase()}</strong><br><br>
+        <strong>Período:</strong> 2022-2024<br>
+        <strong>Data de Geração:</strong> ${new Date().toLocaleDateString('pt-BR')}<br><br>
+        
+        <strong>📊 Resumo Geral de Preenchimento (${currentYear}):</strong><br>
+        • Indicadores Principais: <strong>${counts.coreCount}/${counts.totalCore}</strong> (${((counts.coreCount/counts.totalCore)*100).toFixed(1)}%)<br>
+        • Indicadores de Apoio: <strong>${counts.supportingCount}/${counts.totalSupporting}</strong> (${((counts.supportingCount/counts.totalSupporting)*100).toFixed(1)}%)<br>
+        • Taxa de Completude Total: <strong>${completionRate}%</strong><br><br>
+        
+        <strong>🎯 Status de Certificação:</strong><br>
+        ${getBestCertificationLevel(counts)}<br><br>
+        
+        <strong>📋 Este relatório apresenta a evolução temporal de todos os indicadores com dados disponíveis para os anos 2022, 2023 e 2024.</strong>
+    `;
+    
+    document.getElementById('reportSummary').innerHTML = summaryHtml;
+    
+    // Update modal title with municipality name
+    document.querySelector('.modal-title').textContent = `Relatório Completo ISO 37120 - ${municipalityFullName}`;
+    
+    // Generate and show trends summary
+    const trendsHtml = generateTrendsSummary();
+    const trendsContainer = document.getElementById('trendsSummary');
+    trendsContainer.innerHTML = trendsHtml;
+    trendsContainer.style.display = 'block';
+    
+    // Generate charts for indicators with data
+    generateIndicatorCharts();
+    
+    // Show modal
+    document.getElementById('reportModal').style.display = 'block';
+}
 
         // Get best certification level achieved
         function getBestCertificationLevel(counts) {
@@ -3074,53 +3088,59 @@ function selectMunicipality() {
 
         // Export to CSV
         function exportToCSV() {
-            let csv = 'Categoria,Indicador,Tipo,ODS,Valor_2022,Valor_2023,Valor_2024,Unidade,Fonte_2024\n';
-            
-            Object.keys(indicatorsData).forEach(categoryKey => {
-                const category = indicatorsData[categoryKey];
-                category.indicators.forEach((indicator, index) => {
-                    const data2022 = currentData[`${categoryKey}_${index}_2022`] || { value: '', source: '' };
-                    const data2023 = currentData[`${categoryKey}_${index}_2023`] || { value: '', source: '' };
-                    const data2024 = currentData[`${categoryKey}_${index}_2024`] || { value: '', source: '' };
-                    
-                    csv += `"${category.name}","${indicator.name}","${indicator.type}","${indicator.ods}","${data2022.value}","${data2023.value}","${data2024.value}","${indicator.unit}","${data2024.source}"\n`;
-                });
-            });
+    if (!selectedMunicipalityData) {
+        alert('Por favor, selecione um município primeiro.');
+        return;
+    }
 
-            downloadFile(`iso37120_${selectedMunicipality}_completo.csv`, csv, 'text/csv');
-        }
+    const municipalityName = selectedMunicipalityData.nome;
+    const stateName = selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla;
+    const fileName = `${municipalityName}_${stateName}`.toLowerCase().replace(/\s+/g, '_');
+    
+    let csv = 'Categoria,Indicador,Tipo,ODS,Valor_2022,Valor_2023,Valor_2024,Unidade,Fonte_2024\n';
+    
+    Object.keys(indicatorsData).forEach(categoryKey => {
+        const category = indicatorsData[categoryKey];
+        category.indicators.forEach((indicator, index) => {
+            const data2022 = currentData[`${categoryKey}_${index}_2022`] || { value: '', source: '' };
+            const data2023 = currentData[`${categoryKey}_${index}_2023`] || { value: '', source: '' };
+            const data2024 = currentData[`${categoryKey}_${index}_2024`] || { value: '', source: '' };
+            
+            csv += `"${category.name}","${indicator.name}","${indicator.type}","${indicator.ods}","${data2022.value}","${data2023.value}","${data2024.value}","${indicator.unit}","${data2024.source}"\n`;
+        });
+    });
+
+    downloadFile(`iso37120_${fileName}_completo.csv`, csv, 'text/csv');
+}
 
         // Export to JSON
-        function exportToJSON() {
-            const counts = countFilledIndicators();
-            const exportData = {
-                municipality: selectedMunicipality.replace('-', ' ').toUpperCase(),
-                exportDate: new Date().toISOString(),
-                summary: {
-                    coreIndicators: `${counts.coreCount}/${counts.totalCore}`,
-                    supportingIndicators: `${counts.supportingCount}/${counts.totalSupporting}`,
-                    total: `${counts.coreCount + counts.supportingCount}/${counts.totalCore + counts.totalSupporting}`,
-                    completionRate: `${((counts.coreCount + counts.supportingCount)/(counts.totalCore + counts.totalSupporting)*100).toFixed(1)}%`
-                },
-                data: currentData,
-                metadata: indicatorsData
-            };
-            
-            downloadFile(`iso37120_${selectedMunicipality}_completo.json`, JSON.stringify(exportData, null, 2), 'application/json');
-        }
+       function exportToJSON() {
+    if (!selectedMunicipalityData) {
+        alert('Por favor, selecione um município primeiro.');
+        return;
+    }
 
-        // Download file
-        function downloadFile(filename, content, mimeType) {
-            const blob = new Blob([content], { type: mimeType });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }
+    const municipalityName = selectedMunicipalityData.nome;
+    const stateName = selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla;
+    const municipalityFullName = `${municipalityName} - ${stateName}`;
+    const fileName = `${municipalityName}_${stateName}`.toLowerCase().replace(/\s+/g, '_');
+    
+    const counts = countFilledIndicators();
+    const exportData = {
+        municipality: municipalityFullName.toUpperCase(),
+        exportDate: new Date().toISOString(),
+        summary: {
+            coreIndicators: `${counts.coreCount}/${counts.totalCore}`,
+            supportingIndicators: `${counts.supportingCount}/${counts.totalSupporting}`,
+            total: `${counts.coreCount + counts.supportingCount}/${counts.totalCore + counts.totalSupporting}`,
+            completionRate: `${((counts.coreCount + counts.supportingCount)/(counts.totalCore + counts.totalSupporting)*100).toFixed(1)}%`
+        },
+        data: currentData,
+        metadata: indicatorsData
+    };
+    
+    downloadFile(`iso37120_${fileName}_completo.json`, JSON.stringify(exportData, null, 2), 'application/json');
+}
 
         // Initialize when page loads
         window.onload = init;
