@@ -1,19 +1,25 @@
 import multiprocessing
-
-# Número de workers (processos)
-workers = multiprocessing.cpu_count() * 2 + 1
-
-# Configurações do servidor
+# Server socket
 bind = "0.0.0.0:8000"
-timeout = 120
-keepalive = 5
-
-# Configurações de logging
-accesslog = "-"
-errorlog = "-"
+backlog = 2048
+# Worker processes
+workers = multiprocessing.cpu_count() * 2 + 1
+worker_class = "sync"
+worker_connections = 1000
+timeout = 30
+keepalive = 2
+user = "datacity"
+group = "datacity"
+# Restart workers after this many requests, to help prevent memory leaks
+max_requests = 1000
+max_requests_jitter = 50
+# Logging
+errorlog = "/var/www/datacity/logs/gunicorn_error.log"
+accesslog = "/var/www/datacity/logs/gunicorn_access.log"
 loglevel = "info"
-
-# Configurações de segurança
-limit_request_line = 4094
-limit_request_fields = 100
-limit_request_field_size = 8190 
+# Process naming
+proc_name = "datacity_gunicorn"
+# Server mechanics
+daemon = False
+pidfile = "/var/www/datacity/datacity_project/gunicorn.pid"
+tmp_upload_dir = None
