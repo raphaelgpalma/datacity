@@ -1436,29 +1436,29 @@
             <!-- Sections to hide when municipality is selected -->
             <div id="default-sections">
                 <!-- Summary Section -->
-                <div class="purple-section">
-                    <div class="section-content">
-                        <h2 class="section-title">Resumo dos indicadores</h2>
-                        <div class="summary-stats">
-                            <div class="stat-item">
-                                <div class="stat-number">70</div>
-                                <div class="stat-label">Total de Indicadores</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number">19</div>
-                                <div class="stat-label">Categorias</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number">17</div>
-                                <div class="stat-label">ODS Relacionados</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number">4</div>
-                                <div class="stat-label">Níveis de Certificação</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="purple-section">
+    <div class="section-content">
+        <h2 class="section-title">Resumo dos indicadores</h2>
+        <div class="summary-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="total-indicators-count">70</div>
+                <div class="stat-label">Total de Indicadores</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="categories-count">19</div>
+                <div class="stat-label">Categorias</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">17</div>
+                <div class="stat-label">ODS Relacionados</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Níveis de Certificação</div>
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Categories Section -->
                 <div class="purple-section">
@@ -1858,6 +1858,128 @@
             }
         };
 
+        // Mapeamento de direção de tendência para cada indicador
+        // 1 = aumentar é bom, -1 = diminuir é bom
+        const indicatorTrendDirection = {
+            // Economia
+            'Porcentagem dos contratos de prestação de serviços municipais que disponham de política de dados abertos': 1,
+            'Taxa de sobrevivência de novos negócios por 100 000 habitantes': 1,
+            'Porcentagem da força de trabalho empregada em ocupações no setor de tecnologia da informação e comunicação (TIC)': 1,
+            'Porcentagem da força de trabalho empregada em ocupações nos setores de educação, pesquisa e desenvolvimento': 1,
+            
+            // Educação
+            'Porcentagem da população da cidade com proficiência profissional em mais de um idioma': 1,
+            'Número de computadores, laptops, tablets ou outros dispositivos de aprendizagem digital disponíveis por 1 000 estudantes': 1,
+            'Número de graduados em ensino superior nas áreas de Ciência, Tecnologia, Engenharia e Matemática (STEM) por 100 000 habitantes': 1,
+            
+            // Energia
+            'Porcentagem de energia elétrica e térmica produzida do tratamento de águas residuais, resíduos sólidos e outros tratamentos de estado líquido e outros recursos de calor residual': 1,
+            'Energia elétrica e térmica (GJ) produzida a partir do tratamento de águas residuais per capita por ano': 1,
+            'Energia elétrica e térmica (GJ) produzida a partir de resíduos sólidos ou outros processos de tratamento de resíduos líquidos per capita por ano': 1,
+            'Porcentagem da energia elétrica consumida na cidade produzida por meio de sistemas descentralizados de geração energética': 1,
+            'Capacidade de armazenamento da rede de energia, relativamente ao consumo total de energia da cidade': 1,
+            'Porcentagem dos pontos de iluminação pública gerenciados por sistema de telegestão': 1,
+            'Porcentagem dos pontos de iluminação pública que tenham sido remodelados e recém-instalados': 1,
+            'Porcentagem de edifícios na cidade com medidores inteligentes de energia': 1,
+            'Número de estações de carregamento de veículos elétricos por veículo elétrico registrado': 1,
+            'Porcentagem de edifícios públicos que necessitam de renovação/remodelagem': -1,
+            
+            // Governança
+            'Número anual de visitas on-line ao portal municipal de dados abertos por 100 000 habitantes': 1,
+            'Porcentagem de serviços urbanos acessíveis e que podem ser solicitados on-line': 1,
+            'Tempo médio de inatividade da infraestrutura de TI da cidade': -1,
+            'Tempo médio de resposta a chamados realizados por meio de sistema de chamados não emergenciais da cidade (dias)': -1,
+            
+            // Meio ambiente
+            'Porcentagem de edifícios construídos ou reformados, nos últimos cinco anos, em conformidade com os princípios da construção verde': 1,
+            'Número de estações remotas de monitoramento da qualidade do ar em tempo real por quilômetro quadrado (km²)': 1,
+            'Porcentagem de edifícios públicos equipados para monitoramento da qualidade do ar interior': 1,
+            
+            // Agricultura
+            'Porcentagem da área da cidade coberta por sistema on-line de mapeamento de fornecedores de alimentos': 1,
+            'Porcentagem do orçamento municipal anual destinada a iniciativas de agricultura urbana': 1,
+            'Total de resíduos alimentares coletados anualmente enviados a instalações de processamento para compostagem per capita (em toneladas)': 1,
+            
+            // Saúde
+            'Porcentagem da população da cidade com prontuário eletrônico unificado, acessível on-line pelos provedores de serviços de saúde': 1,
+            'Número anual de consultas médicas realizadas remotamente por 100 000 habitantes': 1,
+            'Porcentagem da população da cidade com acesso a sistemas de alertas públicos em tempo real sobre condições de qualidade do ar e da água': 1,
+            
+            // Segurança
+            'Porcentagem da área da cidade coberta por câmeras de vigilância digital': 1,
+            
+            // Planejamento
+            'Porcentagem da população da cidade que reside em zonas de média ou alta densidade populacional': 1,
+            'Porcentagem das solicitações de licenças de construção submetidas por sistema eletrônico': 1,
+            'Tempo médio para aprovação de licença de construção (dias)': -1,
+            'Número anual de cidadãos engajados no processo de planejamento urbano por 100 000 habitantes': 1,
+            
+            // Habitação
+            'Porcentagem de domicílios com medidores inteligentes de energia': 1,
+            'Porcentagem de domicílios com medidores inteligentes de água': 1,
+            
+            // População
+            'Porcentagem das faixas de travessia de pedestres equipadas com sinalização de acessibilidade': 1,
+            'Porcentagem do orçamento municipal alocado a programas voltados à redução da exclusão digital': 1,
+            'Porcentagem de edifícios públicos acessíveis por pessoas com necessidades especiais': 1,
+            'Porcentagem do orçamento municipal alocado a ações de apoio, dispositivos e tecnologias assistivas a cidadãos com necessidades especiais de mobilidade': 1,
+            
+            // Água
+            'Porcentagem da rede de distribuição de água da cidade monitorada por sistemas inteligentes': 1,
+            'Número de estações de monitoramento de qualidade da água ambiental em tempo real por 100 000 habitantes': 1,
+            'Porcentagem dos imóveis da cidade que possuem medidores inteligentes de água': 1,
+            'Porcentagem da água potável cuja qualidade é monitorada em tempo real por estações remotas': 1,
+            
+            // Águas residuais
+            'Porcentagem da rede de coleta de esgotos que é monitorada em tempo real por sistema de sensores': 1,
+            'Energia derivada de águas residuais como porcentagem do consumo de energia total da cidade': 1,
+            'Porcentagem da quantidade total de águas residuais da cidade que é empregada para geração de energia': 1,
+            'Porcentagem de águas residuais tratadas que é reutilizada': 1,
+            'Porcentagem de biossólidos que são reutilizados (massa de matéria seca)': 1,
+            
+            // Resíduos
+            'Porcentagem das lixeiras públicas que são dotadas de sensores': 1,
+            'Porcentagem da quantidade total de resíduos da cidade empregada para gerar energia': 1,
+            'Porcentagem de centros de coleta (contêineres) de resíduos equipados com telemetria': 1,
+            'Porcentagem da população da cidade que dispõe de coleta de lixo porta a porta com monitoramento individual das quantidades de resíduos domésticos': 1,
+            'Porcentagem da quantidade total de resíduos plásticos reciclados na cidade': 1,
+            'Porcentagem de resíduos elétricos e eletrônicos da cidade que são reciclados': 1,
+            
+            // Telecomunicações
+            'Porcentagem da população da cidade com acesso à banda larga suficientemente rápida': 1,
+            'Porcentagem de área da cidade sob uma zona branca/ponto morto/não coberta por conectividade de telecomunicações': -1,
+            'Porcentagem da área da cidade coberta por conectividade à Internet fornecida pelo município': 1,
+            
+            // Recreação
+            'Porcentagem de serviços públicos de recreação que podem ser reservados on-line': 1,
+            
+            // Esporte e cultura
+            'Número de livros disponíveis em bibliotecas públicas e e-books por 100 000 habitantes': 1,
+            'Porcentagem da população da cidade que é usuária ativa de bibliotecas públicas': 1,
+            'Número de reservas on-line para instalações culturais por 100000 habitantes': 1,
+            'Porcentagem do acervo cultural da cidade que foi digitalizado': 1,
+            
+            // Transporte
+            'Porcentagem de linhas de transporte público equipadas com sistema acessível ao público em tempo real': 1,
+            'Porcentagem de vagas de estacionamento público equipadas com sistemas de monitoramento de disponibilidade em tempo real': 1,
+            'Porcentagem dos semáforos que são inteligentes': 1,
+            'Porcentagem das linhas de transporte público dotada de conectividade à Internet para os usuários, oferecida e/ou gerenciada pelo município': 1,
+            'Porcentagem de vias em conformidade com sistemas de condução autônomos': 1,
+            'Porcentagem de ruas e vias da cidade cobertas por alertas e informações de tráfego on-line em tempo real': 1,
+            'Porcentagem de veículos registrados na cidade que são veículos de baixa emissão': 1,
+            'Número de bicicletas disponíveis por meio de serviços municipais de compartilhamento de bicicletas por 100 000 habitantes': 1,
+            'Porcentagem dos serviços de transporte público da cidade cobertos por um sistema de pagamento unificado': 1,
+            'Porcentagem da frota de ônibus da cidade movida por sistemas limpos': 1,
+            'Área da cidade mapeada por sistemas interativos de mapeamento de vias públicas em tempo real, como porcentagem da área total da cidade': 1,
+            'Número de usuários de sistemas de transporte baseados em economia compartilhada por 100000 habitantes': 1,
+            'Porcentagem de vagas de estacionamento público equipadas com sistemas de pagamento eletrônico': 1,
+            'Porcentagem de veículos registrados na cidade que são veículos autônomos': 1,
+            
+            // Finanças
+            'Receita anual obtida a partir de economia compartilhada, como porcentagem da receita própria': 1,
+            'Porcentagem de pagamentos para a cidade realizados por meio eletrônico': 1
+        };
+
         let currentYear = 2024;
         let currentData = {};
 
@@ -1906,9 +2028,26 @@
         // Generate sample data for demonstration
 
         // Load data from memory
-        function loadData() {
-            initializeEmptyData();
-        }
+function loadData() {
+    initializeEmptyData();
+}
+
+// Helper function to initialize empty data
+function initializeEmptyData() {
+    currentData = {};
+    Object.keys(indicatorsData).forEach(categoryKey => {
+        const category = indicatorsData[categoryKey];
+        category.indicators.forEach((indicator, index) => {
+            [2022, 2023, 2024].forEach(year => {
+                const dataKey = `${categoryKey}_${index}_${year}`;
+                currentData[dataKey] = {
+                    value: '',
+                    source: ''
+                };
+            });
+        });
+    });
+}
 
         // Save data to memory
         function saveData() {
@@ -1919,33 +2058,43 @@
 
         // Note: resetPage function removed - using history.back() instead
 
-        // Render categories overview
-        function renderCategoriesOverview() {
-            const grid = document.getElementById('categories-grid');
-            if (!grid) return;
-            
-            grid.innerHTML = '';
+       // Render categories overview
+function renderCategoriesOverview() {
+    const grid = document.getElementById('categories-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
 
-            // Filter out profile indicators for the overview
-            const mainCategories = Object.keys(indicatorsData).filter(key => key !== 'perfil');
+    // Filter out profile indicators for the overview
+    const mainCategories = Object.keys(indicatorsData).filter(key => key !== 'perfil');
 
-            mainCategories.forEach(categoryKey => {
-                const category = indicatorsData[categoryKey];
-                const totalCount = category.indicators.length;
+    // Update summary stats
+    let totalIndicators = 0;
+    mainCategories.forEach(categoryKey => {
+        totalIndicators += indicatorsData[categoryKey].indicators.length;
+    });
+    
+    const totalIndicatorsEl = document.getElementById('total-indicators-count');
+    const categoriesCountEl = document.getElementById('categories-count');
+    if (totalIndicatorsEl) totalIndicatorsEl.textContent = totalIndicators;
+    if (categoriesCountEl) categoriesCountEl.textContent = mainCategories.length;
 
-                const card = document.createElement('div');
-                card.className = 'category-card';
-                card.innerHTML = `
-                    <div class="category-title">${category.name}</div>
-                    <div class="category-description">${category.description}</div>
-                    <div class="category-stats">
-                        <div class="indicator-count">${totalCount} indicadores</div>
-                        <div class="ods-info">ISO 37122</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
+    mainCategories.forEach(categoryKey => {
+        const category = indicatorsData[categoryKey];
+        const totalCount = category.indicators.length;
+
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.innerHTML = `
+            <div class="category-title">${category.name}</div>
+            <div class="category-description">${category.description}</div>
+            <div class="category-stats">
+                <div class="indicator-count">${totalCount} indicadores</div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
 
         // Render profile indicators
         function renderProfileIndicators() {
@@ -2558,19 +2707,32 @@
             }
         });
 
-        // Calculate trend (improvement/worsening) for an indicator
-        function calculateTrend(dataPoints) {
+        // Função auxiliar para determinar a direção da tendência
+        function getTrendDirection(indicatorName) {
+            return indicatorTrendDirection[indicatorName] !== undefined ? indicatorTrendDirection[indicatorName] : 1;
+        }
+
+        // Modificar a função calculateTrend para usar a direção correta
+        function calculateTrend(dataPoints, indicatorName) {
             if (dataPoints.length < 2) return 'neutral';
             
             const firstValue = dataPoints[0];
             const lastValue = dataPoints[dataPoints.length - 1];
+            const trendDirection = getTrendDirection(indicatorName);
             
-            if (lastValue > firstValue) return 'improving';
-            else if (lastValue < firstValue) return 'worsening';
+            if (trendDirection === 1) {
+                // Aumentar é bom (1)
+                if (lastValue > firstValue) return 'improving';
+                else if (lastValue < firstValue) return 'worsening';
+            } else {
+                // Diminuir é bom (-1)
+                if (lastValue < firstValue) return 'improving';
+                else if (lastValue > firstValue) return 'worsening';
+            }
             return 'neutral';
         }
 
-        // Calculate trends for all indicators
+        // Atualizar a função calculateAllTrends para passar o nome do indicador
         function calculateAllTrends() {
             const trends = {
                 improving: [],
@@ -2605,22 +2767,36 @@
                     });
                     
                     if (hasValidData && dataPoints.length >= 2) {
-                        // Compare each consecutive year
+                        // Compare each consecutive year with correct direction
                         for (let i = 1; i < dataPoints.length; i++) {
                             if (dataPoints[i-1] !== null && dataPoints[i] !== null) {
                                 const year = years[i];
-                                if (dataPoints[i] > dataPoints[i-1]) {
-                                    trends.byYear[year].improving++;
-                                } else if (dataPoints[i] < dataPoints[i-1]) {
-                                    trends.byYear[year].worsening++;
+                                const trendDirection = getTrendDirection(indicator.name);
+                                
+                                if (trendDirection === 1) {
+                                    // Aumentar é bom (1)
+                                    if (dataPoints[i] > dataPoints[i-1]) {
+                                        trends.byYear[year].improving++;
+                                    } else if (dataPoints[i] < dataPoints[i-1]) {
+                                        trends.byYear[year].worsening++;
+                                    } else {
+                                        trends.byYear[year].stable++;
+                                    }
                                 } else {
-                                    trends.byYear[year].stable++;
+                                    // Diminuir é bom (-1)
+                                    if (dataPoints[i] < dataPoints[i-1]) {
+                                        trends.byYear[year].improving++;
+                                    } else if (dataPoints[i] > dataPoints[i-1]) {
+                                        trends.byYear[year].worsening++;
+                                    } else {
+                                        trends.byYear[year].stable++;
+                                    }
                                 }
                             }
                         }
                         
-                        // Overall trend (first vs last)
-                        const trend = calculateTrend(dataPoints.filter(p => p !== null));
+                        // Overall trend (first vs last) with correct direction
+                        const trend = calculateTrend(dataPoints.filter(p => p !== null), indicator.name);
                         const indicatorInfo = {
                             name: indicator.name,
                             category: category.name
@@ -2764,8 +2940,8 @@
                             dataPoints.push(value);
                         });
 
-                        // Calculate trend
-                        const trend = calculateTrend(dataPoints.filter(p => p !== null));
+                        // Calculate trend with correct direction (1 ou -1)
+                        const trend = calculateTrend(dataPoints.filter(p => p !== null), indicator.name);
 
                         // Create chart card
                         const chartCard = document.createElement('div');
@@ -3236,76 +3412,76 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Unlock content
-        function unlockContent() {
-            document.getElementById('default-sections').style.display = 'none';
-            document.getElementById('municipality-details').classList.add('show');
-            
-            const isLondrina = selectedMunicipalityData && 
-                              selectedMunicipalityData.nome.toLowerCase() === 'londrina' && 
-                              selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla.toUpperCase() === 'PR';
+      // Unlock content
+function unlockContent() {
+    document.getElementById('default-sections').style.display = 'none';
+    document.getElementById('municipality-details').classList.add('show');
+    
+    const isLondrina = selectedMunicipalityData && 
+                      selectedMunicipalityData.nome.toLowerCase() === 'londrina' && 
+                      selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla.toUpperCase() === 'PR';
 
-            if (isLondrina) {
-                // Show all sections for Londrina
-                const originalSections = document.querySelectorAll('#municipality-details > div:not(#future-implementation-message)');
-                originalSections.forEach(section => {
-                    section.style.display = 'block';
-                });
-                
-                // Remove future implementation message if it exists
-                const futureMessage = document.getElementById('future-implementation-message');
-                if (futureMessage) {
-                    futureMessage.style.display = 'none';
-                }
-                
-                renderTable();
-                updateCertificationLevels();
-                renderProfileIndicators();
-                updateRadarChart();
-                updateCategorySummary();
-
-                document.getElementById('municipality-title').textContent = 'Londrina - PR';
-
-                // Load data from database for Londrina
-                console.log('Loading data from database for Londrina...');
-                loadDataFromDatabase();
-            } else {
-                // Hide original sections for other cities
-                const originalSections = document.querySelectorAll('#municipality-details > div:not(#future-implementation-message)');
-                originalSections.forEach(section => {
-                    section.style.display = 'none';
-                });
-                
-                // Show future implementation message
-                let futureMessage = document.getElementById('future-implementation-message');
-                if (!futureMessage) {
-                    futureMessage = document.createElement('div');
-                    futureMessage.id = 'future-implementation-message';
-                    futureMessage.className = 'white-section';
-                    futureMessage.innerHTML = `
-                        <h2 class="white-section-title">Implementação Futura</h2>
-                        <p style="text-align: center; font-size: 16px; color: #666; margin: 20px 0;">
-                            No momento, apenas a cidade de Londrina-PR possui dados disponíveis.<br>
-                            Estamos trabalhando para incluir mais municípios em breve.
-                        </p>
-                    `;
-                    document.getElementById('municipality-details').appendChild(futureMessage);
-                } else {
-                    futureMessage.style.display = 'block';
-                }
-                
-                const cityName = selectedMunicipalityData.nome;
-                const stateName = selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla;
-                document.getElementById('municipality-title').textContent = `${cityName} - ${stateName}`;
-            }
-            
-            setTimeout(() => {
-                document.getElementById('municipality-details').scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }, 100);
+    if (isLondrina) {
+        // Show all sections for Londrina
+        const originalSections = document.querySelectorAll('#municipality-details > div:not(#future-implementation-message)');
+        originalSections.forEach(section => {
+            section.style.display = 'block';
+        });
+        
+        // Remove future implementation message if it exists
+        const futureMessage = document.getElementById('future-implementation-message');
+        if (futureMessage) {
+            futureMessage.style.display = 'none';
         }
+
+        document.getElementById('municipality-title').textContent = 'Londrina - PR';
+
+        // Initialize data structures first
+        initializeEmptyData();
+        
+        // Then render empty table
+        renderTable();
+        updateCertificationLevels();
+        renderProfileIndicators();
+        updateRadarChart();
+        updateCategorySummary();
+    } else {
+        // Hide original sections for other cities
+        const originalSections = document.querySelectorAll('#municipality-details > div:not(#future-implementation-message)');
+        originalSections.forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        // Show future implementation message
+        let futureMessage = document.getElementById('future-implementation-message');
+        if (!futureMessage) {
+            futureMessage = document.createElement('div');
+            futureMessage.id = 'future-implementation-message';
+            futureMessage.className = 'white-section';
+            futureMessage.innerHTML = `
+                <h2 class="white-section-title">Implementação Futura</h2>
+                <p style="text-align: center; font-size: 16px; color: #666; margin: 20px 0;">
+                    No momento, apenas a cidade de Londrina-PR possui dados disponíveis.<br>
+                    Estamos trabalhando para incluir mais municípios em breve.
+                </p>
+            `;
+            document.getElementById('municipality-details').appendChild(futureMessage);
+        } else {
+            futureMessage.style.display = 'block';
+        }
+        
+        const cityName = selectedMunicipalityData.nome;
+        const stateName = selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla;
+        document.getElementById('municipality-title').textContent = `${cityName} - ${stateName}`;
+    }
+    
+    setTimeout(() => {
+        document.getElementById('municipality-details').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }, 100);
+}
 
         // Close dropdowns when clicking outside
         document.addEventListener('click', function(event) {
@@ -3318,10 +3494,7 @@
         });
 
         // Initialize when page loads
-        window.addEventListener('load', function() {
-            console.log('Window loaded - calling populateFilterOptions');
-            populateFilterOptions();
-        });
+window.onload = init;
         // Função de relatório histórico (Visualização histórica)
         function generateReport() {
             const counts = countFilledIndicators();
@@ -3547,34 +3720,10 @@
             }
         }
 
-        // Auto-select Londrina on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadStates();
-
-            // Auto-select Londrina for demonstration and load data
-            setTimeout(() => {
-                if (!selectedMunicipalityData) {
-                    // Auto-select Londrina if no municipality is selected
-                    selectedMunicipalityData = {
-                        id: 4113700,
-                        nome: 'Londrina',
-                        microrregiao: {
-                            mesorregiao: {
-                                UF: {
-                                    id: 41,
-                                    nome: 'Paraná',
-                                    sigla: 'PR'
-                                }
-                            }
-                        }
-                    };
-                    console.log('Auto-selected Londrina, loading data...');
-                    loadDataFromDatabase();
-                    showSelection();
-                    unlockContent();
-                }
-            }, 1000);
-        });
+       // Auto-select Londrina on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadStates();
+});
     </script>
 </body>
 </html>

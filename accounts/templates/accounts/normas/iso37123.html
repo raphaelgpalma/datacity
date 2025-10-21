@@ -1713,10 +1713,21 @@
         // Generate individual indicator charts organized by category sections
         function generateIndicatorCharts() {
             const chartsContainer = document.getElementById('indicator-charts-container');
+            if (!chartsContainer) {
+                console.error('Container de gráficos não encontrado');
+                return;
+            }
+            
             chartsContainer.innerHTML = '';
             
             // Destroy existing modal charts
-            modalCharts.forEach(chart => chart.destroy());
+            modalCharts.forEach(chart => {
+                try {
+                    chart.destroy();
+                } catch (e) {
+                    console.error('Erro ao destruir gráfico:', e);
+                }
+            });
             modalCharts = [];
             
             const years = [2022, 2023, 2024];
@@ -1735,7 +1746,7 @@
                     const hasData = years.some(year => {
                         const dataKey = `${categoryKey}_${index}_${year}`;
                         const data = currentData[dataKey];
-                        return data && data.value && data.value.trim() !== '';
+                        return data && data.value && String(data.value).trim() !== '';
                     });
                     
                     if (hasData) {
@@ -1748,38 +1759,49 @@
                 if (hasDataInCategory) {
                     // Create category section with styled header
                     const categorySection = document.createElement('div');
-                    categorySection.style.marginBottom = '32px';
-                    categorySection.innerHTML = `<h4 style="color:#513C9A;font-weight:700;margin-bottom:16px;">${category.name}</h4>`;
+                    categorySection.className = 'category-charts-section';
                     
-                    // Create grid for charts with proper styling (denser layout)
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.className = 'category-charts-header';
+                    categoryHeader.textContent = category.name;
+                    categorySection.appendChild(categoryHeader);
+                    
+                    // Create grid for charts
                     const grid = document.createElement('div');
-                    grid.style.display = 'grid';
-                    grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(240px, 1fr))';
-                    grid.style.gap = '16px';
+                    grid.className = 'category-charts-grid';
                     
                     // Process indicators with data
                     categoryIndicatorsWithData.forEach(({ indicator, index }) => {
                         const dataPoints = [];
+                        let hasValidData = false;
                         
                         years.forEach(year => {
                             const dataKey = `${categoryKey}_${index}_${year}`;
                             const data = currentData[dataKey];
-                            const value = data && data.value ? parseFloat(data.value) || 0 : 0;
-                            dataPoints.push(value);
+                            const value = data && data.value ? parseFloat(data.value) : null;
+                            
+                            if (value !== null && !isNaN(value)) {
+                                hasValidData = true;
+                                dataPoints.push(value);
+                            } else {
+                                dataPoints.push(null);
+                            }
                         });
                         
-                        // Calculate trend
-                        const trend = calculateTrend(dataPoints);
+                        // Only create chart if we have at least one valid data point
+                        if (!hasValidData) return;
                         
-                        // Create chart card with proper styling
+                        // Calculate trend with improvement direction
+                        const validPoints = dataPoints.filter(p => p !== null);
+                        const trend = validPoints.length >= 2 ? 
+                            calculateTrend(validPoints, indicator.improvementDirection || 1) : 
+                            'neutral';
+                        
+                        // Create chart card
                         const chartCard = document.createElement('div');
-                        chartCard.style.background = '#fff';
-                        chartCard.style.borderRadius = '12px';
-                        chartCard.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
-                        chartCard.style.padding = '24px';
-                        chartCard.style.marginBottom = '8px';
+                        chartCard.className = 'chart-card';
                         
-                        const chartId = `chart_${categoryKey}_${index}`;
+                        const chartId = `chart_${categoryKey}_${index}_${Date.now()}`;
                         
                         // Determine colors based on trend
                         let borderColor, backgroundColor, trendIcon, trendText;
@@ -1800,26 +1822,15 @@
                             trendText = 'Estável';
                         }
                         
-                        // Determine indicator type for badge
-                        const typeColor = indicator.type === 'core' ? '#513C9A' : '#6B4FB5';
-                        const typeText = indicator.type === 'core' ? 'PRINCIPAL' : 'APOIO';
-                        
-                        // Create chart card content with proper styling and fixed height container
+                        // Create chart card content
                         chartCard.innerHTML = `
-                            <div style="margin-bottom:16px;">
-                                <div style="font-weight:600;color:#513C9A;margin-bottom:6px;">
-                                    ${indicator.name}
-                                    <small style="color: ${borderColor}; margin-left: 10px; font-size:0.9em;">
-                                        ${trendIcon} ${trendText}
-                                    </small>
-                                </div>
-                                <small style="color: ${typeColor}; font-weight: bold; font-size: 0.8rem;">
-                                    (Indicador ${typeText})
+                            <h4>
+                                ${indicator.name}
+                                <small style="color: ${borderColor}; margin-left: 10px; font-size:0.85em;">
+                                    ${trendIcon} ${trendText}
                                 </small>
-                            </div>
-                            <div style="height:180px;position:relative;">
-                                <canvas id="${chartId}"></canvas>
-                            </div>
+                            </h4>
+                            <canvas id="${chartId}"></canvas>
                         `;
                         
                         grid.appendChild(chartCard);
@@ -1828,227 +1839,236 @@
                         setTimeout(() => {
                             const ctx = document.getElementById(chartId);
                             if (ctx) {
-                                const chart = new Chart(ctx, {
-                                    type: 'line',
-                                    data: {
-                                        labels: years,
-                                        datasets: [{
-                                            label: `${indicator.unit}`,
-                                            data: dataPoints,
-                                            backgroundColor: backgroundColor,
-                                            borderColor: borderColor,
-                                            borderWidth: 4,
-                                            pointBackgroundColor: borderColor,
-                                            pointBorderColor: '#fff',
-                                            pointBorderWidth: 3,
-                                            pointRadius: 8,
-                                            pointHoverRadius: 10,
-                                            fill: true,
-                                            tension: 0.4
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            legend: {
-                                                display: true,
-                                                labels: {
-                                                    color: '#513C9A',
-                                                    font: {
-                                                        size: 12,
-                                                        weight: 'bold'
-                                                    }
-                                                }
-                                            },
-                                            tooltip: {
-                                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                                                titleColor: '#fff',
-                                                bodyColor: '#fff',
+                                try {
+                                    const chart = new Chart(ctx, {
+                                        type: 'line',
+                                        data: {
+                                            labels: years,
+                                            datasets: [{
+                                                label: indicator.unit,
+                                                data: dataPoints,
+                                                backgroundColor: backgroundColor,
                                                 borderColor: borderColor,
-                                                borderWidth: 2,
-                                                titleFont: {
-                                                    size: 14,
-                                                    weight: 'bold'
-                                                },
-                                                bodyFont: {
-                                                    size: 13
-                                                },
-                                                callbacks: {
-                                                    afterLabel: function(context) {
-                                                        const year = context.label;
-                                                        const dataKey = `${categoryKey}_${index}_${year}`;
-                                                        const data = currentData[dataKey];
-                                                        return data && data.source ? `Fonte: ${data.source}` : '';
-                                                    }
-                                                }
-                                            }
+                                                borderWidth: 3,
+                                                pointBackgroundColor: borderColor,
+                                                pointBorderColor: '#fff',
+                                                pointBorderWidth: 2,
+                                                pointRadius: 6,
+                                                pointHoverRadius: 8,
+                                                fill: true,
+                                                tension: 0.3,
+                                                spanGaps: true
+                                            }]
                                         },
-                                        scales: {
-                                            x: {
-                                                ticks: {
-                                                    color: '#513C9A',
-                                                    font: {
-                                                        size: 12,
-                                                        weight: 'bold'
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: true,
+                                            aspectRatio: 2,
+                                            plugins: {
+                                                legend: {
+                                                    display: true,
+                                                    labels: {
+                                                        color: '#513C9A',
+                                                        font: {
+                                                            size: 11,
+                                                            weight: 'bold'
+                                                        }
                                                     }
                                                 },
-                                                grid: {
-                                                    color: 'rgba(81, 60, 154, 0.2)'
+                                                tooltip: {
+                                                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                                    titleColor: '#fff',
+                                                    bodyColor: '#fff',
+                                                    borderColor: borderColor,
+                                                    borderWidth: 2,
+                                                    titleFont: {
+                                                        size: 13,
+                                                        weight: 'bold'
+                                                    },
+                                                    bodyFont: {
+                                                        size: 12
+                                                    },
+                                                    callbacks: {
+                                                        afterLabel: function(context) {
+                                                            const year = context.label;
+                                                            const dataKey = `${categoryKey}_${index}_${year}`;
+                                                            const data = currentData[dataKey];
+                                                            return data && data.source ? `Fonte: ${data.source}` : '';
+                                                        }
+                                                    }
                                                 }
                                             },
-                                            y: {
-                                                ticks: {
-                                                    color: '#513C9A',
-                                                    font: {
-                                                        size: 12
+                                            scales: {
+                                                x: {
+                                                    ticks: {
+                                                        color: '#513C9A',
+                                                        font: {
+                                                            size: 11,
+                                                            weight: 'bold'
+                                                        }
+                                                    },
+                                                    grid: {
+                                                        color: 'rgba(81, 60, 154, 0.1)'
                                                     }
                                                 },
-                                                grid: {
-                                                    color: 'rgba(81, 60, 154, 0.2)'
+                                                y: {
+                                                    ticks: {
+                                                        color: '#513C9A',
+                                                        font: {
+                                                            size: 11
+                                                        }
+                                                    },
+                                                    grid: {
+                                                        color: 'rgba(81, 60, 154, 0.1)'
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                });
-                                modalCharts.push(chart);
+                                    });
+                                    modalCharts.push(chart);
+                                } catch (error) {
+                                    console.error('Erro ao criar gráfico:', error);
+                                }
+                            } else {
+                                console.error('Canvas não encontrado:', chartId);
                             }
-                        }, 100);
+                        }, 150 * categoryIndicatorsWithData.indexOf({ indicator, index }));
                     });
                     
+                    categorySection.appendChild(grid);
                     chartsContainer.appendChild(categorySection);
                 }
             });
         }
         
-        // Data structure for ISO 37123 indicators
+        // Data structure for ISO 37123 indicators with improvement direction
         const indicatorsData = {
             'economia': {
                 name: 'Economia',
                 description: 'Indicadores econômicos para cidades resilientes',
                 indicators: [
-                    { name: 'Porcentagem de propriedades com cobertura de seguro para ameaças de alto risco', ods: '8', unit: '%' },
-                    { name: 'Perdas históricas por desastres como porcentagem do produto da cidade', ods: '1, 8, 11', unit: '%' },
-                    { name: 'Porcentagem da força de trabalho em empregos informais', ods: '1, 8, 11', unit: '%' },
-                    { name: 'Porcentagem do valor total segurado para o valor total em risco dentro da cidade', ods: '8', unit: '%' },
-                    { name: 'Perda anual média por desastres como porcentagem do produto da cidade', ods: '1, 8, 11', unit: '%' },
-                    { name: 'Concentração de empregos', ods: '', unit: 'índice' }
+                    { name: 'Porcentagem de propriedades com cobertura de seguro para ameaças de alto risco', ods: '8', unit: '%', improvementDirection: 1 },
+                    { name: 'Perdas históricas por desastres como porcentagem do produto da cidade', ods: '1, 8, 11', unit: '%', improvementDirection: -1 },
+                    { name: 'Porcentagem da força de trabalho em empregos informais', ods: '1, 8, 11', unit: '%', improvementDirection: -1 },
+                    { name: 'Porcentagem do valor total segurado para o valor total em risco dentro da cidade', ods: '8', unit: '%', improvementDirection: 1 },
+                    { name: 'Perda anual média por desastres como porcentagem do produto da cidade', ods: '1, 8, 11', unit: '%', improvementDirection: -1 },
+                    { name: 'Concentração de empregos', ods: '', unit: 'índice', improvementDirection: -1 }
                 ]
             },
             'educacao': {
                 name: 'Educação',
                 description: 'Indicadores educacionais para cidades resilientes',
                 indicators: [
-                    { name: 'Porcentagem de escolas que ensinam preparação para situações de emergência e redução de riscos de desastres', ods: '4, 6', unit: '%' },
-                    { name: 'Porcentagem da população treinada em preparação para situações de emergência e redução de riscos de desastres', ods: '4, 6, 18', unit: '%' },
-                    { name: 'Interrupção educacional', ods: '4', unit: 'dias/ano' },
-                    { name: 'Porcentagem de publicações de preparação para emergências fornecidas em idiomas alternativos', ods: '6, 10', unit: '%' }
+                    { name: 'Porcentagem de escolas que ensinam preparação para situações de emergência e redução de riscos de desastres', ods: '4, 6', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem da população treinada em preparação para situações de emergência e redução de riscos de desastres', ods: '4, 6, 18', unit: '%', improvementDirection: 1 },
+                    { name: 'Interrupção educacional', ods: '4', unit: 'dias/ano', improvementDirection: -1 },
+                    { name: 'Porcentagem de publicações de preparação para emergências fornecidas em idiomas alternativos', ods: '6, 10', unit: '%', improvementDirection: 1 }
                 ]
             },
             'energia': {
                 name: 'Energia',
                 description: 'Indicadores energéticos para cidades resilientes',
                 indicators: [
-                    { name: 'Capacidade de fornecimento de energia elétrica como porcentagem do pico de demanda de energia elétrica', ods: '7, 9', unit: '%' },
-                    { name: 'Número de diferentes fontes de energia elétrica que fornecem pelo menos 5% da capacidade total de fornecimento de energia', ods: '1, 7, 9, 12', unit: 'número' },
-                    { name: 'Porcentagem de instalações críticas atendidas por serviços de energia fora da rede', ods: '', unit: '%' }
+                    { name: 'Capacidade de fornecimento de energia elétrica como porcentagem do pico de demanda de energia elétrica', ods: '7, 9', unit: '%', improvementDirection: 1 },
+                    { name: 'Número de diferentes fontes de energia elétrica que fornecem pelo menos 5% da capacidade total de fornecimento de energia', ods: '1, 7, 9, 12', unit: 'número', improvementDirection: 1 },
+                    { name: 'Porcentagem de instalações críticas atendidas por serviços de energia fora da rede', ods: '', unit: '%', improvementDirection: 1 }
                 ]
             },
             'governanca': {
                 name: 'Governança',
                 description: 'Indicadores de governança para cidades resilientes',
                 indicators: [
-                    { name: 'Porcentagem de dados eletrônicos da cidade com armazenamento de back-up seguro e remoto', ods: '10', unit: '%' },
-                    { name: 'Frequência da atualização dos planos de gerenciamento de desastres', ods: '1, 10, 11', unit: 'vezes/ano' },
-                    { name: 'Porcentagem de prestadores de serviços essenciais que possuem um plano de continuidade documentado', ods: '1, 10, 11', unit: '%' },
-                    { name: 'Porcentagem de serviços essenciais cobertos por um plano de continuidade documentado', ods: '10, 11', unit: '%' },
-                    { name: 'Porcentagem de reuniões públicas dedicadas à resiliência na cidade', ods: '16', unit: '%' },
-                    { name: 'Número de acordos intergovernamentais destinados ao planejamento de choques como porcentagem do total de acordos intergovernamentais', ods: '16', unit: '%' }
+                    { name: 'Porcentagem de dados eletrônicos da cidade com armazenamento de back-up seguro e remoto', ods: '10', unit: '%', improvementDirection: 1 },
+                    { name: 'Frequência da atualização dos planos de gerenciamento de desastres', ods: '1, 10, 11', unit: 'vezes/ano', improvementDirection: 1 },
+                    { name: 'Porcentagem de prestadores de serviços essenciais que possuem um plano de continuidade documentado', ods: '1, 10, 11', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem de serviços essenciais cobertos por um plano de continuidade documentado', ods: '10, 11', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem de reuniões públicas dedicadas à resiliência na cidade', ods: '16', unit: '%', improvementDirection: 1 },
+                    { name: 'Número de acordos intergovernamentais destinados ao planejamento de choques como porcentagem do total de acordos intergovernamentais', ods: '16', unit: '%', improvementDirection: 1 }
                 ]
             },
             'meio-ambiente': {
                 name: 'Meio ambiente e mudanças climáticas',
                 description: 'Indicadores ambientais para cidades resilientes',
                 indicators: [
-                    { name: 'Magnitude dos efeitos (atmosféricos) das ilhas de calor urbana', ods: '', unit: '°C' },
-                    { name: 'Porcentagem de áreas naturais dentro da cidade submetidas a avaliação ecológica de seus serviços de proteção', ods: '15', unit: '%' },
-                    { name: 'Território em processo de restauração de ecossistemas como porcentagem da área total da cidade', ods: '15', unit: '%' },
-                    { name: 'Frequência anual dos eventos de tempestades', ods: '', unit: 'eventos/ano' },
-                    { name: 'Frequência anual de eventos de calor', ods: '', unit: 'eventos/ano' },
-                    { name: 'Frequência anual de eventos de frio extremo', ods: '', unit: 'eventos/ano' },
-                    { name: 'Frequência anual de eventos de enchentes', ods: '', unit: 'eventos/ano' },
-                    { name: 'Porcentagem da área territorial da cidade coberta por copas de árvores', ods: '15', unit: '%' },
-                    { name: 'Porcentagem da área da cidade coberta com materiais com alto índice de albedo, o que contribui para a mitigação das ilhas de calor', ods: '', unit: '%' }
+                    { name: 'Magnitude dos efeitos (atmosféricos) das ilhas de calor urbana', ods: '', unit: '°C', improvementDirection: -1 },
+                    { name: 'Porcentagem de áreas naturais dentro da cidade submetidas a avaliação ecológica de seus serviços de proteção', ods: '15', unit: '%', improvementDirection: 1 },
+                    { name: 'Território em processo de restauração de ecossistemas como porcentagem da área total da cidade', ods: '15', unit: '%', improvementDirection: 1 },
+                    { name: 'Frequência anual dos eventos de tempestades', ods: '', unit: 'eventos/ano', improvementDirection: -1 },
+                    { name: 'Frequência anual de eventos de calor', ods: '', unit: 'eventos/ano', improvementDirection: -1 },
+                    { name: 'Frequência anual de eventos de frio extremo', ods: '', unit: 'eventos/ano', improvementDirection: -1 },
+                    { name: 'Frequência anual de eventos de enchentes', ods: '', unit: 'eventos/ano', improvementDirection: -1 },
+                    { name: 'Porcentagem da área territorial da cidade coberta por copas de árvores', ods: '15', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem da área da cidade coberta com materiais com alto índice de albedo, o que contribui para a mitigação das ilhas de calor', ods: '', unit: '%', improvementDirection: 1 }
                 ]
             },
             'agricultura': {
                 name: 'Agricultura Local/Urbana e Segurança Alimentar',
                 description: 'Indicadores de agricultura urbana e segurança alimentar para cidades resilientes',
                 indicators: [
-                    { name: 'Porcentagem da população da cidade que vive a 1 km de um mercado', ods: '11', unit: '%' },
-                    { name: 'Porcentagem da população da cidade que pode ser atendida com as reservas de alimentos da cidade por 72 h em caso de emergência', ods: '2', unit: '%' },
-                    { name: 'Porcentagem da população com sobrepeso ou obesa – IMC', ods: '2, 12', unit: '%' }
+                    { name: 'Porcentagem da população da cidade que vive a 1 km de um mercado', ods: '11', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem da população da cidade que pode ser atendida com as reservas de alimentos da cidade por 72 h em caso de emergência', ods: '2', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem da população com sobrepeso ou obesa – IMC', ods: '2, 12', unit: '%', improvementDirection: -1 }
                 ]
             },
             'saude': {
                 name: 'Saúde',
                 description: 'Indicadores de saúde para cidades resilientes',
                 indicators: [
-                    { name: 'Porcentagem da população com seguro de saúde básico', ods: '1, 3, 11', unit: '%' },
-                    { name: 'Porcentagem da população totalmente imunizadas', ods: '', unit: '%' },
-                    { name: 'Porcentagem de crianças totalmente imunizadas', ods: '1, 3', unit: '%' },
-                    { name: 'Número de surtos de doenças infecciosas por ano', ods: '1, 3', unit: 'surtos/ano' },
-                    { name: 'Porcentagem de hospitais equipados com geradores back-up de energia elétrica', ods: '9', unit: '%' }
+                    { name: 'Porcentagem da população com seguro de saúde básico', ods: '1, 3, 11', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem da população totalmente imunizadas', ods: '', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem de crianças totalmente imunizadas', ods: '1, 3', unit: '%', improvementDirection: 1 },
+                    { name: 'Número de surtos de doenças infecciosas por ano', ods: '1, 3', unit: 'surtos/ano', improvementDirection: -1 },
+                    { name: 'Porcentagem de hospitais equipados com geradores back-up de energia elétrica', ods: '9', unit: '%', improvementDirection: 1 }
                 ]
             },
             'seguranca': {
                 name: 'Segurança',
                 description: 'Indicadores de segurança para cidades resilientes',
                 indicators: [
-                    { name: 'Porcentagem da população da cidade coberta por sistemas de alerta prévio de ameaças múltiplas', ods: '1, 15', unit: '%' },
-                    { name: 'Porcentagem de alertas locais de ameaças emitidos anualmente por agências nacionais e recebidos em tempo hábil pela cidade', ods: '', unit: '%' },
-                    { name: 'Porcentagem de equipes de emergência que receberam treinamento de resposta a desastres', ods: '15', unit: '%' },
-                    { name: 'Número de leitos hospitalares na cidade destruídos ou danificados por desastres naturais por 100 000 habitantes', ods: '1, 3', unit: 'leitos/100k hab' }
+                    { name: 'Porcentagem da população da cidade coberta por sistemas de alerta prévio de ameaças múltiplas', ods: '1, 15', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem de alertas locais de ameaças emitidos anualmente por agências nacionais e recebidos em tempo hábil pela cidade', ods: '', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem de equipes de emergência que receberam treinamento de resposta a desastres', ods: '15', unit: '%', improvementDirection: 1 },
+                    { name: 'Número de leitos hospitalares na cidade destruídos ou danificados por desastres naturais por 100 000 habitantes', ods: '1, 3', unit: 'leitos/100k hab', improvementDirection: -1 }
                 ]
             },
             'planejamento': {
                 name: 'Planejamento urbano',
                 description: 'Indicadores de planejamento urbano para cidades resilientes',
                 indicators: [
-                    { name: 'Porcentagem de área territorial da cidade em zonas de alto risco em que medidas de redução de riscos foram implementadas', ods: '11', unit: '%' },
-                    { name: 'Áreas e espaços públicos permeáveis e pavimentos construídos com materiais porosos e drenantes como porcentagem da área territorial da cidade', ods: '6', unit: '%' },
-                    { name: 'Porcentagem da área da cidade coberta por mapas de ameaças disponíveis ao público', ods: '1, 11', unit: '%' },
-                    { name: 'Porcentagem de departamentos e serviços de utilidades da cidade que realizam avaliação de riscos em seu planejamento e investimento', ods: '16', unit: '%' }
+                    { name: 'Porcentagem de área territorial da cidade em zonas de alto risco em que medidas de redução de riscos foram implementadas', ods: '11', unit: '%', improvementDirection: 1 },
+                    { name: 'Áreas e espaços públicos permeáveis e pavimentos construídos com materiais porosos e drenantes como porcentagem da área territorial da cidade', ods: '6', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem da área da cidade coberta por mapas de ameaças disponíveis ao público', ods: '1, 11', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem de departamentos e serviços de utilidades da cidade que realizam avaliação de riscos em seu planejamento e investimento', ods: '16', unit: '%', improvementDirection: 1 }
                 ]
             },
             'habitacao': {
                 name: 'Habitação',
                 description: 'Indicadores habitacionais para cidades resilientes',
                 indicators: [
-                    { name: 'Porcentagem de infraestrutura danificada que foi "reconstruída melhor" após um desastre', ods: '9, 11, 12', unit: '%' },
-                    { name: 'Capacidade de abrigos destinados a emergências por 100 000 habitantes', ods: '11, 12', unit: 'pessoas/100k hab' },
-                    { name: 'Porcentagem de edifícios estruturalmente vulneráveis a ameaças de alto risco', ods: '11, 12', unit: '%' },
-                    { name: 'Porcentagem de edifícios residenciais não conformes com os códigos e normas de construção', ods: '11, 12', unit: '%' },
-                    { name: 'Número anual de propriedades residenciais inundadas como uma porcentagem do total de propriedades residenciais na cidade', ods: '11', unit: '%' },
-                    { name: 'Porcentagem de propriedades residenciais situadas em áreas de alto risco', ods: '1, 11, 12', unit: '%' }
+                    { name: 'Porcentagem de infraestrutura danificada que foi "reconstruída melhor" após um desastre', ods: '9, 11, 12', unit: '%', improvementDirection: 1 },
+                    { name: 'Capacidade de abrigos destinados a emergências por 100 000 habitantes', ods: '11, 12', unit: 'pessoas/100k hab', improvementDirection: 1 },
+                    { name: 'Porcentagem de edifícios estruturalmente vulneráveis a ameaças de alto risco', ods: '11, 12', unit: '%', improvementDirection: -1 },
+                    { name: 'Porcentagem de edifícios residenciais não conformes com os códigos e normas de construção', ods: '11, 12', unit: '%', improvementDirection: -1 },
+                    { name: 'Número anual de propriedades residenciais inundadas como uma porcentagem do total de propriedades residenciais na cidade', ods: '11', unit: '%', improvementDirection: -1 },
+                    { name: 'Porcentagem de propriedades residenciais situadas em áreas de alto risco', ods: '1, 11, 12', unit: '%', improvementDirection: -1 }
                 ]
             },
             'populacao': {
                 name: 'População e condições sociais',
                 description: 'Indicadores sociais para cidades resilientes',
                 indicators: [
-                    { name: 'População vulnerável como porcentagem da população da cidade', ods: '1', unit: '%' },
-                    { name: 'Porcentagem da população inscrita em programas de assistência social', ods: '1, 10', unit: '%' },
-                    { name: 'Porcentagem da população exposta a alto risco de ameaças naturais', ods: '1, 13', unit: '%' },
-                    { name: 'Porcentagem anual da população da cidade diretamente afetada por ameaças naturais', ods: '1, 13', unit: '%' }
+                    { name: 'População vulnerável como porcentagem da população da cidade', ods: '1', unit: '%', improvementDirection: -1 },
+                    { name: 'Porcentagem da população inscrita em programas de assistência social', ods: '1, 10', unit: '%', improvementDirection: 1 },
+                    { name: 'Porcentagem da população exposta a alto risco de ameaças naturais', ods: '1, 13', unit: '%', improvementDirection: -1 },
+                    { name: 'Porcentagem anual da população da cidade diretamente afetada por ameaças naturais', ods: '1, 13', unit: '%', improvementDirection: -1 }
                 ]
             },
             'agua': {
                 name: 'Água',
                 description: 'Indicadores de gestão da água para cidades resilientes',
                 indicators: [
-                    { name: 'Número de fontes diferentes que fornecem pelo menos 5 % da capacidade total de abastecimento de água', ods: '6, 12', unit: 'número' },
-                    { name: 'Porcentagem da população da cidade que pode ser abastecida de água potável por métodos alternativos por 72 h', ods: '6', unit: '%' }
+                    { name: 'Número de fontes diferentes que fornecem pelo menos 5 % da capacidade total de abastecimento de água', ods: '6, 12', unit: 'número', improvementDirection: 1 },
+                    { name: 'Porcentagem da população da cidade que pode ser abastecida de água potável por métodos alternativos por 72 h', ods: '6', unit: '%', improvementDirection: 1 }
                 ]
             },
             'aguas-residuais': {
@@ -2060,14 +2080,14 @@
                 name: 'Resíduos sólidos',
                 description: 'Indicadores de gestão de resíduos para cidades resilientes',
                 indicators: [
-                    { name: 'Número de locais disponíveis, ativos e temporários de gestão de resíduos para detritos e destroços por quilômetro quadrado', ods: '12', unit: 'locais/km²' }
+                    { name: 'Número de locais disponíveis, ativos e temporários de gestão de resíduos para detritos e destroços por quilômetro quadrado', ods: '12', unit: 'locais/km²', improvementDirection: 1 }
                 ]
             },
             'telecomunicacoes': {
                 name: 'Telecomunicação',
                 description: 'Indicadores de telecomunicação para cidades resilientes',
                 indicators: [
-                    { name: 'Porcentagem de equipes de emergência na cidade equipadas com tecnologias de comunicação especializadas capazes de operar de maneira confiável durante um evento de desastre', ods: '9', unit: '%' }
+                    { name: 'Porcentagem de equipes de emergência na cidade equipadas com tecnologias de comunicação especializadas capazes de operar de maneira confiável durante um evento de desastre', ods: '9', unit: '%', improvementDirection: 1 }
                 ]
             },
             'recreacao': {
@@ -2084,19 +2104,19 @@
                 name: 'Transporte',
                 description: 'Indicadores de transporte para cidades resilientes',
                 indicators: [
-                    { name: 'Número de rotas e evacuação disponíveis por 100 000 habitantes', ods: '9', unit: 'rotas/100k hab' }
+                    { name: 'Número de rotas e evacuação disponíveis por 100 000 habitantes', ods: '9', unit: 'rotas/100k hab', improvementDirection: 1 }
                 ]
             },
             'financas': {
                 name: 'Finanças',
                 description: 'Indicadores financeiros para cidades resilientes',
                 indicators: [
-                    { name: 'Alocação total de fundos de reserva para desastres como porcentagem do orçamento total da cidade', ods: '8', unit: '%' },
-                    { name: 'Despesas anuais com atualização e manutenção dos ativos de serviços urbanos como porcentagem do orçamento total da cidade', ods: '9, 11', unit: '%' },
-                    { name: 'Despesas anuais em serviços sociais e comunitários como porcentagem do orçamento total da cidade', ods: '11', unit: '%' },
-                    { name: 'Despesas anuais com atualização e manutenção de infraestrutura de águas pluviais como porcentagem do orçamento total da cidade', ods: '9, 11', unit: '%' },
-                    { name: 'Despesas anuais destinadas à restauração de ecossistemas no território da cidade como porcentagem do orçamento total da cidade', ods: '9, 11', unit: '%' },
-                    { name: 'Despesas anuais com infraestruturas verde e azul como porcentagem do orçamento total da cidade', ods: '9, 11', unit: '%' }
+                    { name: 'Alocação total de fundos de reserva para desastres como porcentagem do orçamento total da cidade', ods: '8', unit: '%', improvementDirection: 1 },
+                    { name: 'Despesas anuais com atualização e manutenção dos ativos de serviços urbanos como porcentagem do orçamento total da cidade', ods: '9, 11', unit: '%', improvementDirection: 1 },
+                    { name: 'Despesas anuais em serviços sociais e comunitários como porcentagem do orçamento total da cidade', ods: '11', unit: '%', improvementDirection: 1 },
+                    { name: 'Despesas anuais com atualização e manutenção de infraestrutura de águas pluviais como porcentagem do orçamento total da cidade', ods: '9, 11', unit: '%', improvementDirection: 1 },
+                    { name: 'Despesas anuais destinadas à restauração de ecossistemas no território da cidade como porcentagem do orçamento total da cidade', ods: '9, 11', unit: '%', improvementDirection: 1 },
+                    { name: 'Despesas anuais com infraestruturas verde e azul como porcentagem do orçamento total da cidade', ods: '9, 11', unit: '%', improvementDirection: 1 }
                 ]
             },
             'perfil': {
@@ -2390,7 +2410,6 @@
                     <div class="category-description">${category.description}</div>
                     <div class="category-stats">
                         <div class="indicator-count">${totalCount} indicadores</div>
-                        <div class="ods-info">ISO 37123</div>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -2795,15 +2814,26 @@
             }
         });
 
-        // Calculate trend (improvement/worsening) for an indicator
-        function calculateTrend(dataPoints) {
+        // Calculate trend (improvement/worsening) for an indicator with direction
+        function calculateTrend(dataPoints, improvementDirection) {
             if (dataPoints.length < 2) return 'neutral';
             
             const firstValue = dataPoints[0];
             const lastValue = dataPoints[dataPoints.length - 1];
             
-            if (lastValue > firstValue) return 'improving';
-            else if (lastValue < firstValue) return 'worsening';
+            // For indicators where increase is good (improvementDirection = 1)
+            if (improvementDirection === 1) {
+                if (lastValue > firstValue) return 'improving';
+                else if (lastValue < firstValue) return 'worsening';
+                else return 'neutral';
+            } 
+            // For indicators where decrease is good (improvementDirection = -1)
+            else if (improvementDirection === -1) {
+                if (lastValue < firstValue) return 'improving';
+                else if (lastValue > firstValue) return 'worsening';
+                else return 'neutral';
+            }
+            
             return 'neutral';
         }
 
@@ -2846,9 +2876,11 @@
                         for (let i = 1; i < dataPoints.length; i++) {
                             if (dataPoints[i-1] !== null && dataPoints[i] !== null) {
                                 const year = years[i];
-                                if (dataPoints[i] > dataPoints[i-1]) {
+                                const trend = calculateTrend([dataPoints[i-1], dataPoints[i]], indicator.improvementDirection);
+                                
+                                if (trend === 'improving') {
                                     trends.byYear[year].improving++;
-                                } else if (dataPoints[i] < dataPoints[i-1]) {
+                                } else if (trend === 'worsening') {
                                     trends.byYear[year].worsening++;
                                 } else {
                                     trends.byYear[year].stable++;
@@ -2857,7 +2889,7 @@
                         }
                         
                         // Overall trend (first vs last)
-                        const trend = calculateTrend(dataPoints.filter(p => p !== null));
+                        const trend = calculateTrend(dataPoints.filter(p => p !== null), indicator.improvementDirection);
                         const indicatorInfo = {
                             name: indicator.name,
                             category: category.name
@@ -2905,205 +2937,6 @@
             `;
             
             return trendsHtml;
-        }
-
-        // Generate individual indicator charts organized by category sections
-        function generateIndicatorCharts() {
-            const chartsContainer = document.getElementById('indicator-charts-container');
-            chartsContainer.innerHTML = '';
-            
-            // Destroy existing modal charts
-            modalCharts.forEach(chart => chart.destroy());
-            modalCharts = [];
-            
-            const years = [2022, 2023, 2024];
-            
-            // Process categories in order, excluding 'perfil'
-            const categoryOrder = Object.keys(indicatorsData).filter(key => key !== 'perfil');
-            
-            categoryOrder.forEach(categoryKey => {
-                const category = indicatorsData[categoryKey];
-                
-                // Check if category has any data
-                let hasDataInCategory = false;
-                const categoryIndicatorsWithData = [];
-                
-                category.indicators.forEach((indicator, index) => {
-                    const hasData = years.some(year => {
-                        const dataKey = `${categoryKey}_${index}_${year}`;
-                        const data = currentData[dataKey];
-                        return data && data.value && data.value.trim() !== '';
-                    });
-                    
-                    if (hasData) {
-                        hasDataInCategory = true;
-                        categoryIndicatorsWithData.push({ indicator, index });
-                    }
-                });
-                
-                // Only create section if category has data
-                if (hasDataInCategory) {
-                    // Create category section
-                    const categorySection = document.createElement('div');
-                    categorySection.className = 'category-charts-section';
-                    categorySection.innerHTML = `
-                        <div class="category-charts-header">${category.name}</div>
-                        <div class="category-charts-grid">
-                        </div>
-                    `;
-                    
-                    const categoryChartsGrid = categorySection.querySelector('.category-charts-grid');
-                    
-                    // Process indicators with data
-                    categoryIndicatorsWithData.forEach(({ indicator, index }) => {
-                        const dataPoints = [];
-                        
-                        years.forEach(year => {
-                            const dataKey = `${categoryKey}_${index}_${year}`;
-                            const data = currentData[dataKey];
-                            const value = data && data.value ? parseFloat(data.value) || 0 : 0;
-                            dataPoints.push(value);
-                        });
-                        
-                        // Calculate trend
-                        const trend = calculateTrend(dataPoints);
-                        
-                        // Create chart card
-                        const chartCard = document.createElement('div');
-                        chartCard.className = 'chart-card';
-                        chartCard.style.marginBottom = '12px';
-                        
-                        const chartId = `chart_${categoryKey}_${index}`;
-                        
-                        // Determine colors based on trend
-                        let borderColor, backgroundColor, trendIcon, trendText;
-                        if (trend === 'improving') {
-                            borderColor = 'rgba(40, 167, 69, 1)';
-                            backgroundColor = 'rgba(40, 167, 69, 0.1)';
-                            trendIcon = '📈';
-                            trendText = 'Melhorando';
-                        } else if (trend === 'worsening') {
-                            borderColor = 'rgba(220, 53, 69, 1)';
-                            backgroundColor = 'rgba(220, 53, 69, 0.1)';
-                            trendIcon = '📉';
-                            trendText = 'Piorando';
-                        } else {
-                            borderColor = 'rgba(108, 117, 125, 1)';
-                            backgroundColor = 'rgba(108, 117, 125, 0.1)';
-                            trendIcon = '➡️';
-                            trendText = 'Estável';
-                        }
-                        
-                        chartCard.innerHTML = `
-                            <h4 style="margin:0 0 10px 0; font-size:14px; color:#513C9A; font-weight:600;">
-                                ${indicator.name}
-                                <br>
-                                <small style="color: ${borderColor}; margin-left: 4px; font-weight:600; font-size:0.85rem;">
-                                    ${trendIcon} ${trendText}
-                                </small>
-                            </h4>
-                            <div style="height:180px; position:relative;">
-                                <canvas id="${chartId}"></canvas>
-                            </div>
-                        `;
-                        
-                        categoryChartsGrid.appendChild(chartCard);
-                        
-                        // Create chart after DOM insertion
-                        setTimeout(() => {
-                            const ctx = document.getElementById(chartId);
-                            if (ctx) {
-                                const chart = new Chart(ctx, {
-                                    type: 'line',
-                                    data: {
-                                        labels: years,
-                                        datasets: [{
-                                            label: `${indicator.unit}`,
-                                            data: dataPoints,
-                                            backgroundColor: backgroundColor,
-                                            borderColor: borderColor,
-                                            borderWidth: 4,
-                                            pointBackgroundColor: borderColor,
-                                            pointBorderColor: '#fff',
-                                            pointBorderWidth: 3,
-                                            pointRadius: 8,
-                                            pointHoverRadius: 10,
-                                            fill: true,
-                                            tension: 0.4
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            legend: {
-                                                display: true,
-                                                labels: {
-                                                    color: '#513C9A',
-                                                    font: {
-                                                        size: 12,
-                                                        weight: 'bold'
-                                                    }
-                                                }
-                                            },
-                                            tooltip: {
-                                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                                                titleColor: '#fff',
-                                                bodyColor: '#fff',
-                                                borderColor: borderColor,
-                                                borderWidth: 2,
-                                                titleFont: {
-                                                    size: 14,
-                                                    weight: 'bold'
-                                                },
-                                                bodyFont: {
-                                                    size: 13
-                                                },
-                                                callbacks: {
-                                                    afterLabel: function(context) {
-                                                        const year = context.label;
-                                                        const dataKey = `${categoryKey}_${index}_${year}`;
-                                                        const data = currentData[dataKey];
-                                                        return data && data.source ? `Fonte: ${data.source}` : '';
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        scales: {
-                                            x: {
-                                                ticks: {
-                                                    color: '#513C9A',
-                                                    font: {
-                                                        size: 12,
-                                                        weight: 'bold'
-                                                    }
-                                                },
-                                                grid: {
-                                                    color: 'rgba(81, 60, 154, 0.2)'
-                                                }
-                                            },
-                                            y: {
-                                                ticks: {
-                                                    color: '#513C9A',
-                                                    font: {
-                                                        size: 12
-                                                    }
-                                                },
-                                                grid: {
-                                                    color: 'rgba(81, 60, 154, 0.2)'
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-                                modalCharts.push(chart);
-                            }
-                        }, 100);
-                    });
-                    
-                    chartsContainer.appendChild(categorySection);
-                }
-            });
         }
 
         // Close modal
