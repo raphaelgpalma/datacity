@@ -1302,7 +1302,7 @@
             <!-- Page Title -->
             <div class="page-title">
                 <h1>ISO 37125</h1>
-                <p>Indicadores ESG: Ambiental, Social e Governança</p>
+                <p>133 indicadores voltados para ESG: Ambientais, Sociais e de Governança</p>
             </div>
 
             <!-- Municipality Selection -->
@@ -1399,7 +1399,7 @@
                     <h2 class="progress-title">Progresso de Mapeamento</h2>
                     <div class="progress-content">
                         <div class="profile-indicators-container">
-                            <h3>Indicadores contextuais</h3>
+                            <h3>Indicadores de Perfil do município</h3>
                             <div class="profile-indicators-grid" id="profile-indicators">
                                 <!-- Será preenchido dinamicamente -->
                             </div>
@@ -1480,8 +1480,12 @@
                     </div>
 
                     <div class="export-section">
-                        <button class="export-btn" onclick="exportToCSV()">📄 Exportar CSV</button>
-                        <button class="export-btn" onclick="exportToJSON()">💾 Exportar JSON</button>
+                        <!-- Year selection for PDF export -->
+                        <label style="margin-right:8px">📅 Anos para exportar:</label>
+                        <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2024" checked> 2024</label>
+                        <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2023"> 2023</label>
+                        <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2022"> 2022</label>
+                        <button class="export-btn" onclick="exportToPDF()">📄 Exportar PDF</button>
                     </div>
                 </div>
             </div>
@@ -1506,8 +1510,7 @@
                 </div>
             </div>
             <div class="modal-export-buttons">
-                <button class="export-btn" onclick="exportToCSV()">📄 Exportar CSV</button>
-                <button class="export-btn" onclick="exportToJSON()">💾 Exportar JSON</button>
+                <button class="export-btn" onclick="exportToPDF()">📄 Exportar PDF</button>
             </div>
         </div>
     </div>
@@ -3176,6 +3179,79 @@
                 }
             }, 1000);
         });
+        
+        // === PDF export implementation using jsPDF and autotable ===
+        function ensurePdfLibraries(callback) {
+            if (window.jspdf && window.jspdf.jsPDF && window.jspdfAutoTable) return callback();
+            const head = document.getElementsByTagName('head')[0];
+            const s1 = document.createElement('script');
+            s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            s1.onload = () => {
+                const s2 = document.createElement('script');
+                s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js';
+                s2.onload = () => callback();
+                head.appendChild(s2);
+            };
+            head.appendChild(s1);
+        }
+
+        function exportToPDF() {
+            if (!selectedMunicipalityData) { alert('Selecione um município antes de exportar.'); return; }
+            const yearEls = Array.from(document.querySelectorAll('.export-year'));
+            const years = yearEls.filter(e => e.checked).map(e => e.value);
+            if (years.length === 0) { alert('Selecione ao menos um ano para exportar.'); return; }
+
+            ensurePdfLibraries(() => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('l', 'mm', 'a4');
+                const municipalityName = selectedMunicipalityData.nome;
+                const stateName = selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla;
+                const title = `ISO 37125 - ${municipalityName} - ${stateName}`;
+                doc.setFontSize(14);
+                doc.text(title, 14, 16);
+
+                const columns = [{ header: 'Indicador', dataKey: 'indicator' }, { header: 'ODS', dataKey: 'ods' }];
+                years.forEach(y => columns.push({ header: `Valor ${y}`, dataKey: `v_${y}` }));
+                years.forEach(y => columns.push({ header: `Fonte ${y}`, dataKey: `s_${y}` }));
+
+                const rows = [];
+                Object.keys(indicatorsData).forEach(categoryKey => {
+                    const category = indicatorsData[categoryKey];
+                    if (!category || !category.indicators) return;
+                    category.indicators.forEach(ind => {
+                        const row = { indicator: ind.name || '', ods: ind.ods || '' };
+                        years.forEach(y => {
+                            const key = ind.key || ind.name;
+                            let value = '';
+                            let source = '';
+                            try {
+                                if (window.currentData && currentData[key] && currentData[key][y] !== undefined) value = currentData[key][y];
+                                else if (window.selectedMunicipalityData && selectedMunicipalityData.indicators && selectedMunicipalityData.indicators[key] && selectedMunicipalityData.indicators[key][y] !== undefined) value = selectedMunicipalityData.indicators[key][y];
+                            } catch (e) { value = ''; }
+                            try {
+                                if (window.currentData && currentData[key] && currentData[key][`source_${y}`] !== undefined) source = currentData[key][`source_${y}`];
+                                else if (window.selectedMunicipalityData && selectedMunicipalityData.indicators && selectedMunicipalityData.indicators[key] && selectedMunicipalityData.indicators[key][`source_${y}`]) source = selectedMunicipalityData.indicators[key][`source_${y}`];
+                            } catch (e) { source = ''; }
+                            row[`v_${y}`] = (value === null || value === undefined) ? '' : String(value);
+                            row[`s_${y}`] = (source === null || source === undefined) ? '' : String(source);
+                        });
+                        rows.push(row);
+                    });
+                });
+
+                doc.autoTable({
+                    head: [columns.map(c => c.header)],
+                    body: rows.map(r => columns.map(c => r[c.dataKey] || '')),
+                    startY: 22,
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [41, 128, 185] },
+                    margin: { left: 8, right: 8 }
+                });
+
+                const fname = `iso37125_${municipalityName}_${stateName}.pdf`.toLowerCase().replace(/\s+/g, '_');
+                doc.save(fname);
+            });
+        }
     </script>
 </body>
 </html>

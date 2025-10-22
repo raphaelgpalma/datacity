@@ -292,6 +292,15 @@ def csc(request):
 
 @login_required
 @require_http_methods(["GET"])
+def inteligente(request):
+    context = {
+        'dimensoes': MOCK_DATA['dimensoes'],
+        'username': request.user.username
+    }
+    return render(request, 'accounts/plataformas/inteligente.html', context)
+
+@login_required
+@require_http_methods(["GET"])
 def iso37120(request):
     context = {
         'dimensoes': MOCK_DATA['dimensoes'],

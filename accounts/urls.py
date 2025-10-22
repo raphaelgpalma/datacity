@@ -15,6 +15,7 @@ urlpatterns = [
     path('dashboard/normas/', views.normas, name='normas'),
     path('dashboard/plataformas/', views.plataformas, name='plataformas'),
     path('dashboard/plataformas/csc/', views.csc, name='csc'),
+    path('dashboard/plataformas/inteligente/', views.inteligente, name='inteligente'),
     path('dashboard/normas/iso37120/', views.iso37120, name='iso37120'),
     path('dashboard/normas/iso37122/', views.iso37122, name='iso37122'),
     path('dashboard/normas/iso37123/', views.iso37123, name='iso37123'),
