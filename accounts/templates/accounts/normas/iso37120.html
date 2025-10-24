@@ -3996,34 +3996,55 @@
                 const rows = [];
                 Object.keys(indicatorsData).forEach(categoryKey => {
                     const category = indicatorsData[categoryKey];
-                    if (!category || !category.indicators) return;
-                    category.indicators.forEach(ind => {
-                        const row = { indicator: ind.name || '', ods: ind.ods || '' };
-                        years.forEach(y => {
-                            const key = ind.key || ind.name;
-                            let value = '';
-                            let source = '';
-                            try {
-                                if (window.currentData && currentData[key] && currentData[key][y] !== undefined) value = currentData[key][y];
-                                else if (window.selectedMunicipalityData && selectedMunicipalityData.indicators && selectedMunicipalityData.indicators[key] && selectedMunicipalityData.indicators[key][y] !== undefined) value = selectedMunicipalityData.indicators[key][y];
-                            } catch (e) { value = ''; }
-                            try {
-                                if (window.currentData && currentData[key] && currentData[key][`source_${y}`] !== undefined) source = currentData[key][`source_${y}`];
-                                else if (window.selectedMunicipalityData && selectedMunicipalityData.indicators && selectedMunicipalityData.indicators[key] && selectedMunicipalityData.indicators[key][`source_${y}`]) source = selectedMunicipalityData.indicators[key][`source_${y}`];
-                            } catch (e) { source = ''; }
-                            row[`v_${y}`] = (value === null || value === undefined) ? '' : String(value);
-                            row[`s_${y}`] = (source === null || source === undefined) ? '' : String(source);
+                    if (!category) return;
+
+                    // regular indicators
+                    if (category.indicators) {
+                        category.indicators.forEach((ind, index) => {
+                            const row = { indicator: ind.name || '', ods: ind.ods || '' };
+                            years.forEach(y => {
+                                const dataKey = `${categoryKey}_${index}_${y}`;
+                                const data = currentData[dataKey] || { value: '', source: '' };
+                                row[`v_${y}`] = (data.value === null || data.value === undefined) ? '' : String(data.value);
+                                row[`s_${y}`] = (data.source === null || data.source === undefined) ? '' : String(data.source);
+                            });
+                            rows.push(row);
                         });
-                        rows.push(row);
-                    });
+                    }
+
+                    // profile indicators
+                    if (category.profileIndicators) {
+                        category.profileIndicators.forEach((ind, pIndex) => {
+                            const row = { indicator: ind.name || '', ods: ind.ods || '' };
+                            years.forEach(y => {
+                                const dataKey = `${categoryKey}_profile_${pIndex}_${y}`;
+                                const data = currentData[dataKey] || { value: '', source: '' };
+                                row[`v_${y}`] = (data.value === null || data.value === undefined) ? '' : String(data.value);
+                                row[`s_${y}`] = (data.source === null || data.source === undefined) ? '' : String(data.source);
+                            });
+                            rows.push(row);
+                        });
+                    }
                 });
+
+                const columnStyles = {};
+                columnStyles[0] = { cellWidth: 120, overflow: 'linebreak', halign: 'left' };
+                columnStyles[1] = { cellWidth: 24, halign: 'center' };
+                const vStart = 2;
+                const sStart = 2 + years.length;
+                for (let i = 0; i < years.length; i++) {
+                    columnStyles[vStart + i] = { cellWidth: 30, halign: 'center' };
+                    columnStyles[sStart + i] = { cellWidth: 60, overflow: 'linebreak', halign: 'left' };
+                }
 
                 doc.autoTable({
                     head: [columns.map(c => c.header)],
                     body: rows.map(r => columns.map(c => r[c.dataKey] || '')),
                     startY: 22,
-                    styles: { fontSize: 8 },
+                    styles: { fontSize: 8, cellPadding: 3 },
                     headStyles: { fillColor: [41, 128, 185] },
+                    columnStyles: columnStyles,
+                    showHead: 'everyPage',
                     margin: { left: 8, right: 8 }
                 });
 
