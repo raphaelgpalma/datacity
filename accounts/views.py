@@ -1302,3 +1302,222 @@ def listar_normas(request):
         'status': 'success',
         'normas': norms
     })
+
+# Admin User Management Views
+@login_required
+@admin_required
+def admin_menu(request):
+    """Menu de administração - apenas para administradores"""
+    context = {
+        'username': request.user.username,
+        'user_type': request.user.user_type,
+    }
+    return render(request, 'accounts/admin/menu.html', context)
+
+@login_required
+@admin_required
+def list_users(request):
+    """Listar todos os usuários do sistema"""
+    users = User.objects.all().order_by('-created_at')
+    context = {
+        'users': users,
+        'username': request.user.username,
+        'user_type': request.user.user_type,
+    }
+    return render(request, 'accounts/admin/list_users.html', context)
+
+@login_required
+@admin_required
+def add_user(request):
+    """Adicionar novo usuário"""
+    if request.method == 'POST':
+        try:
+            # Pegar dados do formulário
+            nome = request.POST.get('nome')
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            cpf = request.POST.get('cpf')
+            cidade = request.POST.get('cidade')
+            categoria = request.POST.get('categoria')
+
+            # Validar campos obrigatórios
+            if not all([nome, username, email, password, cpf, cidade, categoria]):
+                messages.error(request, 'Todos os campos são obrigatórios')
+                return redirect('add_user')
+
+            # Verificar se o email já existe
+            if User.objects.filter(email=email).exists():
+                messages.error(request, 'Já existe um usuário com este email')
+                return redirect('add_user')
+
+            # Verificar se o username já existe
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Já existe um usuário com este nome de usuário')
+                return redirect('add_user')
+
+            # Criar novo usuário (user_type será igual a categoria)
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                nome=nome,
+                cpf=cpf,
+                cidade=cidade,
+                categoria=categoria,
+                user_type=categoria
+            )
+
+            messages.success(request, f'Usuário {username} criado com sucesso!')
+            return redirect('list_users')
+
+        except Exception as e:
+            messages.error(request, f'Erro ao criar usuário: {str(e)}')
+            return redirect('add_user')
+
+    context = {
+        'username': request.user.username,
+        'user_type': request.user.user_type,
+    }
+    return render(request, 'accounts/admin/add_user.html', context)
+
+@login_required
+@admin_required
+def edit_user(request, user_id):
+    """Editar usuário existente"""
+    user_to_edit = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        try:
+            # Pegar dados do formulário
+            nome = request.POST.get('nome')
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            cpf = request.POST.get('cpf')
+            cidade = request.POST.get('cidade')
+            categoria = request.POST.get('categoria')
+
+            # Validar campos obrigatórios
+            if not all([nome, username, email, cpf, cidade, categoria]):
+                messages.error(request, 'Todos os campos são obrigatórios')
+                return redirect('edit_user', user_id=user_id)
+
+            # Verificar se o email já existe (exceto para o usuário atual)
+            if User.objects.filter(email=email).exclude(id=user_id).exists():
+                messages.error(request, 'Já existe um usuário com este email')
+                return redirect('edit_user', user_id=user_id)
+
+            # Verificar se o username já existe (exceto para o usuário atual)
+            if User.objects.filter(username=username).exclude(id=user_id).exists():
+                messages.error(request, 'Já existe um usuário com este nome de usuário')
+                return redirect('edit_user', user_id=user_id)
+
+            # Atualizar dados do usuário (user_type será igual a categoria)
+            user_to_edit.nome = nome
+            user_to_edit.username = username
+            user_to_edit.email = email
+            user_to_edit.cpf = cpf
+            user_to_edit.cidade = cidade
+            user_to_edit.categoria = categoria
+            user_to_edit.user_type = categoria
+
+            # Atualizar senha apenas se foi fornecida
+            if password:
+                user_to_edit.set_password(password)
+
+            user_to_edit.save()
+
+            messages.success(request, f'Usuário {username} atualizado com sucesso!')
+            return redirect('list_users')
+
+        except Exception as e:
+            messages.error(request, f'Erro ao atualizar usuário: {str(e)}')
+            return redirect('edit_user', user_id=user_id)
+
+    context = {
+        'user_to_edit': user_to_edit,
+        'username': request.user.username,
+        'user_type': request.user.user_type,
+    }
+    return render(request, 'accounts/admin/edit_user.html', context)
+
+@login_required
+@admin_required
+def delete_user(request, user_id):
+    """Excluir usuário"""
+    if request.method == 'POST':
+        try:
+            user_to_delete = get_object_or_404(User, id=user_id)
+
+            # Não permitir que o admin delete a si mesmo
+            if user_to_delete.id == request.user.id:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Você não pode excluir sua própria conta'
+                })
+
+            username = user_to_delete.username
+            user_to_delete.delete()
+
+            return JsonResponse({
+                'success': True,
+                'message': f'Usuário {username} excluído com sucesso'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao excluir usuário: {str(e)}'
+            })
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Método não permitido'
+    })
+
+@login_required
+@admin_required
+def change_user_role(request, user_id):
+    """Modificar privilégios do usuário"""
+    if request.method == 'POST':
+        try:
+            user_to_change = get_object_or_404(User, id=user_id)
+            new_role = request.POST.get('user_type')
+
+            if new_role not in ['ADMIN', 'MANAGER', 'COMMON']:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Tipo de usuário inválido'
+                })
+
+            # Não permitir que o admin mude seu próprio privilégio
+            if user_to_change.id == request.user.id:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Você não pode modificar seus próprios privilégios'
+                })
+
+            user_to_change.user_type = new_role
+            user_to_change.categoria = new_role
+            user_to_change.save()
+
+            role_names = {
+                'ADMIN': 'Administrador',
+                'MANAGER': 'Gestor',
+                'COMMON': 'Usuário Comum'
+            }
+
+            return JsonResponse({
+                'success': True,
+                'message': f'Privilégios de {user_to_change.username} alterados para {role_names[new_role]}'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao modificar privilégios: {str(e)}'
+            })
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Método não permitido'
+    })

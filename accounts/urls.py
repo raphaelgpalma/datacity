@@ -45,6 +45,14 @@ urlpatterns = [
     path('dashboard/indicador/<str:dimensao_id>/<int:indicador_id>/', views.indicador_detalhes, name='indicador_detalhes'),
     path('logout/', views.logout, name='logout'),
 
+    # Admin - Gerenciamento de Usuários (apenas para administradores)
+    path('dashboard/admin/', views.admin_menu, name='admin_menu'),
+    path('dashboard/admin/users/', views.list_users, name='list_users'),
+    path('dashboard/admin/users/add/', views.add_user, name='add_user'),
+    path('dashboard/admin/users/<int:user_id>/edit/', views.edit_user, name='edit_user'),
+    path('dashboard/admin/users/<int:user_id>/delete/', views.delete_user, name='delete_user'),
+    path('dashboard/admin/users/<int:user_id>/change-role/', views.change_user_role, name='change_user_role'),
+
     # Modais
     path('dashboard/modals/dimensoes/', views.modal_dimensoes, name='modal-dimensoes'),
     path('dashboard/modals/indicadores/', views.modal_indicadores, name='modal-indicadores'),

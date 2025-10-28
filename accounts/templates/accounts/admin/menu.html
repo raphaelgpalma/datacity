@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DataCity - Sua plataforma de dados urbanos</title>
+    <title>DataCity - Menu de Administração</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -54,17 +54,24 @@
             justify-content: flex-start;
             align-items: center;
             text-align: center;
-            max-width: 600px;
+            max-width: 700px;
             padding: 0 20px;
-            margin-top: 20px; /* Adjusted to move content closer to logo */
+            margin-top: 20px;
         }
 
         .main-title {
             color: #513C9A;
             font-size: 36px;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             line-height: 1.2;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 30px;
         }
 
         .description {
@@ -84,7 +91,7 @@
         }
 
         .btn {
-            width: 150px;
+            width: 200px;
             height: 50px;
             background: #513C9A;
             border: none;
@@ -98,6 +105,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            text-decoration: none;
         }
 
         .btn:hover {
@@ -110,18 +118,47 @@
             transform: translateY(0);
         }
 
-        .logout-container {
+        .btn-back {
+            background: #666;
+            width: 150px;
+        }
+
+        .btn-back:hover {
+            background: #777;
+        }
+
+        .header-buttons {
             position: absolute;
             top: 20px;
             right: 20px;
             z-index: 10;
+            display: flex;
+            gap: 10px;
         }
+
+        .btn-header {
+            width: 120px;
+            height: 40px;
+            font-size: 14px;
+        }
+
         .btn-logout {
             background: #9e1220 !important;
-            width: 120px !important;
         }
+
         .btn-logout:hover {
             background: #bd2130 !important;
+        }
+
+        /* Admin badge */
+        .admin-badge {
+            background: #513C9A;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
 
         /* Responsive Design */
@@ -133,7 +170,7 @@
             }
 
             .content {
-                margin-top: 15px; /* Adjusted for smaller screens */
+                margin-top: 15px;
                 max-width: 90%;
             }
 
@@ -153,9 +190,14 @@
             }
 
             .btn {
-                width: 140px;
+                width: 200px;
                 height: 45px;
                 font-size: 15px;
+            }
+
+            .header-buttons {
+                flex-direction: column;
+                gap: 5px;
             }
         }
 
@@ -174,7 +216,7 @@
             }
 
             .btn {
-                width: 130px;
+                width: 180px;
                 height: 42px;
                 font-size: 14px;
             }
@@ -183,29 +225,28 @@
 </head>
 <body>
     <div class="container">
-        <div class="logout-container">
-            <a href="{% url 'logout' %}" class="btn btn-logout">Sair</a>
+        <div class="header-buttons">
+            <a href="{% url 'menu' %}" class="btn btn-header btn-back">Voltar</a>
+            <a href="{% url 'logout' %}" class="btn btn-header btn-logout">Sair</a>
         </div>
+
         <!-- Logo -->
         <div class="logo-container">
             <img src="{% static 'img/Logo_drive.png' %}" alt="DataCity Logo" />
         </div>
+
         <div class="content">
-            <h1 class="main-title">Bem vindo ao DataCity</h1>
+            <div class="admin-badge">ADMINISTRADOR</div>
+            <h1 class="main-title">Menu de Administração</h1>
+            <p class="subtitle">Bem-vindo, {{ username }}</p>
             <p class="description">
-                Selecione uma das opções abaixo para navegar:
+                Gerencie usuários do sistema, modifique permissões e controle o acesso à plataforma.
             </p>
             <div class="buttons-container">
-                <a href="{% url 'plataformas' %}" class="btn">Plataformas</a>
-                <a href="{% url 'normas' %}" class="btn">Normas</a>
-                {% if user_type == 'ADMIN' %}
-                <a href="{% url 'admin_menu' %}" class="btn" style="background: #004505;">Administração</a>
-                {% endif %}
+                <a href="{% url 'list_users' %}" class="btn">Gerenciar Usuários</a>
+                <a href="{% url 'add_user' %}" class="btn">Adicionar Usuário</a>
             </div>
         </div>
     </div>
-
-
 </body>
 </html>
-
