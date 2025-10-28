@@ -110,6 +110,20 @@
             transform: translateY(0);
         }
 
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+        .btn-logout {
+            background: #9e1220 !important;
+            width: 120px !important;
+        }
+        .btn-logout:hover {
+            background: #bd2130 !important;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .logo-container {
@@ -169,6 +183,9 @@
 </head>
 <body>
     <div class="container">
+        <div class="logout-container">
+            <a href="{% url 'logout' %}" class="btn btn-logout">Sair</a>
+        </div>
         <!-- Logo -->
         <div class="logo-container">
             <img src="{% static 'img/Logo_drive.png' %}" alt="DataCity Logo" />
