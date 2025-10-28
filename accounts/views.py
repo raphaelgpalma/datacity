@@ -214,6 +214,7 @@ def normalize_url(url):
     return url
 
 @login_required
+@admin_required
 def adicionar_plataforma(request):
     if request.method == 'POST':
         try:
@@ -240,6 +241,7 @@ def adicionar_plataforma(request):
     return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
+@admin_required
 def editar_plataforma(request, platform_id):
     if request.method == 'POST':
         platform = get_object_or_404(Platform, id_plataforma=platform_id)
@@ -270,6 +272,7 @@ def editar_plataforma(request, platform_id):
     return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
+@admin_required
 def remover_plataforma(request, platform_id):
     if request.method == 'DELETE':
         platform = get_object_or_404(Platform, id_plataforma=platform_id)
@@ -311,6 +314,7 @@ def iso37120(request):
 # API to save/update ISO37120 indicator data
 @csrf_exempt
 @login_required
+@manager_required
 def save_iso37120_data(request):
     if request.method == 'POST':
         try:
@@ -411,6 +415,7 @@ def get_iso37120_data(request):
 # API to update specific field (for edit functionality)
 @csrf_exempt
 @login_required
+@manager_required
 def update_iso37120_field(request):
     if request.method == 'POST':
         try:
@@ -438,6 +443,7 @@ def update_iso37120_field(request):
 # API to save/update ISO37122 indicator data
 @csrf_exempt
 @login_required
+@manager_required
 def save_iso37122_data(request):
     if request.method == 'POST':
         try:
@@ -538,6 +544,7 @@ def get_iso37122_data(request):
 # API to save/update ISO37123 indicator data
 @csrf_exempt
 @login_required
+@manager_required
 def save_iso37123_data(request):
     if request.method == 'POST':
         try:
@@ -638,6 +645,7 @@ def get_iso37123_data(request):
 # API to save/update ISO37125 indicator data
 @csrf_exempt
 @login_required
+@manager_required
 def save_iso37125_data(request):
     if request.method == 'POST':
         try:
@@ -738,6 +746,7 @@ def get_iso37125_data(request):
 # API to update specific field for ISO37122 (for edit functionality)
 @csrf_exempt
 @login_required
+@manager_required
 def update_iso37122_field(request):
     if request.method == 'POST':
         try:
@@ -765,6 +774,7 @@ def update_iso37122_field(request):
 # API to update specific field for ISO37123 (for edit functionality)
 @csrf_exempt
 @login_required
+@manager_required
 def update_iso37123_field(request):
     if request.method == 'POST':
         try:
@@ -792,6 +802,7 @@ def update_iso37123_field(request):
 # API to update specific field for ISO37125 (for edit functionality)
 @csrf_exempt
 @login_required
+@manager_required
 def update_iso37125_field(request):
     if request.method == 'POST':
         try:
@@ -1215,7 +1226,7 @@ def modal_indicadores(request):
     return render(request, 'screens/modals-indicadores.html')
 
 @login_required
-@manager_required
+@admin_required
 def adicionar_norma(request):
     if request.method == 'POST':
         try:
@@ -1242,7 +1253,7 @@ def adicionar_norma(request):
     return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
-@manager_required
+@admin_required
 def editar_norma(request, norm_id):
     norm = get_object_or_404(Norm, id_norma=norm_id)
     
@@ -1269,7 +1280,7 @@ def editar_norma(request, norm_id):
     return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 @login_required
-@manager_required
+@admin_required
 def remover_norma(request, norm_id):
     norm = get_object_or_404(Norm, id_norma=norm_id)
     

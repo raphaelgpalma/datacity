@@ -224,7 +224,7 @@
             <h1 class="menu-title">Normas disponíveis</h1>
             <div class="admin-actions">
                 <input type="text" id="searchInput" placeholder="Pesquisar normas..." onkeyup="filterNorms()">
-                {% if user.user_type == 'MANAGER' or user.user_type == 'ADMIN' %}
+                {% if user.user_type == 'ADMIN' %}
                 <button class="action-button" data-bs-toggle="modal" data-bs-target="#addNormModal">
                     <span class="icon">+</span>
                     <span class="label">Adicionar</span>
@@ -252,7 +252,7 @@
                 {% for norm in norms %}
                 <div class="menu-btn norm-item" data-norm-name="{{ norm.Nome|lower }}" onclick="window.open('{{ norm.Direcionamento }}', '_blank')">
                     {{ norm.Nome }}
-                    {% if user.user_type == 'MANAGER' or user.user_type == 'ADMIN' %}
+                    {% if user.user_type == 'ADMIN' %}
                     <div class="admin-controls">
                         <button class="control-btn edit-norm" data-norm-id="{{ norm.id_norma }}" onclick="event.stopPropagation(); editNorm('{{ norm.id_norma }}', '{{ norm.Nome }}', '{{ norm.Direcionamento }}')">✎</button>
                         <button class="control-btn delete-norm" data-norm-id="{{ norm.id_norma }}" onclick="event.stopPropagation(); deleteNorm('{{ norm.id_norma }}', '{{ norm.Nome }}')">×</button>

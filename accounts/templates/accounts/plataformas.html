@@ -224,7 +224,7 @@
             <h1 class="menu-title">Plataformas disponíveis</h1>
             <div class="admin-actions">
                 <input type="text" id="searchInput" placeholder="Pesquisar plataformas..." onkeyup="filterPlatforms()">
-                {% if user.user_type == 'MANAGER' or user.user_type == 'ADMIN' %}
+                {% if user.user_type == 'ADMIN' %}
                 <button class="action-button" data-bs-toggle="modal" data-bs-target="#addPlatformModal">
                     <span class="icon">+</span>
                     <span class="label">Adicionar</span>
@@ -246,7 +246,7 @@
                 {% for platform in platforms %}
                 <div class="menu-btn platform-item" data-platform-name="{{ platform.Nome|lower }}" onclick="window.open('{{ platform.Direcionamento }}', '_blank')">
                     {{ platform.Nome }}
-                    {% if user.user_type == 'MANAGER' or user.user_type == 'ADMIN' %}
+                    {% if user.user_type == 'ADMIN' %}
                     <div class="admin-controls">
                         <button class="control-btn edit-platform" data-platform-id="{{ platform.id_plataforma }}" onclick="event.stopPropagation(); editPlatform('{{ platform.id_plataforma }}', '{{ platform.Nome }}', '{{ platform.Direcionamento }}')">✎</button>
                         <button class="control-btn delete-platform" data-platform-id="{{ platform.id_plataforma }}" onclick="event.stopPropagation(); deletePlatform('{{ platform.id_plataforma }}', '{{ platform.Nome }}')">×</button>

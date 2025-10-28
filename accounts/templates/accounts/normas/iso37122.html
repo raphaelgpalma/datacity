@@ -1632,7 +1632,11 @@
     <script>
         let radarChart = null;
         let modalCharts = [];
-        
+
+        // Tipo de usuário para controle de permissões
+        const userType = '{{ user.user_type }}';
+        const canEdit = userType === 'ADMIN' || userType === 'MANAGER';
+
         // Data structure for ISO 37122 indicators
         const indicatorsData = {
             'economia': {
@@ -2247,15 +2251,15 @@ function renderCategoriesOverview() {
                                 <input type="text" class="data-input ${currentValue.value ? 'filled' : ''}"
                                        value="${currentValue.value}"
                                        onchange="updateData('${dataKey}', 'value', this.value)"
-                                       placeholder="Clique no lápis para editar"
+                                       placeholder="${canEdit ? 'Clique no lápis para editar' : ''}"
                                        disabled>
-                                <button class="edit-icon" title="Clique para editar" onclick="enableEdit(this)">
+                                ${canEdit ? `<button class="edit-icon" title="Clique para editar" onclick="enableEdit(this)">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                         <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
                                         <path d="m15 5 3 3"/>
                                     </svg>
-                                </button>
+                                </button>` : ''}
                             </div>
                         </div>
                         <div class="table-cell unit-cell">${indicator.unit}</div>
@@ -2263,27 +2267,27 @@ function renderCategoriesOverview() {
                             ${currentValue.source && isValidUrl(currentValue.source) ?
                                 `<div class="input-container">
                                     <a href="${currentValue.source}" target="_blank" class="source-link">${currentValue.source}</a>
-                                    <button class="edit-icon" title="Clique para editar" onclick="enableSourceEdit(this, '${dataKey}')">
+                                    ${canEdit ? `<button class="edit-icon" title="Clique para editar" onclick="enableSourceEdit(this, '${dataKey}')">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                             <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
                                             <path d="m15 5 3 3"/>
                                         </svg>
-                                    </button>
+                                    </button>` : ''}
                                 </div>` :
                                 `<div class="input-container">
                                     <input type="url" class="source-input"
                                             value="${currentValue.source}"
                                             onchange="updateData('${dataKey}', 'source', this.value)"
-                                            placeholder="Clique no lápis para editar"
+                                            placeholder="${canEdit ? 'Clique no lápis para editar' : ''}"
                                             disabled>
-                                    <button class="edit-icon" title="Clique para editar" onclick="enableSourceEdit(this, '${dataKey}')">
+                                    ${canEdit ? `<button class="edit-icon" title="Clique para editar" onclick="enableSourceEdit(this, '${dataKey}')">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                             <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
                                             <path d="m15 5 3 3"/>
                                         </svg>
-                                    </button>
+                                    </button>` : ''}
                                 </div>`
                             }
                         </div>
@@ -3800,13 +3804,13 @@ window.onload = init;
                     // Convert to link
                     inputContainer.innerHTML = `
                         <a href="${value}" target="_blank" class="source-link">${value}</a>
-                        <button class="edit-icon" title="Clique para editar" onclick="enableSourceEdit(this, '${dataKey}')">
+                        ${canEdit ? `<button class="edit-icon" title="Clique para editar" onclick="enableSourceEdit(this, '${dataKey}')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                 <path d="m18.5 2.5-8.5 8.5v3h3l8.5-8.5z"/>
                                 <path d="m15 5 3 3"/>
                             </svg>
-                        </button>
+                        </button>` : ''}
                     `;
                 } else {
                     // Keep as disabled input
