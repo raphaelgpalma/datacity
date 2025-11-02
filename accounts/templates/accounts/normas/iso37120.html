@@ -2102,7 +2102,6 @@
             // Save data to database via API
             if (selectedMunicipalityData) {
                 updateCertificationLevels();
-                saveToDatabaseBatch();
             }
         }
 
@@ -2509,6 +2508,7 @@
                             <div class="input-container">
                                 <input type="text" class="data-input ${currentValue.value ? 'filled' : ''}"
                                        value="${currentValue.value}"
+                                       data-key="${dataKey}"
                                        onchange="updateData('${dataKey}', 'value', this.value)"
                                        placeholder="${canEdit ? 'Clique no lápis para editar' : ''}"
                                        disabled>
@@ -3760,38 +3760,6 @@
             }, 100);
         }
 
-        function updateData(key, field, value) {
-            if (!currentData[key]) {
-                currentData[key] = { value: '', source: '' };
-            }
-            currentData[key][field] = value;
-            saveData();
-            
-            // Update certification levels immediately
-            updateCertificationLevels();
-            
-            // Update profile indicators if needed
-            if (key.startsWith('perfil_')) {
-                renderProfileIndicators();
-            }
-            
-            // Update radar chart and category summary immediately
-            if (selectedMunicipalityData) {
-                updateRadarChart();
-                updateCategorySummary();
-            }
-            
-            // Update input visual state
-            const input = event.target;
-            if (input && input.classList.contains('data-input')) {
-                if (value && value.trim() !== '') {
-                    input.classList.add('filled');
-                } else {
-                    input.classList.remove('filled');
-                }
-            }
-        }
-
         // Function to enable editing when edit icon is clicked
         function enableEdit(editIcon) {
             const inputContainer = editIcon.parentElement;
@@ -3840,6 +3808,15 @@
             const input = inputContainer.querySelector('.data-input');
 
             if (input && !input.disabled) {
+                // Get the data key and value
+                const dataKey = input.dataset.key;
+                const value = input.value;
+
+                // Update data before disabling
+                if (dataKey) {
+                    updateData(dataKey, 'value', value);
+                }
+
                 // Disable the input
                 input.disabled = true;
                 input.classList.remove('editing');

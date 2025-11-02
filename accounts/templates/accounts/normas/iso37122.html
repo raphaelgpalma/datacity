@@ -2250,6 +2250,7 @@ function renderCategoriesOverview() {
                             <div class="input-container">
                                 <input type="text" class="data-input ${currentValue.value ? 'filled' : ''}"
                                        value="${currentValue.value}"
+                                       data-key="${dataKey}"
                                        onchange="updateData('${dataKey}', 'value', this.value)"
                                        placeholder="${canEdit ? 'Clique no lápis para editar' : ''}"
                                        disabled>
@@ -2375,7 +2376,7 @@ function renderCategoriesOverview() {
                 const existingData = await getExistingIndicatorData(indicator.name);
 
                 const payload = {
-                    categoria: categoryKey,
+                    categoria: category.name,
                     nome_indicador: indicator.name,
                     tipo: 'core', // Default type for ISO37122
                     ods: indicator.ods,
@@ -3267,6 +3268,8 @@ function renderCategoriesOverview() {
             selectedMunicipalityData = JSON.parse(selectedOption.dataset.municipalityData);
             showSelection();
             unlockContent();
+            // Load data from database for the selected municipality
+            loadDataFromDatabase();
         }
 
         // Load all municipalities for search
@@ -3363,9 +3366,11 @@ function renderCategoriesOverview() {
 
             document.getElementById('municipality-search').value = `${municipalityName} - ${stateName} (${stateCode})`;
             document.getElementById('search-results').classList.remove('show');
-            
+
             showSelection();
             unlockContent();
+            // Load data from database for the selected municipality
+            loadDataFromDatabase();
         }
 
         // Show search results on focus
@@ -3443,15 +3448,15 @@ function unlockContent() {
 
         document.getElementById('municipality-title').textContent = 'Londrina - PR';
 
-        // Initialize data structures first
-        initializeEmptyData();
-        
-        // Then render empty table
-        renderTable();
-        updateCertificationLevels();
-        renderProfileIndicators();
-        updateRadarChart();
-        updateCategorySummary();
+        // Load data from database first, then initialize visualizations
+        loadDataFromDatabase().then(() => {
+            // Initialize visualizations
+            renderTable();
+            renderProfileIndicators();
+            updateCertificationLevels();
+            updateRadarChart();
+            updateCategorySummary();
+        });
     } else {
         // Hide original sections for other cities
         const originalSections = document.querySelectorAll('#municipality-details > div:not(#future-implementation-message)');
@@ -3709,6 +3714,15 @@ window.onload = init;
             const input = inputContainer.querySelector('.data-input');
 
             if (input && !input.disabled) {
+                // Get the data key and value
+                const dataKey = input.dataset.key;
+                const value = input.value;
+
+                // Update data before disabling
+                if (dataKey) {
+                    updateData(dataKey, 'value', value);
+                }
+
                 // Disable the input
                 input.disabled = true;
                 input.classList.remove('editing');
@@ -3836,6 +3850,31 @@ window.onload = init;
        // Auto-select Londrina on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadStates();
+
+    // Auto-select Londrina for demonstration and load data
+    setTimeout(() => {
+        if (!selectedMunicipalityData) {
+            // Auto-select Londrina if no municipality is selected
+            selectedMunicipalityData = {
+                id: 4113700,
+                nome: 'Londrina',
+                microrregiao: {
+                    mesorregiao: {
+                        UF: {
+                            id: 41,
+                            nome: 'Paraná',
+                            sigla: 'PR'
+                        }
+                    }
+                }
+            };
+            console.log('Auto-selected Londrina, loading data...');
+            loadDataFromDatabase();
+        } else if (selectedMunicipalityData.nome.toLowerCase() === 'londrina' &&
+                   selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla.toUpperCase() === 'PR') {
+            loadDataFromDatabase();
+        }
+    }, 1000);
 });
     </script>
 </body>

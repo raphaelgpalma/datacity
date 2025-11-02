@@ -2343,7 +2343,7 @@
                 console.log('Existing data:', existingData);
 
                 const data = {
-                    categoria: categoryKey,
+                    categoria: category.name,
                     nome_indicador: indicator.name,
                     tipo: 'core', // Default type for ISO37123
                     ods: indicator.ods,
@@ -2563,6 +2563,7 @@
                             <div class="input-container">
                                 <input type="text" class="data-input ${currentValue.value ? 'filled' : ''}"
                                        value="${currentValue.value}"
+                                       data-key="${dataKey}"
                                        onchange="updateData('${dataKey}', 'value', this.value)"
                                        placeholder="${canEdit ? 'Clique no lápis para editar' : ''}"
                                        disabled>
@@ -3384,6 +3385,15 @@
             const input = inputContainer.querySelector('.data-input');
 
             if (input && !input.disabled) {
+                // Get the data key and value
+                const dataKey = input.dataset.key;
+                const value = input.value;
+
+                // Update data before disabling
+                if (dataKey) {
+                    updateData(dataKey, 'value', value);
+                }
+
                 // Disable the input
                 input.disabled = true;
                 input.classList.remove('editing');
