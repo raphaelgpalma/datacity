@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     # Rotas públicas
-    path('register/', views.register, name='register'),
+    # path('register/', views.register, name='register'),  # Rota de cadastro desabilitada
     path('login/', views.login, name='login'),
     path('', views.landing, name='landing'),
     path('saiba-mais/', views.saiba_mais, name='saiba_mais'),
