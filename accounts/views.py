@@ -331,11 +331,13 @@ def save_iso37120_data(request):
             dado_2022 = data.get('dado_2022')
             dado_2023 = data.get('dado_2023')
             dado_2024 = data.get('dado_2024')
+            dado_2025 = data.get('dado_2025')
 
             # Source fields
             fonte_2022 = data.get('fonte_2022')
             fonte_2023 = data.get('fonte_2023')
             fonte_2024 = data.get('fonte_2024')
+            fonte_2025 = data.get('fonte_2025')
 
             # Create or update indicator
             indicator, created = ISO37120Indicator.objects.get_or_create(
@@ -350,9 +352,11 @@ def save_iso37120_data(request):
                     'dado_2022': dado_2022,
                     'dado_2023': dado_2023,
                     'dado_2024': dado_2024,
+                    'dado_2025': dado_2025,
                     'fonte_2022': fonte_2022,
                     'fonte_2023': fonte_2023,
                     'fonte_2024': fonte_2024,
+                    'fonte_2025': fonte_2025,
                 }
             )
 
@@ -370,6 +374,8 @@ def save_iso37120_data(request):
                     indicator.dado_2023 = dado_2023
                 if dado_2024 is not None:
                     indicator.dado_2024 = dado_2024
+                if dado_2025 is not None:
+                    indicator.dado_2025 = dado_2025
 
                 # Only update source fields if they are provided (not None)
                 if fonte_2022 is not None:
@@ -378,6 +384,8 @@ def save_iso37120_data(request):
                     indicator.fonte_2023 = fonte_2023
                 if fonte_2024 is not None:
                     indicator.fonte_2024 = fonte_2024
+                if fonte_2025 is not None:
+                    indicator.fonte_2025 = fonte_2025
 
                 indicator.save()
 
@@ -460,11 +468,13 @@ def save_iso37122_data(request):
             dado_2022 = data.get('dado_2022')
             dado_2023 = data.get('dado_2023')
             dado_2024 = data.get('dado_2024')
+            dado_2025 = data.get('dado_2025')
 
             # Source fields
             fonte_2022 = data.get('fonte_2022')
             fonte_2023 = data.get('fonte_2023')
             fonte_2024 = data.get('fonte_2024')
+            fonte_2025 = data.get('fonte_2025')
 
             # Create or update indicator
             indicator, created = ISO37122Indicator.objects.get_or_create(
@@ -479,9 +489,11 @@ def save_iso37122_data(request):
                     'dado_2022': dado_2022,
                     'dado_2023': dado_2023,
                     'dado_2024': dado_2024,
+                    'dado_2025': dado_2025,
                     'fonte_2022': fonte_2022,
                     'fonte_2023': fonte_2023,
                     'fonte_2024': fonte_2024,
+                    'fonte_2025': fonte_2025,
                 }
             )
 
@@ -499,6 +511,8 @@ def save_iso37122_data(request):
                     indicator.dado_2023 = dado_2023
                 if dado_2024 is not None:
                     indicator.dado_2024 = dado_2024
+                if dado_2025 is not None:
+                    indicator.dado_2025 = dado_2025
 
                 # Only update source fields if they are provided (not None)
                 if fonte_2022 is not None:
@@ -507,6 +521,8 @@ def save_iso37122_data(request):
                     indicator.fonte_2023 = fonte_2023
                 if fonte_2024 is not None:
                     indicator.fonte_2024 = fonte_2024
+                if fonte_2025 is not None:
+                    indicator.fonte_2025 = fonte_2025
 
                 indicator.save()
 
@@ -561,11 +577,13 @@ def save_iso37123_data(request):
             dado_2022 = data.get('dado_2022')
             dado_2023 = data.get('dado_2023')
             dado_2024 = data.get('dado_2024')
+            dado_2025 = data.get('dado_2025')
 
             # Source fields
             fonte_2022 = data.get('fonte_2022')
             fonte_2023 = data.get('fonte_2023')
             fonte_2024 = data.get('fonte_2024')
+            fonte_2025 = data.get('fonte_2025')
 
             # Create or update indicator
             indicator, created = ISO37123Indicator.objects.get_or_create(
@@ -580,9 +598,11 @@ def save_iso37123_data(request):
                     'dado_2022': dado_2022,
                     'dado_2023': dado_2023,
                     'dado_2024': dado_2024,
+                    'dado_2025': dado_2025,
                     'fonte_2022': fonte_2022,
                     'fonte_2023': fonte_2023,
                     'fonte_2024': fonte_2024,
+                    'fonte_2025': fonte_2025,
                 }
             )
 
@@ -600,6 +620,8 @@ def save_iso37123_data(request):
                     indicator.dado_2023 = dado_2023
                 if dado_2024 is not None:
                     indicator.dado_2024 = dado_2024
+                if dado_2025 is not None:
+                    indicator.dado_2025 = dado_2025
 
                 # Only update source fields if they are provided (not None)
                 if fonte_2022 is not None:
@@ -608,6 +630,8 @@ def save_iso37123_data(request):
                     indicator.fonte_2023 = fonte_2023
                 if fonte_2024 is not None:
                     indicator.fonte_2024 = fonte_2024
+                if fonte_2025 is not None:
+                    indicator.fonte_2025 = fonte_2025
 
                 indicator.save()
 
@@ -662,11 +686,13 @@ def save_iso37125_data(request):
             dado_2022 = data.get('dado_2022')
             dado_2023 = data.get('dado_2023')
             dado_2024 = data.get('dado_2024')
+            dado_2025 = data.get('dado_2025')
 
             # Source fields
             fonte_2022 = data.get('fonte_2022')
             fonte_2023 = data.get('fonte_2023')
             fonte_2024 = data.get('fonte_2024')
+            fonte_2025 = data.get('fonte_2025')
 
             # Create or update indicator
             indicator, created = ISO37125Indicator.objects.get_or_create(
@@ -681,9 +707,11 @@ def save_iso37125_data(request):
                     'dado_2022': dado_2022,
                     'dado_2023': dado_2023,
                     'dado_2024': dado_2024,
+                    'dado_2025': dado_2025,
                     'fonte_2022': fonte_2022,
                     'fonte_2023': fonte_2023,
                     'fonte_2024': fonte_2024,
+                    'fonte_2025': fonte_2025,
                 }
             )
 
@@ -701,6 +729,8 @@ def save_iso37125_data(request):
                     indicator.dado_2023 = dado_2023
                 if dado_2024 is not None:
                     indicator.dado_2024 = dado_2024
+                if dado_2025 is not None:
+                    indicator.dado_2025 = dado_2025
 
                 # Only update source fields if they are provided (not None)
                 if fonte_2022 is not None:
@@ -709,6 +739,8 @@ def save_iso37125_data(request):
                     indicator.fonte_2023 = fonte_2023
                 if fonte_2024 is not None:
                     indicator.fonte_2024 = fonte_2024
+                if fonte_2025 is not None:
+                    indicator.fonte_2025 = fonte_2025
 
                 indicator.save()
 

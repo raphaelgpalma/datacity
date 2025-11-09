@@ -102,11 +102,13 @@ class ISO37120Indicator(models.Model):
     dado_2022 = models.CharField(max_length=100, null=True, blank=True)
     dado_2023 = models.CharField(max_length=100, null=True, blank=True)
     dado_2024 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2025 = models.CharField(max_length=100, null=True, blank=True)
 
     # Fontes para diferentes anos
     fonte_2022 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2023 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2025 = models.CharField(max_length=500, null=True, blank=True)
 
     # Cidade para permitir dados de múltiplas cidades
     cidade = models.CharField(max_length=100, default='Londrina')
@@ -139,11 +141,13 @@ class ISO37122Indicator(models.Model):
     dado_2022 = models.CharField(max_length=100, null=True, blank=True)
     dado_2023 = models.CharField(max_length=100, null=True, blank=True)
     dado_2024 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2025 = models.CharField(max_length=100, null=True, blank=True)
 
     # Fontes para diferentes anos
     fonte_2022 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2023 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2025 = models.CharField(max_length=500, null=True, blank=True)
 
     # Cidade para permitir dados de múltiplas cidades
     cidade = models.CharField(max_length=100, default='Londrina')
@@ -176,11 +180,13 @@ class ISO37123Indicator(models.Model):
     dado_2022 = models.CharField(max_length=100, null=True, blank=True)
     dado_2023 = models.CharField(max_length=100, null=True, blank=True)
     dado_2024 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2025 = models.CharField(max_length=100, null=True, blank=True)
 
     # Fontes para diferentes anos
     fonte_2022 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2023 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2025 = models.CharField(max_length=500, null=True, blank=True)
 
     # Cidade para permitir dados de múltiplas cidades
     cidade = models.CharField(max_length=100, default='Londrina')
@@ -213,11 +219,13 @@ class ISO37125Indicator(models.Model):
     dado_2022 = models.CharField(max_length=100, null=True, blank=True)
     dado_2023 = models.CharField(max_length=100, null=True, blank=True)
     dado_2024 = models.CharField(max_length=100, null=True, blank=True)
+    dado_2025 = models.CharField(max_length=100, null=True, blank=True)
 
     # Fontes para diferentes anos
     fonte_2022 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2023 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
+    fonte_2025 = models.CharField(max_length=500, null=True, blank=True)
 
     # Cidade para permitir dados de múltiplas cidades
     cidade = models.CharField(max_length=100, default='Londrina')

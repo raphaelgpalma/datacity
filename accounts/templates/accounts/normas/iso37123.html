@@ -1562,7 +1562,8 @@
                         <div class="year-selector">
                             <label>📅 Ano:</label>
                             <div class="year-buttons" id="year-buttons">
-                                <button class="year-btn active" onclick="selectYear(2024)">2024</button>
+                                <button class="year-btn active" onclick="selectYear(2025)">2025</button>
+                                <button class="year-btn" onclick="selectYear(2024)">2024</button>
                                 <button class="year-btn" onclick="selectYear(2023)">2023</button>
                                 <button class="year-btn" onclick="selectYear(2022)">2022</button>
                             </div>
@@ -1597,7 +1598,8 @@
                     <div class="export-section">
                         <!-- Year selection for PDF export -->
                         <label style="margin-right:8px">📅 Anos para exportar:</label>
-                        <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2024" checked> 2024</label>
+                        <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2025" checked> 2025</label>
+                        <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2024"> 2024</label>
                         <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2023"> 2023</label>
                         <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2022"> 2022</label>
                         <button class="export-btn" onclick="exportToPDF()">📄 Exportar PDF</button>
@@ -1619,7 +1621,7 @@
                 <!-- Trends summary will be inserted here -->
             </div>
             <div class="indicator-charts-section">
-                <h3 class="chart-title">📈 Evolução dos Indicadores (2022-2024)</h3>
+                <h3 class="chart-title">📈 Evolução dos Indicadores (2022-2025)</h3>
                 <div id="indicator-charts-container" class="charts-grid">
                     <!-- Individual indicator charts will be rendered here -->
                 </div>
@@ -1646,8 +1648,8 @@
             const municipioDisplay = municipioUF ? `${municipioNome} ${municipioUF}` : municipioNome;
             document.querySelector('.modal-title').textContent = `Relatório Completo ISO 37123 - ${municipioDisplay}`;
 
-            // Calcular resumo especificamente para o período 2024 (solicitado)
-            const targetYear = 2024;
+            // Calcular resumo especificamente para o período 2025 (solicitado)
+            const targetYear = 2025;
             let totalCount = 0;
             let filledCount = 0;
 
@@ -1678,7 +1680,7 @@
             const executiveHtml = `
                 <div style="font-size:16px;line-height:1.6;color:#333;">
                     <div style="font-weight:700;color:#513C9A;margin-bottom:8px;">📈 Relatório Executivo - ${municipioDisplay}</div>
-                    <div><strong>Período:</strong> 2022-2024</div>
+                    <div><strong>Período:</strong> 2022-2025</div>
                     <div><strong>Data de Geração:</strong> ${generationDate}</div>
                     <hr style="margin:12px 0;border:none;border-top:1px solid #eee;" />
                     <div style="margin-bottom:8px;"><strong>📊 Resumo Geral de Preenchimento (${targetYear}):</strong></div>
@@ -1691,7 +1693,7 @@
                         ${bestLevel === 'Prata' ? '🥈' : bestLevel === 'Bronze' ? '🥉' : bestLevel === 'Ouro' ? '🥇' : bestLevel === 'Platina' ? '🏆' : ''}
                         <strong> Nível ${bestLevel}</strong> - Cidade atende aos requisitos para certificação ${bestLevel}
                     </div>
-                    <div style="margin-top:8px;color:#666;">📋 Este relatório apresenta a evolução temporal de todos os indicadores com dados disponíveis para os anos 2022, 2023 e 2024.</div>
+                    <div style="margin-top:8px;color:#666;">📋 Este relatório apresenta a evolução temporal de todos os indicadores com dados disponíveis para os anos 2022, 2023, 2024 e 2025.</div>
                 </div>
             `;
 
@@ -1737,7 +1739,7 @@
             });
             modalCharts = [];
             
-            const years = [2022, 2023, 2024];
+            const years = [2022, 2023, 2024, 2025];
             
             // Process categories in order, excluding 'perfil'
             const categoryOrder = Object.keys(indicatorsData).filter(key => key !== 'perfil');
@@ -2158,7 +2160,7 @@
             }
         };
 
-        let currentYear = 2024;
+        let currentYear = 2025;
         let currentData = {};
 
         // Initialize the application
@@ -2242,7 +2244,7 @@
 
                         category.indicators.forEach((indicator, index) => {
                             // For all years, not just current year
-                            [2022, 2023, 2024].forEach(year => {
+                            [2022, 2023, 2024, 2025].forEach(year => {
                                 const dataKey = `${categoryKey}_${index}_${year}`;
                                 const dbRecord = dbDataMap[indicator.name];
 
@@ -2357,9 +2359,11 @@
                     data.dado_2022 = existingData.dado_2022;
                     data.dado_2023 = existingData.dado_2023;
                     data.dado_2024 = existingData.dado_2024;
+                    data.dado_2025 = existingData.dado_2025;
                     data.fonte_2022 = existingData.fonte_2022;
                     data.fonte_2023 = existingData.fonte_2023;
                     data.fonte_2024 = existingData.fonte_2024;
+                    data.fonte_2025 = existingData.fonte_2025;
                 }
 
                 // Update the specific field being changed
@@ -2854,11 +2858,12 @@
                 byYear: {
                     2022: { improving: 0, worsening: 0, stable: 0 },
                     2023: { improving: 0, worsening: 0, stable: 0 },
-                    2024: { improving: 0, worsening: 0, stable: 0 }
+                    2024: { improving: 0, worsening: 0, stable: 0 },
+                    2025: { improving: 0, worsening: 0, stable: 0 }
                 }
             };
 
-            const years = [2022, 2023, 2024];
+            const years = [2022, 2023, 2024, 2025];
             
             Object.keys(indicatorsData).forEach(categoryKey => {
                 if (categoryKey === 'perfil') return; // Skip profile indicators
@@ -2966,16 +2971,17 @@
 
         // Export to CSV
         function exportToCSV() {
-            let csv = 'Categoria,Indicador,ODS,Valor_2022,Valor_2023,Valor_2024,Unidade,Fonte_2024\n';
-            
+            let csv = 'Categoria,Indicador,ODS,Valor_2022,Valor_2023,Valor_2024,Valor_2025,Unidade,Fonte_2025\n';
+
             Object.keys(indicatorsData).forEach(categoryKey => {
                 const category = indicatorsData[categoryKey];
                 category.indicators.forEach((indicator, index) => {
                     const data2022 = currentData[`${categoryKey}_${index}_2022`] || { value: '', source: '' };
                     const data2023 = currentData[`${categoryKey}_${index}_2023`] || { value: '', source: '' };
                     const data2024 = currentData[`${categoryKey}_${index}_2024`] || { value: '', source: '' };
-                    
-                    csv += `"${category.name}","${indicator.name}","${indicator.ods}","${data2022.value}","${data2023.value}","${data2024.value}","${indicator.unit}","${data2024.source}"\n`;
+                    const data2025 = currentData[`${categoryKey}_${index}_2025`] || { value: '', source: '' };
+
+                    csv += `"${category.name}","${indicator.name}","${indicator.ods}","${data2022.value}","${data2023.value}","${data2024.value}","${data2025.value}","${indicator.unit}","${data2025.source}"\n`;
                 });
             });
 

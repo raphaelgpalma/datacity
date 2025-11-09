@@ -1446,7 +1446,8 @@
                         <div class="year-selector">
                             <label>📅 Ano:</label>
                             <div class="year-buttons" id="year-buttons">
-                                <button class="year-btn active" onclick="selectYear(2024)">2024</button>
+                                <button class="year-btn active" onclick="selectYear(2025)">2025</button>
+                                <button class="year-btn" onclick="selectYear(2024)">2024</button>
                                 <button class="year-btn" onclick="selectYear(2023)">2023</button>
                                 <button class="year-btn" onclick="selectYear(2022)">2022</button>
                             </div>
@@ -1482,7 +1483,8 @@
                     <div class="export-section">
                         <!-- Year selection for PDF export -->
                         <label style="margin-right:8px">📅 Anos para exportar:</label>
-                        <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2024" checked> 2024</label>
+                        <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2025" checked> 2025</label>
+                        <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2024"> 2024</label>
                         <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2023"> 2023</label>
                         <label style="margin-right:6px"><input type="checkbox" class="export-year" value="2022"> 2022</label>
                         <button class="export-btn" onclick="exportToPDF()">📄 Exportar PDF</button>
@@ -1504,7 +1506,7 @@
                 <!-- Trends summary will be inserted here -->
             </div>
             <div class="indicator-charts-section">
-                <h3 class="chart-title">📈 Evolução dos Indicadores (2022-2024)</h3>
+                <h3 class="chart-title">📈 Evolução dos Indicadores (2022-2025)</h3>
                 <div id="indicator-charts-container" class="charts-grid">
                     <!-- Individual indicator charts will be rendered here -->
                 </div>
@@ -1684,7 +1686,7 @@
             }
         };
 
-        let currentYear = 2024;
+        let currentYear = 2025;
         let currentData = {};
 
 
@@ -1868,7 +1870,7 @@
             Object.keys(indicatorsData).forEach(categoryKey => {
                 const category = indicatorsData[categoryKey];
                 category.indicators.forEach((indicator, index) => {
-                    [2022, 2023, 2024].forEach(year => {
+                    [2022, 2023, 2024, 2025].forEach(year => {
                         const dataKey = `${categoryKey}_${index}_${year}`;
                         currentData[dataKey] = {
                             value: '',
@@ -1921,9 +1923,11 @@
                     data.dado_2022 = existingData.dado_2022;
                     data.dado_2023 = existingData.dado_2023;
                     data.dado_2024 = existingData.dado_2024;
+                    data.dado_2025 = existingData.dado_2025;
                     data.fonte_2022 = existingData.fonte_2022;
                     data.fonte_2023 = existingData.fonte_2023;
                     data.fonte_2024 = existingData.fonte_2024;
+                    data.fonte_2025 = existingData.fonte_2025;
                 }
 
                 // Update the specific field being changed
@@ -2002,7 +2006,7 @@
                     Object.keys(indicatorsData).forEach(categoryKey => {
                         const category = indicatorsData[categoryKey];
                         category.indicators.forEach((indicator, index) => {
-                            [2022, 2023, 2024].forEach(year => {
+                            [2022, 2023, 2024, 2025].forEach(year => {
                                 const dataKey = `${categoryKey}_${index}_${year}`;
                                 const dbRecord = dbDataMap[indicator.name];
 
@@ -2561,11 +2565,12 @@
                 byYear: {
                     2022: { improving: 0, worsening: 0, stable: 0 },
                     2023: { improving: 0, worsening: 0, stable: 0 },
-                    2024: { improving: 0, worsening: 0, stable: 0 }
+                    2024: { improving: 0, worsening: 0, stable: 0 },
+                    2025: { improving: 0, worsening: 0, stable: 0 }
                 }
             };
 
-            const years = [2022, 2023, 2024];
+            const years = [2022, 2023, 2024, 2025];
             
             Object.keys(indicatorsData).forEach(categoryKey => {
                 const category = indicatorsData[categoryKey];
@@ -2662,7 +2667,7 @@
             modalCharts.forEach(chart => chart.destroy());
             modalCharts = [];
             
-            const years = [2022, 2023, 2024];
+            const years = [2022, 2023, 2024, 2025];
             
             // Process categories in order
             const categoryOrder = Object.keys(indicatorsData);
@@ -2879,28 +2884,30 @@
 
         // Export to CSV
         function exportToCSV() {
-            let csv = 'Eixo,Indicador,Tipo,ODS,Valor_2022,Valor_2023,Valor_2024,Unidade,Fonte_2024\n';
-            
+            let csv = 'Eixo,Indicador,Tipo,ODS,Valor_2022,Valor_2023,Valor_2024,Valor_2025,Unidade,Fonte_2025\n';
+
             Object.keys(indicatorsData).forEach(categoryKey => {
                 const category = indicatorsData[categoryKey];
-                
+
                 // Regular indicators
                 category.indicators.forEach((indicator, index) => {
                     const data2022 = currentData[`${categoryKey}_${index}_2022`] || { value: '', source: '' };
                     const data2023 = currentData[`${categoryKey}_${index}_2023`] || { value: '', source: '' };
                     const data2024 = currentData[`${categoryKey}_${index}_2024`] || { value: '', source: '' };
-                    
-                    csv += `"${category.name}","${indicator.name}","Regular","${indicator.ods}","${data2022.value}","${data2023.value}","${data2024.value}","${indicator.unit}","${data2024.source}"\n`;
+                    const data2025 = currentData[`${categoryKey}_${index}_2025`] || { value: '', source: '' };
+
+                    csv += `"${category.name}","${indicator.name}","Regular","${indicator.ods}","${data2022.value}","${data2023.value}","${data2024.value}","${data2025.value}","${indicator.unit}","${data2025.source}"\n`;
                 });
-                
+
                 // Profile indicators
                 if (category.profileIndicators) {
                     category.profileIndicators.forEach((indicator, index) => {
                         const data2022 = currentData[`${categoryKey}_profile_${index}_2022`] || { value: '', source: '' };
                         const data2023 = currentData[`${categoryKey}_profile_${index}_2023`] || { value: '', source: '' };
                         const data2024 = currentData[`${categoryKey}_profile_${index}_2024`] || { value: '', source: '' };
+                        const data2025 = currentData[`${categoryKey}_profile_${index}_2025`] || { value: '', source: '' };
                         
-                        csv += `"${category.name}","${indicator.name}","Perfil","${indicator.ods}","${data2022.value}","${data2023.value}","${data2024.value}","${indicator.unit}","${data2024.source}"\n`;
+                        csv += `"${category.name}","${indicator.name}","Perfil","${indicator.ods}","${data2022.value}","${data2023.value}","${data2024.value}","${data2025.value}","${indicator.unit}","${data2025.source}"\n`;
                     });
                 }
             });
