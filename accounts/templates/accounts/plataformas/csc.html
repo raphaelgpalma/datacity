@@ -401,6 +401,8 @@
         .eixo-TIC { background-color: #3498db; }
         .eixo-SEG { background-color: #27ae60; }
         .eixo-ENE { background-color: #f1c40f; color: #333; }
+    .eixo-POP { background-color: #6c5ce7; }
+    .eixo-RS { background-color: #00b894; }
 
         /* Charts Section */
         .charts-section {
@@ -738,6 +740,7 @@
                             <div style="max-width:340px; width:100%;">
                                 <select id="municipality-view-selector" class="municipality-select" onchange="changeView()" style="min-width: 220px; max-width: 320px; width:100%;">
                                     <option value="axes">Posição por Eixo até 2024</option>
+                                    <option value="axes-2025">Posição por Eixo — 2025</option>
                                     <option value="indicators">Indicadores do Município</option>
                                     <option value="charts">Gráficos e Análises</option>
                                 </select>
@@ -750,6 +753,13 @@
             <div id="axes" class="tab-content active">
                 <div class="axis-grid">
                     <!-- Eixos serão preenchidos via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Axes 2025 Tab -->
+            <div id="axes-2025" class="tab-content">
+                <div class="axis-grid">
+                    <!-- 2025 positions will be populated via JavaScript -->
                 </div>
             </div>
 
@@ -911,11 +921,11 @@
             { name: "Porcentagem de mulheres eleitas em função do número total de eleitos na gestão da cidade", eixo: "GOV", values: ["", "", "", 24], unit: "%", fonte: "ABNT ISO" },
             { name: "Desempenho na gestão de obras públicas", eixo: "GOV", values: ["", "", "", -1], unit: "NOTA", fonte: "" },
             { name: "Participação dos eleitores nas últimas eleições municipais (como porcentagem dos eleitores registrados)", eixo: "GOV", values: ["", "", "", 71], unit: "%", fonte: "ABNT ISO" },
-            { name: "Despesas anuais com atualização e manutenção dos ativos de serviços urbanos como porcentagem do orçamento total da cidade", eixo: "GOV", values: ["", "", "", 7], unit: "%", fonte: "ABNT ISO" },
-            { name: "Número de sem-teto por 100 000 habitantes", eixo: "GOV", values: ["", "", "", 128], unit: "pessoas/100.000 habitantes", fonte: "ABNT ISO" },
-            { name: "Despesas anuais com serviços sociais e comunitários como porcentagem do orçamento total da cidade", eixo: "GOV", values: ["", "", "", 3], unit: "%", fonte: "ABNT ISO" },
-            { name: "Porcentagem de edifícios públicos acessíveis por pessoas com necessidades especiais", eixo: "GOV", values: ["", "", "", 47], unit: "%", fonte: "ABNT ISO" },
-            { name: "Atualização Cadastral - Cadastro Único", eixo: "GOV", values: ["", "", "", 73], unit: "%", fonte: "" },
+            { name: "Despesas anuais com atualização e manutenção dos ativos de serviços urbanos como porcentagem do orçamento total da cidade", eixo: "URB", values: ["", "", "", 7], unit: "%", fonte: "ABNT ISO" },
+            { name: "Número de sem-teto por 100 000 habitantes", eixo: "URB", values: ["", "", "", 128], unit: "pessoas/100.000 habitantes", fonte: "ABNT ISO" },
+            { name: "Despesas anuais com serviços sociais e comunitários como porcentagem do orçamento total da cidade", eixo: "POP", values: ["", "", "", 3], unit: "%", fonte: "ABNT ISO" },
+            { name: "Porcentagem de edifícios públicos acessíveis por pessoas com necessidades especiais", eixo: "POP", values: ["", "", "", 47], unit: "%", fonte: "ABNT ISO" },
+            { name: "Atualização Cadastral - Cadastro Único", eixo: "POP", values: ["", "", "", 73], unit: "%", fonte: "" },
 
             // Mobilidade (MOB)
             { name: "Bilhete eletrônico transporte público", eixo: "MOB", values: ["Sim", "Sim", "Sim", ""], unit: "Sim/Não", fonte: "IBGE - Perfil de Municípios" },
@@ -940,29 +950,31 @@
             { name: "Semáforos inteligentes", eixo: "URB", values: ["Sim", "Sim", "Sim", ""], unit: "Sim ou Não", fonte: "IBGE - Perfil de Municípios" },
             { name: "Áreas e espaços públicos permeáveis e pavimentos contruídos com materiais porosos e permeáveis como porcentagem da área total da cidade", eixo: "URB", values: ["", "", "", 16], unit: "%", fonte: "ABNT ISO" },
             { name: "Áreas verdes (hectares) por 100 000 habitantes", eixo: "URB", values: ["", "", "", 697], unit: "hectares/100.000 habitantes", fonte: "ABNT ISO" },
+            { name: "Número anual de propriedades residenciais inundadas como porcentagem do total de propriedades residenciais", eixo: "URB", values: ["", "", "", ""], unit: "%", fonte: "ABNT ISO" },
+            { name: "Despesas anuais com atualização e manutenção de infraestrutura de águas pluviais como porcentagem do orçamento total da cidade", eixo: "URB", values: ["", "", "", ""], unit: "%", fonte: "ABNT ISO" },
 
             // Meio Ambiente (MAM)
-            { name: "Cobertura Do Serviço De Coleta De Resíduos", eixo: "MAM", values: [99, 99, 89, 100], unit: "%", fonte: "SNIS" },
+            { name: "Cobertura Do Serviço De Coleta De Resíduos", eixo: "RS", values: [99, 99, 89, 100], unit: "%", fonte: "SNIS" },
             { name: "Monitoramento De Área De Risco", eixo: "MAM", values: ["Não", "Não", "Não", ""], unit: "S / N", fonte: "Cemaden" },
-            { name: "Índice De Atendimento Urbano Of Água - IN023_AE", eixo: "MAM", values: [100.0, 100.0, 100.0, 98], unit: "%", fonte: "SNIS" },
-            { name: "Índice De Atendimento Urbano Of Esgoto - IN024_AE", eixo: "MAM", values: [100.0, 100.0, 100.0, 98], unit: "%", fonte: "SNIS" },
-            { name: "Índice De Perdas Na Distribuição Of Água - IN049_AE", eixo: "MAM", values: [34, 33, 34, 50], unit: "%", fonte: "SNIS" },
-            { name: "Índice De Recuperação Of Materiais Recicláveis - IN031RS", eixo: "MAM", values: [6.0, 6.0, 4.7, 5], unit: "%", fonte: "SNIS" },
-            { name: "Índice De Tratamento De Esgoto - IN046_AE", eixo: "MAM", values: [92.0, 89.7, 89.1, 100], unit: "%", fonte: "SNIS" },
+            { name: "Índice De Atendimento Urbano Of Água - IN023_AE", eixo: "RS", values: [100.0, 100.0, 100.0, 98], unit: "%", fonte: "SNIS" },
+            { name: "Índice De Atendimento Urbano Of Esgoto - IN024_AE", eixo: "RS", values: [100.0, 100.0, 100.0, 98], unit: "%", fonte: "SNIS" },
+            { name: "Índice De Perdas Na Distribuição Of Água - IN049_AE", eixo: "RS", values: [34, 33, 34, 50], unit: "%", fonte: "SNIS" },
+            { name: "Índice De Recuperação Of Materiais Recicláveis - IN031RS", eixo: "RS", values: [6.0, 6.0, 4.7, 5], unit: "%", fonte: "SNIS" },
+            { name: "Índice De Tratamento De Esgoto - IN046_AE", eixo: "RS", values: [92.0, 89.7, 89.1, 100], unit: "%", fonte: "SNIS" },
             { name: "Produção De Energia Em Usinas De Biomassa", eixo: "MAM", values: [0.000, 0.000, 0.000, ""], unit: "KW", fonte: "Aneel" },
             { name: "Produção De Energia Em Usinas De Energia Eólica", eixo: "MAM", values: [0.000, 0.000, 0.000, ""], unit: "KW", fonte: "Aneel" },
             { name: "Produção De Energia Em Usinas Foto Voltaicas", eixo: "MAM", values: [208.000, 208.000, 208.000, ""], unit: "KW", fonte: "Aneel" },
-            { name: "Percentual Da Quantidade Total De Resíduos Plásticos Recuperados Na Cidade", eixo: "MAM", values: [0.29, 0.29, 5.53, 4], unit: "%", fonte: "SNIS / Urban Systems" },
+            { name: "Percentual Da Quantidade Total De Resíduos Plásticos Recuperados Na Cidade", eixo: "RS", values: [0.29, 0.29, 5.53, 4], unit: "%", fonte: "SNIS / Urban Systems" },
             { name: "Porcentagem de áreas designadas para proteção natural", eixo: "MAM", values: ["", "", "", 10], unit: "%", fonte: "ABNT ISO" },
             { name: "Número de estações remotas de monitoramento da qualidade do ar em tempo real por 100 000 habitantes", eixo: "MAM", values: ["", "", "", 0], unit: "estações/100.000 habitantes", fonte: "ABNT ISO" },
             { name: "Emissão de gases de efeito de estufa medida em toneladas per capita", eixo: "MAM", values: ["", "", "", 2], unit: "toneladas/habitante", fonte: "ABNT ISO" },
-            { name: "Total de coleta de resíduos sólidos municipais per capita", eixo: "MAM", values: ["", "", "", 0], unit: "kg/habitante", fonte: "ABNT ISO" },
-            { name: "Porcentagem de resíduos sólidos urbanos que são reciclados", eixo: "MAM", values: ["", "", "", 5], unit: "%", fonte: "ABNT ISO" },
-            { name: "Porcentagem da população da cidade atendida por sistemas de coleta e afastamento de esgoto", eixo: "MAM", values: ["", "", "", 98], unit: "%", fonte: "ABNT ISO" },
-            { name: "Porcentagem do esgoto da cidade que recebe tratamento centralizado", eixo: "MAM", values: ["", "", "", 100], unit: "%", fonte: "ABNT ISO" },
-            { name: "Porcentagem da população da cidade com serviço de abastecimento de água potável", eixo: "MAM", values: ["", "", "", 98], unit: "%", fonte: "ABNT ISO" },
-            { name: "Consumo doméstico total de água per capita (litros/dia)", eixo: "MAM", values: ["", "", "", 161], unit: "litros/dia", fonte: "ABNT ISO" },
-            { name: "Porcentagem de separação entre esgoto e drenagem pluvial no sistema de esgotamento", eixo: "MAM", values: ["", "", "", 100], unit: "%", fonte: "" },
+            { name: "Total de coleta de resíduos sólidos municipais per capita", eixo: "RS", values: ["", "", "", 0], unit: "kg/habitante", fonte: "ABNT ISO" },
+            { name: "Porcentagem de resíduos sólidos urbanos que são reciclados", eixo: "RS", values: ["", "", "", 5], unit: "%", fonte: "ABNT ISO" },
+            { name: "Porcentagem da população da cidade atendida por sistemas de coleta e afastamento de esgoto", eixo: "RS", values: ["", "", "", 98], unit: "%", fonte: "ABNT ISO" },
+            { name: "Porcentagem do esgoto da cidade que recebe tratamento centralizado", eixo: "RS", values: ["", "", "", 100], unit: "%", fonte: "ABNT ISO" },
+            { name: "Porcentagem da população da cidade com serviço de abastecimento de água potável", eixo: "RS", values: ["", "", "", 98], unit: "%", fonte: "ABNT ISO" },
+            { name: "Consumo doméstico total de água per capita (litros/dia)", eixo: "RS", values: ["", "", "", 161], unit: "litros/dia", fonte: "ABNT ISO" },
+            { name: "Porcentagem de separação entre esgoto e drenagem pluvial no sistema de esgotamento", eixo: "RS", values: ["", "", "", 100], unit: "%", fonte: "" },
 
             // Empreendedorismo (EMP)
             { name: "Crescimento Das Empresas De Economia Criativa", eixo: "EMP", values: [-0.47, 9.42, 19.47, 17], unit: "%", fonte: "RAIS" },
@@ -998,7 +1010,7 @@
             { name: "Número De Computadores, Laptops, Tablets Ou Outros Dispositivos Digitais De Aprendizagem Disponíveis Por 1000 Alunos", eixo: "EDU", values: [2.3, 77.9, 59.4, 140], unit: "aparelhos / 1000 alunos", fonte: "INEP" },
             { name: "Percentual Dos Docentes Do Ensino médio Que Possuem Ensino Superior", eixo: "EDU", values: [99.30, 97.90, 99.20, ""], unit: "%", fonte: "INEP" },
             { name: "Percentual Dos Trabalhadores Formais Com Ensino Superior", eixo: "EDU", values: [26.5, 26.1, 25.3, ""], unit: "%", fonte: "RAIS" },
-            { name: "Percentual Da Força De Trabalho Ocupada No Setor Educação E P&D", eixo: "EDU", values: [8.55, 8.18, 8.59, 7], unit: "%", fonte: "RAIS" },
+            { name: "Percentual Da Força De Trabalho Ocupada No Setor Educação E P&D", eixo: "EMP", values: [8.55, 8.18, 8.59, 7], unit: "%", fonte: "RAIS" },
             { name: "Taxa De Abandono (1º Colegial - Público)", eixo: "EDU", values: [1.30, 5.30, 5.30, ""], unit: "%", fonte: "INEP" },
             { name: "Vagas Em Universidade Pública 2022", eixo: "EDU", values: [10.50, 10.61, 11.55, ""], unit: "", fonte: "INEP / IBGE" },
             { name: "Porcentagem da população feminina em idade escolar matriculada em escolas", eixo: "EDU", values: ["", "", "", 102], unit: "%", fonte: "ABNT ISO" },
@@ -1014,12 +1026,12 @@
             { name: "Percentual Da Força De Trabalho Ocupada No Setor Tic", eixo: "TIC", values: [4.03, 4.32, 4.44, 5], unit: "%", fonte: "RAIS" },
             { name: "Sistema de iluminação inteligente", eixo: "TIC", values: ["Sim", "Sim", "Sim", ""], unit: "", fonte: "IBGE - Perfil de Municípios" },
             { name: "Velocidade Média das Conexões contratadas", eixo: "TIC", values: [170.0, 222.2, 323.4, ""], unit: "Mbps", fonte: "Anatel" },
-            { name: "Porcentagem da força de trabalho empregada em ocupações no setor de tecnologia da informação e comunicação", eixo: "TIC", values: ["", "", "", 5], unit: "%", fonte: "ABNT ISO" },
-            { name: "Tempo médio de abertura de empresas", eixo: "TIC", values: ["", "", "", 0], unit: "dias", fonte: "" },
+            { name: "Porcentagem da força de trabalho empregada em ocupações no setor de tecnologia da informação e comunicação", eixo: "EMP", values: ["", "", "", 5], unit: "%", fonte: "ABNT ISO" },
+            { name: "Tempo médio de abertura de empresas", eixo: "EMP", values: ["", "", "", 0], unit: "dias", fonte: "" },
             { name: "Número de acessos à telefonia móvel por 100 000 habitantes", eixo: "TIC", values: ["", "", "", 122238], unit: "acessos/100.000 habitantes", fonte: "ABNT ISO" },
             { name: "Número de acessos à Internet por 100 000 habitantes", eixo: "TIC", values: ["", "", "", 35669], unit: "acessos/100.000 habitantes", fonte: "ABNT ISO" },
             { name: "Porcentagem de área da cidade sob uma zona branca/ponto morto/não coberta por operadoras de telecomunicações", eixo: "TIC", values: ["", "", "", 24], unit: "%", fonte: "ABNT ISO" },
-            { name: "Porcentagem da população da cidade com prontuário eletrônico unificado, acessível on-line por meio de um portal", eixo: "TIC", values: ["", "", "", 4], unit: "%", fonte: "ABNT ISO" },
+            { name: "Porcentagem da população da cidade com prontuário eletrônico unificado, acessível on-line por meio de um portal", eixo: "SAU", values: ["", "", "", 4], unit: "%", fonte: "ABNT ISO" },
 
             // Segurança (SEG)
             { name: "Centro de controle e operações", eixo: "SEG", values: ["Sim", "Sim", "Sim", ""], unit: "", fonte: "IBGE - Perfil de Municípios" },
@@ -1046,7 +1058,27 @@
             { name: "🏗️ Urbanismo", eixo: "URB", positions: [34, 6, 13] },
             { name: "💻 Tecnologia e Inovação", eixo: "TIC", positions: [13, 11, 17] },
             { name: "🛡️ Segurança", eixo: "SEG", positions: ["Fora 100+", "Fora 100+", "Fora 100+"] },
+            { name: "👥 População e Condições Sociais", eixo: "POP", positions: ["Fora 100+", "Fora 100+", "Fora 100+"] },
+            { name: "🗑️ Resíduos, Esgotos e Água", eixo: "RS", positions: ["Fora 100+", "Fora 100+", "Fora 100+"] },
             { name: "⚡ Energia", eixo: "ENE", positions: ["Fora 100+", "Fora 100+", "Fora 100+"] }
+        ];
+
+        // Eixos 2025 data (provided by user)
+        // This list is shown when the user selects the "Posição por Eixo — 2025" view.
+        const eixos2025Data = [
+            { name: "Meio Ambiente e Mudanças Climáticas", position: 30 },
+            { name: "Economia, Finanças", position: 31 },
+            { name: "Habitação e Planejamento Urbano", position: 34 },
+            { name: "População, Condições Sociais", position: 36 },
+            { name: "Mobilidade", position: 38 },
+            { name: "Inovação e Empreendedorismo", position: 48 },
+            { name: "Energia", position: 49 },
+            { name: "Governança", position: 55 },
+            { name: "Agricultura Local/Urbana e Segurança Alimentar", position: 57 },
+            { name: "Educação", position: 62 },
+            { name: "Telecomunicações", position: 72 },
+            { name: "Resíduos Sólidos, Esgotos e Água", position: 74 },
+            { name: "Segurança", position: 78 }
         ];
 
         // Ranking data por ano - COMPLETO COM TODOS OS 100 REGISTROS
@@ -1914,11 +1946,19 @@
             cardRight.style.background = 'linear-gradient(90deg, #513C9A, #6B4FB5)';
             cardRight.style.color = 'white';
             cardRight.style.textAlign = 'center';
-            cardRight.innerHTML = `<div style="font-size:16px;font-weight:700;margin-bottom:6px;">Novos indicadores 2025</div><div style="font-size:32px;font-weight:800;">51</div>`;
+            cardRight.innerHTML = `<div style="font-size:16px;font-weight:700;margin-bottom:6px;">Novos indicadores 2025</div><div style="font-size:32px;font-weight:800;">53</div>`;
             statsEl.appendChild(cardRight);
 
             // Use eixosData order when possible
-            (eixosData || Object.keys(grouped).map(k=>({eixo:k, name:k}))).forEach(e => {
+            // Order axis summary cards by axis code/name for consistent display
+            const axesList = (eixosData || Object.keys(grouped).map(k=>({eixo:k, name:k}))).slice();
+            axesList.sort((a,b)=>{
+                const ac = (a.eixo || a).toString();
+                const bc = (b.eixo || b).toString();
+                return ac.localeCompare(bc, 'pt');
+            });
+
+            axesList.forEach(e => {
                 const code = e.eixo || e;
                 const name = e.name || getAxisName(code) || code;
                 const count = grouped[code] || 0;
@@ -1926,6 +1966,7 @@
                 const card = document.createElement('div');
                 card.className = 'axis-card';
                 card.style.minWidth = '220px';
+                card.title = `${code} ${getAxisName(code)}`;
                 card.innerHTML = `
                     <div class="axis-title">${name}</div>
                     <div style="font-size:24px; font-weight:800; color:#513C9A; text-align:center;">${count}</div>
@@ -1941,10 +1982,17 @@
             if (!axisGrid) return;
 
             axisGrid.innerHTML = '';
+            // Sort axes by code to keep display stable
+            const sorted = [...eixosData].sort((a,b)=>{
+                const ac = (a.eixo||'').toString();
+                const bc = (b.eixo||'').toString();
+                return ac.localeCompare(bc, 'pt');
+            });
 
-            eixosData.forEach(eixo => {
+            sorted.forEach(eixo => {
                 const card = document.createElement('div');
                 card.className = 'axis-card';
+                card.title = `${eixo.eixo} ${getAxisName(eixo.eixo)}`;
                 card.innerHTML = `
                     <div class="axis-title">${eixo.name}</div>
                     <div class="axis-values">
@@ -1966,18 +2014,70 @@
             });
         }
 
+        // Render axis cards for 2025 (single-position view)
+        function renderAxisCards2025() {
+            const axisGrid = document.querySelector('#axes-2025 .axis-grid');
+            if (!axisGrid) return;
+
+            axisGrid.innerHTML = '';
+            // infer axis code for tooltip when possible
+            function inferAxisCode(name) {
+                const n = name.toLowerCase();
+                if (n.includes('meio') || n.includes('ambiente') || n.includes('clima')) return 'MAM';
+                if (n.includes('econom') || n.includes('finan')) return 'ECO';
+                if (n.includes('habita') || n.includes('planej') || n.includes('urban')) return 'URB';
+                if (n.includes('popula') || n.includes('condi')) return 'POP';
+                if (n.includes('mobil')) return 'MOB';
+                if (n.includes('inov') || n.includes('empreend')) return 'EMP';
+                if (n.includes('energia')) return 'ENE';
+                if (n.includes('govern')) return 'GOV';
+                if (n.includes('agricul') || n.includes('alimentar')) return 'MAM';
+                if (n.includes('resídu') || n.includes('esgoto') || n.includes('água')) return 'RS';
+                return null;
+            }
+
+            eixos2025Data.forEach(eixo => {
+                const card = document.createElement('div');
+                card.className = 'axis-card';
+                const code = inferAxisCode(eixo.name) || '';
+                card.title = code ? `${code} ${getAxisName(code)}` : eixo.name;
+                card.innerHTML = `
+                    <div class="axis-title">${eixo.name}</div>
+                    <div class="axis-values">
+                        <div class="year-value" style="flex:1; text-align:center;">
+                            <div class="year">2025</div>
+                            <div class="value">${eixo.position}°</div>
+                        </div>
+                    </div>
+                `;
+                axisGrid.appendChild(card);
+            });
+        }
+
         // Populate indicators table
         function populateIndicatorsTable() {
             const tbody = document.getElementById('indicators-tbody');
             if (!tbody) return;
             
             tbody.innerHTML = '';
-            
-            filteredData.forEach(item => {
+
+            // Sort by eixo code then by indicator name for stable ordering
+            const displayData = [...filteredData].sort((a,b)=>{
+                const ax = (a.eixo||'').toString();
+                const bx = (b.eixo||'').toString();
+                const cmp = ax.localeCompare(bx, 'pt');
+                if (cmp !== 0) return cmp;
+                return (a.name||'').localeCompare(b.name||'', 'pt');
+            });
+
+            displayData.forEach(item => {
                 const row = document.createElement('tr');
+                const axisName = getAxisName(item.eixo || '');
+                // badge shows code and has tooltip with full name
+                const badge = `<span class="eixo-badge eixo-${item.eixo}" title="${(item.eixo||'').toUpperCase()} ${axisName}">${item.eixo}</span>`;
                 row.innerHTML = `
                     <td>${item.name}</td>
-                    <td><span class="eixo-badge eixo-${item.eixo}">${item.eixo}</span></td>
+                    <td>${badge}</td>
                     <td>${item.values[0]}</td>
                     <td>${item.values[1]}</td>
                     <td>${item.values[2]}</td>
@@ -2067,6 +2167,8 @@
 
             if (selectedView === 'axes') {
                 renderAxisCards();
+            } else if (selectedView === 'axes-2025') {
+                renderAxisCards2025();
             }
         }
 
@@ -2083,13 +2185,15 @@
                 'GOV': 'Governança',
                 'MOB': 'Mobilidade',
                 'URB': 'Urbanismo',
-                'MAM': 'Meio Ambiente',
+                    'MAM': 'Meio Ambiente',
                 'EMP': 'Empreendedorismo',
-                'ECO': 'Economia',
+                    'ECO': 'Economia e Finanças',
                 'EDU': 'Educação',
                 'TIC': 'Tecnologia',
                 'SEG': 'Segurança',
-                'ENE': 'Energia'
+                'ENE': 'Energia',
+                'POP': 'População e Condições Sociais',
+                'RS': 'Resíduos Sólidos, Esgotos e Água'
             };
             return eixoNames[eixoCode] || eixoCode;
         }
