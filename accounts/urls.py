@@ -73,6 +73,8 @@ urlpatterns = [
     path('dashboard/api/iso37120/save/', views.save_iso37120_data, name='save_iso37120_data'),
     path('dashboard/api/iso37120/get/', views.get_iso37120_data, name='get_iso37120_data'),
     path('dashboard/api/iso37120/update_field/', views.update_iso37120_field, name='update_iso37120_field'),
+    path('dashboard/api/iso37120/upload_anexo/', views.upload_iso37120_anexo, name='upload_iso37120_anexo'),
+    path('dashboard/api/iso37120/delete_anexo/', views.delete_iso37120_anexo, name='delete_iso37120_anexo'),
 
     # APIs para ISO37122
     path('dashboard/api/iso37122/save/', views.save_iso37122_data, name='save_iso37122_data'),

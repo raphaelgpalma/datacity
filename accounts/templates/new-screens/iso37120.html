@@ -474,7 +474,7 @@
         .table-header {
             background: linear-gradient(90deg, #0d6efd, #0056b3);
             display: grid;
-            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr;
+            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr 1.5fr;
             gap: 1px;
             font-weight: bold;
             font-size: 1.1rem;
@@ -492,7 +492,7 @@
         
         .table-row {
             display: grid;
-            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr;
+            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr 1.5fr;
             gap: 1px;
             background-color: #333;
             border-bottom: 1px solid #444;
@@ -578,7 +578,101 @@
         .source-link:hover {
             text-decoration: underline;
         }
-        
+
+        /* Anexo cell styles */
+        .anexo-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .anexo-upload-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .anexo-input {
+            display: none;
+        }
+
+        .anexo-btn {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .anexo-btn:hover {
+            background: linear-gradient(45deg, #495057, #343a40);
+            transform: translateY(-1px);
+        }
+
+        .anexo-btn.has-file {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .anexo-link {
+            color: #28a745;
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .anexo-link:hover {
+            text-decoration: underline;
+        }
+
+        .anexo-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .anexo-delete-btn {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+            padding: 5px 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .anexo-delete-btn:hover {
+            background: linear-gradient(45deg, #c82333, #bd2130);
+        }
+
+        .upload-progress {
+            width: 100%;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .upload-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #0d6efd, #00d4ff);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
         .category-divider {
             background: linear-gradient(90deg, #0d6efd, #0056b3);
             color: white;
@@ -643,7 +737,7 @@
             }
             
             .table-header, .table-row {
-                grid-template-columns: 2fr 0.5fr 1fr 0.8fr 1.5fr;
+                grid-template-columns: 2fr 0.5fr 1fr 0.8fr 1.5fr 1fr;
                 font-size: 0.9rem;
             }
             
@@ -835,6 +929,7 @@
                     <div>Dado</div>
                     <div>Unidade</div>
                     <div>Fonte</div>
+                    <div>Anexo PDF</div>
                 </div>
                 <div class="table-body" id="table-body">
                     <!-- Table rows will be generated here -->
@@ -1319,6 +1414,9 @@
                         priorityTitle = 'Indicador de Perfil';
                     }
                     
+                    const anexoKey = `${categoryKey}_${index}_anexo_${currentYear}`;
+                    const currentAnexo = currentData[anexoKey] || null;
+
                     row.innerHTML = `
                         <div class="table-cell indicator-name">
                             <span class="priority-indicator ${priorityClass}" title="${priorityTitle}"></span>
@@ -1326,23 +1424,48 @@
                         </div>
                         <div class="table-cell ods-cell">${indicator.ods}</div>
                         <div class="table-cell">
-                            <input type="text" class="data-input ${currentValue.value ? 'filled' : ''}" 
-                                   value="${currentValue.value}" 
+                            <input type="text" class="data-input ${currentValue.value ? 'filled' : ''}"
+                                   value="${currentValue.value}"
                                    onchange="updateData('${dataKey}', 'value', this.value)"
                                    placeholder="Inserir dado">
                         </div>
                         <div class="table-cell unit-cell">${indicator.unit}</div>
                         <div class="table-cell source-cell">
-                            ${currentValue.source && isValidUrl(currentValue.source) ? 
+                            ${currentValue.source && isValidUrl(currentValue.source) ?
                                 `<a href="${currentValue.source}" target="_blank" class="source-link">${currentValue.source}</a>` :
-                                `<input type="url" class="source-input" 
-                                        value="${currentValue.source}" 
+                                `<input type="url" class="source-input"
+                                        value="${currentValue.source}"
                                         onchange="updateData('${dataKey}', 'source', this.value)"
                                         placeholder="https://exemplo.com">`
                             }
                         </div>
+                        <div class="table-cell anexo-cell">
+                            <div class="anexo-upload-container" id="anexo-container-${dataKey}">
+                                ${currentAnexo ?
+                                    `<div class="anexo-actions">
+                                        <a href="${currentAnexo}" target="_blank" class="anexo-link">
+                                            📄 Ver PDF
+                                        </a>
+                                        <button class="anexo-delete-btn" onclick="deleteAnexo('${dataKey}')">
+                                            🗑️
+                                        </button>
+                                    </div>` :
+                                    `<input type="file"
+                                            id="anexo-input-${dataKey}"
+                                            class="anexo-input"
+                                            accept=".pdf"
+                                            onchange="uploadAnexo('${dataKey}', this)">
+                                    <button class="anexo-btn" onclick="document.getElementById('anexo-input-${dataKey}').click()">
+                                        📎 Anexar PDF
+                                    </button>`
+                                }
+                                <div class="upload-progress" id="progress-${dataKey}">
+                                    <div class="upload-progress-bar" id="progress-bar-${dataKey}"></div>
+                                </div>
+                            </div>
+                        </div>
                     `;
-                    
+
                     tableBody.appendChild(row);
                 });
             });
@@ -1368,6 +1491,117 @@
             } catch (_) {
                 return false;
             }
+        }
+
+        // Upload anexo PDF
+        function uploadAnexo(dataKey, inputElement) {
+            const file = inputElement.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.name.toLowerCase().endsWith('.pdf')) {
+                alert('Apenas arquivos PDF são permitidos');
+                inputElement.value = '';
+                return;
+            }
+
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Arquivo muito grande. Máximo permitido: 10MB');
+                inputElement.value = '';
+                return;
+            }
+
+            // Show progress bar
+            const progressContainer = document.getElementById(`progress-${dataKey}`);
+            const progressBar = document.getElementById(`progress-bar-${dataKey}`);
+            if (progressContainer) progressContainer.style.display = 'block';
+
+            // Create FormData
+            const formData = new FormData();
+            formData.append('anexo', file);
+            formData.append('indicator_id', getIndicatorId(dataKey));
+            formData.append('year', currentYear);
+
+            // Upload via fetch
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/dashboard/api/iso37120/upload_anexo/', true);
+
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percent = (e.loaded / e.total) * 100;
+                    if (progressBar) progressBar.style.width = percent + '%';
+                }
+            };
+
+            xhr.onload = function() {
+                if (progressContainer) progressContainer.style.display = 'none';
+                if (progressBar) progressBar.style.width = '0%';
+
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        // Save anexo URL to local data
+                        const anexoKey = dataKey.replace(/_\d{4}$/, '') + '_anexo_' + currentYear;
+                        currentData[anexoKey] = response.anexo_url;
+                        saveData();
+                        renderTable();
+                        alert('Anexo enviado com sucesso!');
+                    } else {
+                        alert('Erro ao enviar anexo: ' + response.message);
+                    }
+                } else {
+                    alert('Erro ao enviar anexo. Tente novamente.');
+                }
+            };
+
+            xhr.onerror = function() {
+                if (progressContainer) progressContainer.style.display = 'none';
+                if (progressBar) progressBar.style.width = '0%';
+                alert('Erro de conexão. Tente novamente.');
+            };
+
+            xhr.send(formData);
+        }
+
+        // Delete anexo PDF
+        function deleteAnexo(dataKey) {
+            if (!confirm('Tem certeza que deseja remover este anexo?')) return;
+
+            fetch('/dashboard/api/iso37120/delete_anexo/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    indicator_id: getIndicatorId(dataKey),
+                    year: currentYear
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove anexo from local data
+                    const anexoKey = dataKey.replace(/_\d{4}$/, '') + '_anexo_' + currentYear;
+                    delete currentData[anexoKey];
+                    saveData();
+                    renderTable();
+                    alert('Anexo removido com sucesso!');
+                } else {
+                    alert('Erro ao remover anexo: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao remover anexo. Tente novamente.');
+            });
+        }
+
+        // Get indicator ID from dataKey (placeholder - needs backend integration)
+        function getIndicatorId(dataKey) {
+            // This returns a pseudo-ID based on the dataKey
+            // In real implementation, this should map to actual database IDs
+            return dataKey;
         }
 
         // Filter by category

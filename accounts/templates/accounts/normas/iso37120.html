@@ -754,7 +754,7 @@
         .table-header {
             background: #513C9A;
             display: grid;
-            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr;
+            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr 1.5fr;
             gap: 1px;
             font-weight: 600;
             font-size: 14px;
@@ -773,7 +773,7 @@
 
         .table-row {
             display: grid;
-            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr;
+            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr 1.5fr;
             gap: 1px;
             background-color: #f8f9fa;
             border-bottom: 1px solid #eee;
@@ -853,6 +853,359 @@
 
         .source-link:hover {
             text-decoration: underline;
+        }
+
+        /* Anexo Cell Styles */
+        .anexo-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .anexo-upload-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .anexo-input {
+            display: none;
+        }
+
+        .anexo-btn {
+            background: white;
+            color: #513C9A;
+            border: 2px solid #513C9A;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .anexo-btn:hover {
+            background: #513C9A;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(81, 60, 154, 0.3);
+        }
+
+        .anexo-btn.has-file {
+            background: linear-gradient(135deg, #513C9A 0%, #6B4FB5 100%);
+            color: white;
+            border-color: #513C9A;
+        }
+
+        .anexo-link {
+            background: linear-gradient(135deg, #513C9A 0%, #6B4FB5 100%);
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .anexo-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(81, 60, 154, 0.3);
+            text-decoration: none;
+        }
+
+        .anexo-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .anexo-delete-btn {
+            background: white;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            padding: 6px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 11px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .anexo-delete-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .upload-progress {
+            width: 100%;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .upload-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #513C9A, #6B4FB5);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Custom Toast Notification */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 450px;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid #513C9A;
+        }
+
+        .toast.success {
+            border-left-color: #28a745;
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+        }
+
+        .toast.warning {
+            border-left-color: #ffc107;
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .toast.error .toast-icon {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .toast.warning .toast-icon {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+
+        .toast-close:hover {
+            color: #513C9A;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Custom Confirm Modal */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            z-index: 10001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .confirm-modal.show {
+            display: flex;
+        }
+
+        .confirm-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: scaleIn 0.2s ease;
+        }
+
+        .confirm-modal-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(81, 60, 154, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+        }
+
+        .confirm-modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .confirm-modal-message {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .confirm-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .confirm-modal-btn {
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .confirm-modal-btn.cancel {
+            background: white;
+            color: #666;
+            border-color: #ddd;
+        }
+
+        .confirm-modal-btn.cancel:hover {
+            background: #f8f9fa;
+            border-color: #ccc;
+        }
+
+        .confirm-modal-btn.confirm {
+            background: linear-gradient(135deg, #513C9A 0%, #6B4FB5 100%);
+            color: white;
+        }
+
+        .confirm-modal-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(81, 60, 154, 0.4);
+        }
+
+        .confirm-modal-btn.danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .confirm-modal-btn.danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         /* Edit Icon Styles */
@@ -1309,7 +1662,7 @@
             }
             
             .table-header, .table-row {
-                grid-template-columns: 2fr 0.5fr 1fr 0.8fr 1.5fr;
+                grid-template-columns: 2fr 0.5fr 1fr 0.8fr 1.5fr 1fr;
                 font-size: 12px;
             }
             
@@ -1633,6 +1986,7 @@
                             <div>Dado</div>
                             <div>Unidade</div>
                             <div>Fonte</div>
+                            <div>Anexo PDF</div>
                         </div>
                         <div class="table-body" id="table-body">
                             <!-- Table rows will be generated here -->
@@ -1675,7 +2029,23 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-icon" id="confirmModalIcon">🗑️</div>
+            <h3 class="confirm-modal-title" id="confirmModalTitle">Confirmar ação</h3>
+            <p class="confirm-modal-message" id="confirmModalMessage">Tem certeza que deseja continuar?</p>
+            <div class="confirm-modal-buttons">
+                <button class="confirm-modal-btn cancel" onclick="closeConfirmModal()">Cancelar</button>
+                <button class="confirm-modal-btn danger" id="confirmModalBtn" onclick="executeConfirmAction()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let radarChart = null;
         let modalCharts = [];
@@ -1683,6 +2053,85 @@
         // Tipo de usuário para controle de permissões
         const userType = '{{ user.user_type }}';
         const canEdit = userType === 'ADMIN' || userType === 'MANAGER';
+
+        // ========== Toast & Modal Functions ==========
+        let confirmCallback = null;
+
+        // Show toast notification
+        function showToast(message, type = 'success', title = null) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠'
+            };
+
+            const titles = {
+                success: title || 'Sucesso',
+                error: title || 'Erro',
+                warning: title || 'Atenção'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+
+            container.appendChild(toast);
+
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Show confirm modal
+        function showConfirmModal(title, message, callback, icon = '🗑️', buttonText = 'Confirmar', buttonClass = 'danger') {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmModalIcon').textContent = icon;
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalMessage').textContent = message;
+
+            const btn = document.getElementById('confirmModalBtn');
+            btn.textContent = buttonText;
+            btn.className = `confirm-modal-btn ${buttonClass}`;
+
+            confirmCallback = callback;
+            modal.classList.add('show');
+        }
+
+        // Close confirm modal
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('show');
+            confirmCallback = null;
+        }
+
+        // Execute confirm action
+        function executeConfirmAction() {
+            if (confirmCallback) {
+                confirmCallback();
+            }
+            closeConfirmModal();
+        }
+
+        // Close modal on outside click
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('confirmModal');
+            if (e.target === modal) {
+                closeConfirmModal();
+            }
+        });
+
+        // ========== End Toast & Modal Functions ==========
 
         // Mapeamento de direção de melhoria para cada indicador
         const improvementDirections = {
@@ -2552,8 +3001,33 @@
                                 </div>`
                             }
                         </div>
+                        <div class="table-cell anexo-cell">
+                            <div class="anexo-upload-container" id="anexo-container-${dataKey}">
+                                ${currentValue.anexo ?
+                                    `<div class="anexo-actions">
+                                        <a href="${currentValue.anexo}" target="_blank" class="anexo-link">
+                                            📄 Ver PDF
+                                        </a>
+                                        ${canEdit ? `<button class="anexo-delete-btn" onclick="deleteAnexo('${dataKey}')">
+                                            🗑️
+                                        </button>` : ''}
+                                    </div>` :
+                                    (canEdit ? `<input type="file"
+                                            id="anexo-input-${dataKey}"
+                                            class="anexo-input"
+                                            accept=".pdf"
+                                            onchange="uploadAnexo('${dataKey}', this)">
+                                    <button class="anexo-btn" onclick="document.getElementById('anexo-input-${dataKey}').click()">
+                                        📎 Anexar PDF
+                                    </button>` : '<span style="color: #999; font-size: 12px;">-</span>')
+                                }
+                                <div class="upload-progress" id="progress-${dataKey}">
+                                    <div class="upload-progress-bar" id="progress-bar-${dataKey}"></div>
+                                </div>
+                            </div>
+                        </div>
                     `;
-                    
+
                     tableBody.appendChild(row);
                 });
             });
@@ -2697,6 +3171,160 @@
             } catch (_) {
                 return false;
             }
+        }
+
+        // Upload anexo PDF
+        function uploadAnexo(dataKey, inputElement) {
+            const file = inputElement.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.name.toLowerCase().endsWith('.pdf')) {
+                showToast('Apenas arquivos PDF são permitidos', 'warning', 'Formato inválido');
+                inputElement.value = '';
+                return;
+            }
+
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('Arquivo muito grande. Máximo permitido: 10MB', 'warning', 'Arquivo grande');
+                inputElement.value = '';
+                return;
+            }
+
+            // Show progress bar
+            const progressContainer = document.getElementById(`progress-${dataKey}`);
+            const progressBar = document.getElementById(`progress-bar-${dataKey}`);
+            if (progressContainer) progressContainer.style.display = 'block';
+
+            // Parse dataKey to get indicator info
+            const keyParts = dataKey.split('_');
+            const categoryKey = keyParts[0];
+            const indicatorIndex = parseInt(keyParts[1]);
+            const year = keyParts[2];
+
+            const category = indicatorsData[categoryKey];
+            if (!category || !category.indicators[indicatorIndex]) {
+                showToast('Indicador não encontrado', 'error');
+                return;
+            }
+
+            const indicator = category.indicators[indicatorIndex];
+
+            // Create FormData
+            const formData = new FormData();
+            formData.append('anexo', file);
+            formData.append('indicator_id', indicator.name);
+            formData.append('year', year);
+            formData.append('categoria', category.name);
+            formData.append('nome_indicador', indicator.name);
+            formData.append('tipo', indicator.type);
+            formData.append('ods', indicator.ods);
+            formData.append('unidade', indicator.unit);
+            formData.append('cidade', selectedMunicipalityData ? selectedMunicipalityData.nome : 'Londrina');
+            formData.append('estado', selectedMunicipalityData ? selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla : 'PR');
+
+            // Upload via XMLHttpRequest for progress tracking
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/dashboard/api/iso37120/upload_anexo/', true);
+
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percent = (e.loaded / e.total) * 100;
+                    if (progressBar) progressBar.style.width = percent + '%';
+                }
+            };
+
+            xhr.onload = function() {
+                if (progressContainer) progressContainer.style.display = 'none';
+                if (progressBar) progressBar.style.width = '0%';
+
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        // Save anexo URL to local data
+                        if (!currentData[dataKey]) {
+                            currentData[dataKey] = { value: '', source: '' };
+                        }
+                        currentData[dataKey].anexo = response.anexo_url;
+                        saveData();
+                        renderTable();
+                        showToast('Anexo enviado com sucesso!', 'success', 'Upload concluído');
+                    } else {
+                        showToast(response.message, 'error', 'Erro no upload');
+                    }
+                } else {
+                    showToast('Erro ao enviar anexo. Tente novamente.', 'error');
+                }
+            };
+
+            xhr.onerror = function() {
+                if (progressContainer) progressContainer.style.display = 'none';
+                if (progressBar) progressBar.style.width = '0%';
+                showToast('Erro de conexão. Tente novamente.', 'error');
+            };
+
+            xhr.send(formData);
+        }
+
+        // Delete anexo PDF
+        function deleteAnexo(dataKey) {
+            showConfirmModal(
+                'Remover anexo',
+                'Tem certeza que deseja remover este anexo PDF? Esta ação não pode ser desfeita.',
+                () => executeDeleteAnexo(dataKey),
+                '🗑️',
+                'Remover',
+                'danger'
+            );
+        }
+
+        // Execute delete anexo after confirmation
+        function executeDeleteAnexo(dataKey) {
+            // Parse dataKey to get indicator info
+            const keyParts = dataKey.split('_');
+            const categoryKey = keyParts[0];
+            const indicatorIndex = parseInt(keyParts[1]);
+            const year = keyParts[2];
+
+            const category = indicatorsData[categoryKey];
+            if (!category || !category.indicators[indicatorIndex]) {
+                showToast('Indicador não encontrado', 'error');
+                return;
+            }
+
+            const indicator = category.indicators[indicatorIndex];
+
+            fetch('/dashboard/api/iso37120/delete_anexo/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome_indicador: indicator.name,
+                    year: year,
+                    cidade: selectedMunicipalityData ? selectedMunicipalityData.nome : 'Londrina',
+                    estado: selectedMunicipalityData ? selectedMunicipalityData.microrregiao.mesorregiao.UF.sigla : 'PR'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove anexo from local data
+                    if (currentData[dataKey]) {
+                        delete currentData[dataKey].anexo;
+                    }
+                    saveData();
+                    renderTable();
+                    showToast('Anexo removido com sucesso!', 'success');
+                } else {
+                    showToast(data.message, 'error', 'Erro ao remover');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Erro ao remover anexo. Tente novamente.', 'error');
+            });
         }
 
         // Filter by category

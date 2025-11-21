@@ -410,11 +410,40 @@ def get_iso37120_data(request):
         indicators = ISO37120Indicator.objects.filter(
             cidade=cidade,
             estado=estado
-        ).values()
+        )
+
+        # Build response with anexo URLs
+        data = []
+        for indicator in indicators:
+            indicator_data = {
+                'id': indicator.id,
+                'categoria': indicator.categoria,
+                'nome_indicador': indicator.nome_indicador,
+                'tipo': indicator.tipo,
+                'ods': indicator.ods,
+                'unidade': indicator.unidade,
+                'dado_2022': indicator.dado_2022,
+                'dado_2023': indicator.dado_2023,
+                'dado_2024': indicator.dado_2024,
+                'dado_2025': indicator.dado_2025,
+                'fonte_2022': indicator.fonte_2022,
+                'fonte_2023': indicator.fonte_2023,
+                'fonte_2024': indicator.fonte_2024,
+                'fonte_2025': indicator.fonte_2025,
+                'anexo_2022': indicator.anexo_2022.url if indicator.anexo_2022 else None,
+                'anexo_2023': indicator.anexo_2023.url if indicator.anexo_2023 else None,
+                'anexo_2024': indicator.anexo_2024.url if indicator.anexo_2024 else None,
+                'anexo_2025': indicator.anexo_2025.url if indicator.anexo_2025 else None,
+                'cidade': indicator.cidade,
+                'estado': indicator.estado,
+                'created_at': indicator.created_at.isoformat() if indicator.created_at else None,
+                'updated_at': indicator.updated_at.isoformat() if indicator.updated_at else None,
+            }
+            data.append(indicator_data)
 
         return JsonResponse({
             'success': True,
-            'data': list(indicators)
+            'data': data
         })
 
     except Exception as e:
@@ -440,6 +469,115 @@ def update_iso37120_field(request):
                 'success': True,
                 'message': 'Campo atualizado com sucesso'
             })
+
+        except ISO37120Indicator.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Indicador não encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+
+# API to upload PDF attachment for ISO37120 indicator
+@csrf_exempt
+@login_required
+@manager_required
+def upload_iso37120_anexo(request):
+    if request.method == 'POST':
+        try:
+            nome_indicador = request.POST.get('nome_indicador') or request.POST.get('indicator_id')
+            year = request.POST.get('year')
+            anexo_file = request.FILES.get('anexo')
+            categoria = request.POST.get('categoria', '')
+            tipo = request.POST.get('tipo', 'core')
+            ods = request.POST.get('ods', '')
+            unidade = request.POST.get('unidade', '')
+            cidade = request.POST.get('cidade', 'Londrina')
+            estado = request.POST.get('estado', 'PR')
+
+            if not nome_indicador or not year or not anexo_file:
+                return JsonResponse({'success': False, 'message': 'Parâmetros obrigatórios ausentes'})
+
+            # Validate file type
+            if not anexo_file.name.lower().endswith('.pdf'):
+                return JsonResponse({'success': False, 'message': 'Apenas arquivos PDF são permitidos'})
+
+            # Validate file size (max 10MB)
+            if anexo_file.size > 10 * 1024 * 1024:
+                return JsonResponse({'success': False, 'message': 'Arquivo muito grande. Máximo permitido: 10MB'})
+
+            # Get or create indicator by name
+            indicator, created = ISO37120Indicator.objects.get_or_create(
+                nome_indicador=nome_indicador,
+                cidade=cidade,
+                estado=estado,
+                defaults={
+                    'categoria': categoria,
+                    'tipo': tipo,
+                    'ods': ods,
+                    'unidade': unidade,
+                }
+            )
+
+            # Get the appropriate field name based on year
+            anexo_field = f'anexo_{year}'
+
+            # Delete old file if exists
+            old_file = getattr(indicator, anexo_field)
+            if old_file:
+                old_file.delete(save=False)
+
+            # Save new file
+            setattr(indicator, anexo_field, anexo_file)
+            indicator.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Anexo enviado com sucesso',
+                'anexo_url': getattr(indicator, anexo_field).url if getattr(indicator, anexo_field) else None
+            })
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+
+# API to delete PDF attachment for ISO37120 indicator
+@csrf_exempt
+@login_required
+@manager_required
+def delete_iso37120_anexo(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            nome_indicador = data.get('nome_indicador') or data.get('indicator_id')
+            year = data.get('year')
+            cidade = data.get('cidade', 'Londrina')
+            estado = data.get('estado', 'PR')
+
+            if not nome_indicador or not year:
+                return JsonResponse({'success': False, 'message': 'Parâmetros obrigatórios ausentes'})
+
+            indicator = ISO37120Indicator.objects.get(
+                nome_indicador=nome_indicador,
+                cidade=cidade,
+                estado=estado
+            )
+
+            # Get the appropriate field name based on year
+            anexo_field = f'anexo_{year}'
+
+            # Delete file if exists
+            old_file = getattr(indicator, anexo_field)
+            if old_file:
+                old_file.delete(save=False)
+                setattr(indicator, anexo_field, None)
+                indicator.save()
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Anexo removido com sucesso'
+                })
+            else:
+                return JsonResponse({'success': False, 'message': 'Nenhum anexo encontrado'})
 
         except ISO37120Indicator.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Indicador não encontrado'})

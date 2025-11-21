@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/scraping/', include('scraping.urls')),
 ]
 
-# Add this to serve static files during development
+# Add this to serve static and media files during development
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
