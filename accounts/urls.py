@@ -80,14 +80,20 @@ urlpatterns = [
     path('dashboard/api/iso37122/save/', views.save_iso37122_data, name='save_iso37122_data'),
     path('dashboard/api/iso37122/get/', views.get_iso37122_data, name='get_iso37122_data'),
     path('dashboard/api/iso37122/update_field/', views.update_iso37122_field, name='update_iso37122_field'),
+    path('dashboard/api/iso37122/upload_anexo/', views.upload_iso37122_anexo, name='upload_iso37122_anexo'),
+    path('dashboard/api/iso37122/delete_anexo/', views.delete_iso37122_anexo, name='delete_iso37122_anexo'),
 
     # APIs para ISO37123
     path('dashboard/api/iso37123/save/', views.save_iso37123_data, name='save_iso37123_data'),
     path('dashboard/api/iso37123/get/', views.get_iso37123_data, name='get_iso37123_data'),
     path('dashboard/api/iso37123/update_field/', views.update_iso37123_field, name='update_iso37123_field'),
+    path('dashboard/api/iso37123/upload_anexo/', views.upload_iso37123_anexo, name='upload_iso37123_anexo'),
+    path('dashboard/api/iso37123/delete_anexo/', views.delete_iso37123_anexo, name='delete_iso37123_anexo'),
 
     # APIs para ISO37125
     path('dashboard/api/iso37125/save/', views.save_iso37125_data, name='save_iso37125_data'),
     path('dashboard/api/iso37125/get/', views.get_iso37125_data, name='get_iso37125_data'),
     path('dashboard/api/iso37125/update_field/', views.update_iso37125_field, name='update_iso37125_field'),
+    path('dashboard/api/iso37125/upload_anexo/', views.upload_iso37125_anexo, name='upload_iso37125_anexo'),
+    path('dashboard/api/iso37125/delete_anexo/', views.delete_iso37125_anexo, name='delete_iso37125_anexo'),
 ]

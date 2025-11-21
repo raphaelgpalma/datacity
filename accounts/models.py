@@ -155,6 +155,12 @@ class ISO37122Indicator(models.Model):
     fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2025 = models.CharField(max_length=500, null=True, blank=True)
 
+    # Anexos PDF para diferentes anos
+    anexo_2022 = models.FileField(upload_to='iso37122/anexos/', null=True, blank=True)
+    anexo_2023 = models.FileField(upload_to='iso37122/anexos/', null=True, blank=True)
+    anexo_2024 = models.FileField(upload_to='iso37122/anexos/', null=True, blank=True)
+    anexo_2025 = models.FileField(upload_to='iso37122/anexos/', null=True, blank=True)
+
     # Cidade para permitir dados de múltiplas cidades
     cidade = models.CharField(max_length=100, default='Londrina')
     estado = models.CharField(max_length=50, default='PR')
@@ -194,6 +200,12 @@ class ISO37123Indicator(models.Model):
     fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2025 = models.CharField(max_length=500, null=True, blank=True)
 
+    # Anexos PDF para diferentes anos
+    anexo_2022 = models.FileField(upload_to='iso37123/anexos/', null=True, blank=True)
+    anexo_2023 = models.FileField(upload_to='iso37123/anexos/', null=True, blank=True)
+    anexo_2024 = models.FileField(upload_to='iso37123/anexos/', null=True, blank=True)
+    anexo_2025 = models.FileField(upload_to='iso37123/anexos/', null=True, blank=True)
+
     # Cidade para permitir dados de múltiplas cidades
     cidade = models.CharField(max_length=100, default='Londrina')
     estado = models.CharField(max_length=50, default='PR')
@@ -232,6 +244,12 @@ class ISO37125Indicator(models.Model):
     fonte_2023 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2024 = models.CharField(max_length=500, null=True, blank=True)
     fonte_2025 = models.CharField(max_length=500, null=True, blank=True)
+
+    # Anexos PDF para diferentes anos
+    anexo_2022 = models.FileField(upload_to='iso37125/anexos/', null=True, blank=True)
+    anexo_2023 = models.FileField(upload_to='iso37125/anexos/', null=True, blank=True)
+    anexo_2024 = models.FileField(upload_to='iso37125/anexos/', null=True, blank=True)
+    anexo_2025 = models.FileField(upload_to='iso37125/anexos/', null=True, blank=True)
 
     # Cidade para permitir dados de múltiplas cidades
     cidade = models.CharField(max_length=100, default='Londrina')

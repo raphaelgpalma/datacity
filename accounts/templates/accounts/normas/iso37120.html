@@ -754,7 +754,7 @@
         .table-header {
             background: #513C9A;
             display: grid;
-            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr 1.5fr;
+            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2.5fr;
             gap: 1px;
             font-weight: 600;
             font-size: 14px;
@@ -773,7 +773,7 @@
 
         .table-row {
             display: grid;
-            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2fr 1.5fr;
+            grid-template-columns: 3fr 0.8fr 1.2fr 1fr 2.5fr;
             gap: 1px;
             background-color: #f8f9fa;
             border-bottom: 1px solid #eee;
@@ -853,15 +853,6 @@
 
         .source-link:hover {
             text-decoration: underline;
-        }
-
-        /* Anexo Cell Styles */
-        .anexo-cell {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
-            justify-content: center;
         }
 
         .anexo-upload-container {
@@ -1662,7 +1653,7 @@
             }
             
             .table-header, .table-row {
-                grid-template-columns: 2fr 0.5fr 1fr 0.8fr 1.5fr 1fr;
+                grid-template-columns: 2fr 0.5fr 1fr 0.8fr 2fr;
                 font-size: 12px;
             }
             
@@ -1986,7 +1977,6 @@
                             <div>Dado</div>
                             <div>Unidade</div>
                             <div>Fonte</div>
-                            <div>Anexo PDF</div>
                         </div>
                         <div class="table-body" id="table-body">
                             <!-- Table rows will be generated here -->
@@ -2653,13 +2643,15 @@
                                 if (dbRecord) {
                                     currentData[dataKey] = {
                                         value: dbRecord[`dado_${year}`] || '',
-                                        source: dbRecord[`fonte_${year}`] || ''
+                                        source: dbRecord[`fonte_${year}`] || '',
+                                        anexo: dbRecord[`anexo_${year}`] || null
                                     };
                                 } else {
                                     // Initialize with empty values if no database record
                                     currentData[dataKey] = {
                                         value: '',
-                                        source: ''
+                                        source: '',
+                                        anexo: null
                                     };
                                 }
                             });
@@ -2674,7 +2666,8 @@
                                 const dataKey = `${categoryKey}_${index}_${year}`;
                                 currentData[dataKey] = {
                                     value: '',
-                                    source: ''
+                                    source: '',
+                                    anexo: null
                                 };
                             });
                         });
@@ -2700,11 +2693,12 @@
             Object.keys(indicatorsData).forEach(categoryKey => {
                 const category = indicatorsData[categoryKey];
                 category.indicators.forEach((indicator, index) => {
-                    [2022, 2023, 2024].forEach(year => {
+                    [2022, 2023, 2024, 2025].forEach(year => {
                         const dataKey = `${categoryKey}_${index}_${year}`;
                         currentData[dataKey] = {
                             value: '',
-                            source: ''
+                            source: '',
+                            anexo: null
                         };
                     });
                 });
@@ -3000,8 +2994,6 @@
                                     </button>` : ''}
                                 </div>`
                             }
-                        </div>
-                        <div class="table-cell anexo-cell">
                             <div class="anexo-upload-container" id="anexo-container-${dataKey}">
                                 ${currentValue.anexo ?
                                     `<div class="anexo-actions">
@@ -3019,7 +3011,7 @@
                                             onchange="uploadAnexo('${dataKey}', this)">
                                     <button class="anexo-btn" onclick="document.getElementById('anexo-input-${dataKey}').click()">
                                         📎 Anexar PDF
-                                    </button>` : '<span style="color: #999; font-size: 12px;">-</span>')
+                                    </button>` : '')
                                 }
                                 <div class="upload-progress" id="progress-${dataKey}">
                                     <div class="upload-progress-bar" id="progress-bar-${dataKey}"></div>
